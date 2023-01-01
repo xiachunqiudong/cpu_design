@@ -96,12 +96,12 @@ module id(
     wire rv64_and  = rv64_alu   & (fun3 == 3'b111) & (fun7 == 7'b00_000_00);
 
     // BRANCH INSTRUCTIONS
-    wire rv64_beq  = rv64_branch & (fun3 == 3'000);
-    wire rv64_bne  = rv64_branch & (fun3 == 3'001);
-    wire rv64_blt  = rv64_branch & (fun3 == 3'100);
-    wire rv64_bgt  = rv64_branch & (fun3 == 3'101);
-    wire rv64_bltu = rv64_branch & (fun3 == 3'110);
-    wire rv64_bgtu = rv64_branch & (fun3 == 3'111);
+    wire rv64_beq  = rv64_branch & (fun3 == 3'b000);
+    wire rv64_bne  = rv64_branch & (fun3 == 3'b001);
+    wire rv64_blt  = rv64_branch & (fun3 == 3'b100);
+    wire rv64_bgt  = rv64_branch & (fun3 == 3'b101);
+    wire rv64_bltu = rv64_branch & (fun3 == 3'b110);
+    wire rv64_bgtu = rv64_branch & (fun3 == 3'b111);
 
     // LOAD INSTRUCTIONS
     wire rv64_lb  = rv64_load & (fun3 == 3'b000);
