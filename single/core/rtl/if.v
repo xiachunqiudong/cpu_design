@@ -10,18 +10,23 @@ module if(
     output if_pc_misalign_o, // 取指地址不对齐
     output if_bus_err_o
 );
-
-    // 根据PC取指
-
-    // 生成下一周期的pc
     
-    // 普通指令
-    
+    // 1. 普通指令
+    // pc_next = pc + 4
+    // 2. jal
+    // pc_next = pc + imm
+    // 3. jalr
+    // pc_next = rs1 + imm
+    // 4. bxx
+    // pc_next = cnd ? pc + imm : pc + 4
+
+    // jalr rs1如何处理?
+
     wire jal;
     wire jalr;
     wire bxx;
     
-    wire bjp = jal | jalr | bxx;
+    wire bj = jal | jalr | bxx;
 
     wire prdt_taken;
 
@@ -29,11 +34,6 @@ module if(
     wire [`PC_WIDTH-1:0] bjp_pc_op2;
 
     
-
-
-    wire [`PC_WIDTH-1:0] pc_next_op1 = (bjp & prdt_taken);
-    wire [`PC_WIDTH-1:0] pc_next_op2;
-
     assign pc_next_o = pc_next_op1 + pc_next_op2;
 
 

@@ -12,14 +12,14 @@ module id(
     input              rf_rs1_rdata_i,
     input              rf_rs2_rdata_i,
     
+    // write back
     output             id_rd_en_o,
     output [4:0]       id_rd_idx_o,
 
-    output id_branch,
-    output id_jal,
-    output id_jalr,
+    // opcode info
+    output [`OP_INFO_WIDTH-1:0] id_opcode_info_o,
 
-    // to ex or if
+    // to ex
     output [`XLEN-1:0] id_rs1_rdata_o,
     output [`XLEN-1:0] id_rs2_rdata_o,
     output [`XLEN-1:0] id_imm_o,
@@ -49,51 +49,51 @@ module id(
     
     // opcode
     // reg-imm
-    wire rv64_op_imm   = (opcode == 7'b00_100_11);
-    wire rv64_op_imm_w = (opcode == 7'b00_110_11);
+    wire rv64_alu_imm   = (opcode == 7'b00_100_11);
+    wire rv64_alu_imm_w = (opcode == 7'b00_110_11);
     // reg-reg
-    wire rv64_op       = (opcode == 7'b01_100_11);
-    wire rv64_op_w     = (opcode == 7'b01_110_11);
-    wire rv64_branch   = (opcode == 7'b11_000_11);
-    wire rv64_jal      = (opcode == 7'b11_011_11);
-    wire rv64_jalr     = (opcode == 7'b11_001_11);
-    wire rv64_load     = (opcode == 7'b00_000_11);
-    wire rv64_store    = (opcode == 7'b01_000_11);
-    wire rv64_lui      = (opcode == 7'b01_101_11);
-    wire rv64_auipc    = (opcode == 7'b00_101_11);
-    wire rv64_system   = (opcode == 7'b11_100_11);
+    wire rv64_alu       = (opcode == 7'b01_100_11);
+    wire rv64_alu_w     = (opcode == 7'b01_110_11);
+    wire rv64_branch    = (opcode == 7'b11_000_11);
+    wire rv64_jal       = (opcode == 7'b11_011_11);
+    wire rv64_jalr      = (opcode == 7'b11_001_11);
+    wire rv64_load      = (opcode == 7'b00_000_11);
+    wire rv64_store     = (opcode == 7'b01_000_11);
+    wire rv64_lui       = (opcode == 7'b01_101_11);
+    wire rv64_auipc     = (opcode == 7'b00_101_11);
+    wire rv64_system    = (opcode == 7'b11_100_11);
 
     // ALU OP
     // 1. reg-imm
-    wire rv64_addi  = rv64_op_imm   & (fun3 == 3'b000);
-    wire rv64_addiw = rv64_op_imm_w & (fun3 == 3'b000);
-    wire rv64_slli  = rv64_op_imm   & (fun3 == 3'b001) & (fun7 == 7'b00_000_00);
-    wire rv64_slliw = rv64_op_imm_w & (fun3 == 3'b001) & (fun7 == 7'b00_000_00);
-    wire rv64_slti  = rv64_op_imm   & (fun3 == 3'b010);
-    wire rv64_sltui = rv64_op_imm   & (fun3 == 3'b011);
-    wire rv64_xori  = rv64_op_imm   & (fun3 == 3'b100);
-    wire rv64_srli  = rv64_op_imm   & (fun3 == 3'b101) & (fun7 == 7'b00_000_00);
-    wire rv64_srliw = rv64_op_imm_w & (fun3 == 3'b101) & (fun7 == 7'b00_000_00);
-    wire rv64_srai  = rv64_op_imm   & (fun3 == 3'b101) & (fun7 == 7'b01_000_00);
-    wire rv64_sraiw = rv64_op_imm_w & (fun3 == 3'b101) & (fun7 == 7'b01_000_00);
-    wire rv64_ori   = rv64_op_imm   & (fun3 == 3'b110);
-    wire rv64_andi  = rv64_op_imm   & (fun3 == 3'b111);
+    wire rv64_addi  = rv64_alu_imm   & (fun3 == 3'b000);
+    wire rv64_addiw = rv64_alu_imm_w & (fun3 == 3'b000);
+    wire rv64_slli  = rv64_alu_imm   & (fun3 == 3'b001) & (fun7 == 7'b00_000_00);
+    wire rv64_slliw = rv64_alu_imm_w & (fun3 == 3'b001) & (fun7 == 7'b00_000_00);
+    wire rv64_slti  = rv64_alu_imm   & (fun3 == 3'b010);
+    wire rv64_sltui = rv64_alu_imm   & (fun3 == 3'b011);
+    wire rv64_xori  = rv64_alu_imm   & (fun3 == 3'b100);
+    wire rv64_srli  = rv64_alu_imm   & (fun3 == 3'b101) & (fun7 == 7'b00_000_00);
+    wire rv64_srliw = rv64_alu_imm_w & (fun3 == 3'b101) & (fun7 == 7'b00_000_00);
+    wire rv64_srai  = rv64_alu_imm   & (fun3 == 3'b101) & (fun7 == 7'b01_000_00);
+    wire rv64_sraiw = rv64_alu_imm_w & (fun3 == 3'b101) & (fun7 == 7'b01_000_00);
+    wire rv64_ori   = rv64_alu_imm   & (fun3 == 3'b110);
+    wire rv64_andi  = rv64_alu_imm   & (fun3 == 3'b111);
     // 2. reg-reg
-    wire rv64_add  = rv64_op   & (fun3 == 3'b000) & (fun7 == 7'b00_000_00);
-    wire rv64_addw = rv64_op_w & (fun3 == 3'b000) & (fun7 == 7'b00_000_00);
-    wire rv64_sub  = rv64_op   & (fun3 == 3'b000) & (fun7 == 7'b01_000_00);
-    wire rv64_subw = rv64_op_w & (fun3 == 3'b000) & (fun7 == 7'b01_000_00);
-    wire rv64_sll  = rv64_op   & (fun3 == 3'b001) & (fun7 == 7'b00_000_00);
-    wire rv64_sllw = rv64_op_w & (fun3 == 3'b001) & (fun7 == 7'b00_000_00);
-    wire rv64_slt  = rv64_op   & (fun3 == 3'b010) & (fun7 == 7'b00_000_00);
-    wire rv64_sltu = rv64_op   & (fun3 == 3'b011) & (fun7 == 7'b00_000_00);
-    wire rv64_xor  = rv64_op   & (fun3 == 3'b100) & (fun7 == 7'b00_000_00);
-    wire rv64_srl  = rv64_op   & (fun3 == 3'b101) & (fun7 == 7'b00_000_00);
-    wire rv64_srlw = rv64_op_w & (fun3 == 3'b101) & (fun7 == 7'b00_000_00);
-    wire rv64_sra  = rv64_op   & (fun3 == 3'b101) & (fun7 == 7'b01_000_00);
-    wire rv64_sraw = rv64_op_w & (fun3 == 3'b101) & (fun7 == 7'b01_000_00);
-    wire rv64_or   = rv64_op   & (fun3 == 3'b110) & (fun7 == 7'b00_000_00);
-    wire rv64_and  = rv64_op   & (fun3 == 3'b111) & (fun7 == 7'b00_000_00);
+    wire rv64_add  = rv64_alu   & (fun3 == 3'b000) & (fun7 == 7'b00_000_00);
+    wire rv64_addw = rv64_alu_w & (fun3 == 3'b000) & (fun7 == 7'b00_000_00);
+    wire rv64_sub  = rv64_alu   & (fun3 == 3'b000) & (fun7 == 7'b01_000_00);
+    wire rv64_subw = rv64_alu_w & (fun3 == 3'b000) & (fun7 == 7'b01_000_00);
+    wire rv64_sll  = rv64_alu   & (fun3 == 3'b001) & (fun7 == 7'b00_000_00);
+    wire rv64_sllw = rv64_alu_w & (fun3 == 3'b001) & (fun7 == 7'b00_000_00);
+    wire rv64_slt  = rv64_alu   & (fun3 == 3'b010) & (fun7 == 7'b00_000_00);
+    wire rv64_sltu = rv64_alu   & (fun3 == 3'b011) & (fun7 == 7'b00_000_00);
+    wire rv64_xor  = rv64_alu   & (fun3 == 3'b100) & (fun7 == 7'b00_000_00);
+    wire rv64_srl  = rv64_alu   & (fun3 == 3'b101) & (fun7 == 7'b00_000_00);
+    wire rv64_srlw = rv64_alu_w & (fun3 == 3'b101) & (fun7 == 7'b00_000_00);
+    wire rv64_sra  = rv64_alu   & (fun3 == 3'b101) & (fun7 == 7'b01_000_00);
+    wire rv64_sraw = rv64_alu_w & (fun3 == 3'b101) & (fun7 == 7'b01_000_00);
+    wire rv64_or   = rv64_alu   & (fun3 == 3'b110) & (fun7 == 7'b00_000_00);
+    wire rv64_and  = rv64_alu   & (fun3 == 3'b111) & (fun7 == 7'b00_000_00);
 
     // BRANCH INSTRUCTIONS
     wire rv64_beq  = rv64_branch & (fun3 == 3'000);
@@ -132,6 +132,22 @@ module id(
     wire rv64_csrrsi = rv64_system & (fun3 == 3'b110);
     wire rv64_csrrci = rv64_system & (fun3 == 3'b111);
 
+    // OP INFO
+    assign id_opcode_info_o = {
+                              rv64_alu_imm,
+                              rv64_alu_imm_w,
+                              rv64_alu,
+                              rv64_alu_w,
+                              rv64_branch,
+                              rv64_jal,
+                              rv64_jalr,
+                              rv64_load,
+                              rv64_store,
+                              rv64_lui,
+                              rv64_auipc,
+                              rv64_system
+                              };
+
 //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
 //  rv64_need_rs1 rv64_need_rs2
 //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
@@ -147,17 +163,17 @@ module id(
                        & (~rv64_ecall)  & (~rv64_ebreak);
 
     // RV64I需要rs2的有
-    // 1. rv64_op
+    // 1. rv64_alu
     // 2. branch
     // 3. store
-    wire rv64_need_rs2 = (rv64_op | rv64_op_w | rv64_branch | rv64_store);
+    wire rv64_need_rs2 = (rv64_alu | rv64_alu_w | rv64_branch | rv64_store);
 
     // RV64I不需要rd的有
     // 1. ecall/ebreak
     // 2. fence/fence_i
     // 3. branch
     // 4. store
-    wire rv32_need_rd = (~rv64_ecall)  & (~rv64_ebreak) 
+    wire rv64_need_rd = (~rv64_ecall)  & (~rv64_ebreak) 
                       & (~rv64_branch) & (~rv64_store);
 
     // imm解析
@@ -169,7 +185,7 @@ module id(
     wire [`XLEN-1:0] rv64_u_imm = { {32{instr_i[31]}}, instr_i[31:12], 12'b0 };
 
     // imm选择
-    wire rv64_imm_sel_i = rv64_op_imm | rv64_op_imm_w | rv64_load | rv64_jalr;
+    wire rv64_imm_sel_i = rv64_alu_imm | rv64_alu_imm_w | rv64_load | rv64_jalr;
     wire rv64_imm_sel_s = rv64_store;
     wire rv64_imm_sel_b = rv64_branch;
     wire rv64_imm_sel_j = rv64_jal;
