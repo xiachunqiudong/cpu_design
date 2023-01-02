@@ -1,3 +1,10 @@
 include ../../../rule.mk
 
-obj = id
+obj = cpu
+
+
+.PHONY: git
+git:
+	git add .
+	git commit -m "2023/1/2"
+	git push

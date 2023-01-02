@@ -176,6 +176,12 @@ module id(
     wire rv64_need_rd = (~rv64_ecall)  & (~rv64_ebreak) 
                       & (~rv64_branch) & (~rv64_store);
 
+
+    // rs1_en rs2_en rd_en
+    assign id_rs1_en_o = rv64_need_rs1;
+    assign id_rs2_en_o = rv64_need_rs2;
+    assign id_rd_en_o  = rv64_need_rd;
+
     // imm解析
     // 所有立即数都是有符号数 需要进行符号扩展至64位
     wire [`XLEN-1:0] rv64_i_imm = { {52{instr_i[31]}}, instr_i[31:20] };
@@ -196,6 +202,8 @@ module id(
                               | ({`XLEN{rv64_imm_sel_b}} & rv64_b_imm)
                               | ({`XLEN{rv64_imm_sel_j}} & rv64_j_imm)
                               | ({`XLEN{rv64_imm_sel_u}} & rv64_u_imm);
+
+    assign id_imm_o = rv64_i_imm;
 
 
 endmodule

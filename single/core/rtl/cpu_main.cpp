@@ -1,5 +1,5 @@
 #include "verilated_vcd_c.h"
-#include "Vid.h"  
+#include "Vcpu.h"  
 #include "verilated.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -9,12 +9,6 @@
 
 using namespace std;
 
-int instr_arr[4] = {
-    0x00238393,
-    0x00130313,
-    0x007302B3,
-    0x00552423
-};
 
 vluint64_t main_time = 0;
 
@@ -27,29 +21,30 @@ int main(int argc, char** argv, char** env) {
 
     VerilatedContext* contextp = new VerilatedContext;
     contextp->commandArgs(argc, argv);
-    Vid* id = new Vid{contextp};
+    Vcpu* cpu = new Vcpu{contextp};
 
     Verilated::traceEverOn(true);
     VerilatedVcdC* tfp = new VerilatedVcdC;
-    id->trace(tfp, 0);
+    cpu->trace(tfp, 0);
     tfp->open("wave.vcd");
 
-    int index = 0;
-    int cnt = 0;
+    int clk = 1;
+    int rst = 0;
     while (main_time < 20 && !contextp->gotFinish()) {
         
-        id->eval();
-        id->instr_i = instr_arr[index % 4];
+        cpu->eval();
+        cpu->clk = clk;
+        cpu->rst = rst;
         
-        //contextp->timeInc(1);
+        // clk翻转
+        clk = 1 - clk;
+
         tfp->dump(main_time);
         main_time++;
-        if(main_time % 2 == 0) {
-            index++;
-        }
+
     }
 
-    delete id;
+    delete cpu;
     tfp->close();	
     delete contextp;
     return 0;
