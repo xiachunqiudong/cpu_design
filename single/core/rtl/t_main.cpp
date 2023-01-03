@@ -1,5 +1,5 @@
 #include "verilated_vcd_c.h"
-#include "Vcpu.h"  
+#include "Vt.h"  
 #include "verilated.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -21,25 +21,20 @@ int main(int argc, char** argv, char** env) {
 
     VerilatedContext* contextp = new VerilatedContext;
     contextp->commandArgs(argc, argv);
-    Vcpu* cpu = new Vcpu{contextp};
+    Vt* t = new Vt{contextp};
 
     Verilated::traceEverOn(true);
     VerilatedVcdC* tfp = new VerilatedVcdC;
-    cpu->trace(tfp, 0);
+    t->trace(tfp, 0);
     tfp->open("wave.vcd");
 
     int clk = 0;
     int reset = 1;
     while (main_time < 20 && !contextp->gotFinish()) {
-        
-        if(main_time > 1) {
-            reset = 0;    
-        }
 
-        cpu->clk = clk;
-        cpu->reset = reset;
+        t->clk = clk;
 
-        cpu->eval();
+        t->eval();
 
         
         // clk翻转
@@ -50,7 +45,7 @@ int main(int argc, char** argv, char** env) {
 
     }
 
-    delete cpu;
+    delete t;
     tfp->close();	
     delete contextp;
     return 0;

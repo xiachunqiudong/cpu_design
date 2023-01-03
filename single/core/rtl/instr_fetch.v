@@ -6,15 +6,22 @@ module instr_fetch(
     
     output [`INSTR_WIDTH-1:0] if_instr_o,
 
+    // to reffile
+    output                    if_jalr_rs1_en_o,
+    output [4:0]              if_jalr_rs1_idx_o,
+    // from regfile
+    input  [`XLEN-1:0]        jalr_rs1_rdata_i,
+
     // 取指异常
-    output if_pc_misalign_o, // 取指地址不对齐
-    output if_bus_err_o
+    output                    if_pc_misalign_o, // 取指地址不对齐
+    output                    if_bus_err_o      
 );
     
 //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
 // 从指令内存中取指令
 //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
     
+    // if x bus
     if_bus if_bus_u(
         .pc_i                 ( pc_i             ),
         .if_bus_instr_o       ( if_instr_o       ),
@@ -37,19 +44,40 @@ module instr_fetch(
 
     // jalr rs1如何处理?
 
-    wire jal;
-    wire jalr;
-    wire bxx;
+    wire             mini_dec_jal;
+    wire             mini_dec_jalr;
+    wire             mini_dec_branch;
+    wire [`XLEN-1:0] mini_dec_imm;
+
+    // 简单译码
+    if_mini_dec if_mini_dec_u(
+        .instr_i                 ( if_instr_o        ),
+        .mini_dec_jal_o          ( mini_dec_jal      ),
+        .mini_dec_jalr_o         ( mini_dec_jalr     ),
+        .mini_dec_branch_o       ( mini_dec_branch   ),
+        .mini_dec_jalr_rs1_idx_o ( if_jalr_rs1_idx_o ),
+        .mini_dec_imm_o          ( mini_dec_imm      )
+    );
+
+    assign if_jalr_rs1_en_o = mini_dec_jalr;
+
+    wire bj = mini_dec_branch | mini_dec_jal | mini_dec_jalr;
+
     
-    wire bj = jal | jalr | bxx;
+    // jal & branch pc_next = pc + imm   -> PC相对跳转
+    // jalr         pc_next = rs1 + imm  -> 绝对跳转
+    wire [`PC_WIDTH-1:0] bj_pc_op1 = (mini_dec_jal | mini_dec_branch) ? pc_i :
+                                      mini_dec_jalr                   ? jalr_rs1_rdata_i
+                                                                      : 0;
 
-    wire prdt_taken;
+    wire [`PC_WIDTH-1:0] bj_pc_op2 = mini_dec_imm;
 
-    wire [`PC_WIDTH-1:0] bj_pc_op1;
-    wire [`PC_WIDTH-1:0] bj_pc_op2;
+    // 跳转:   pc_next = bj_pc_op1 + bj_pc_op2
+    // 不跳转: pc_next = pc + 4
+    wire [`PC_WIDTH-1:0] pc_add_op1 = bj ? bj_pc_op1 : pc_i;
+    wire [`PC_WIDTH-1:0] pc_add_op2 = bj ? bj_pc_op2 : 4;
 
-
-    //assign if_pc_next_o = pc_next_op1 + pc_next_op2;
+    assign if_pc_next_o = pc_add_op1 + pc_add_op2;
 
 
 endmodule

@@ -7,7 +7,7 @@ module pc_reg(
     output [`PC_WIDTH-1:0] IF_pc_o
 );
 
-    wire ena;
+    wire ena = 1'b1;
     
     dff #(.DATA_WIDTH(`PC_WIDTH), .RESET_VAL(0)) pc_dff (
         .clk(clk),
