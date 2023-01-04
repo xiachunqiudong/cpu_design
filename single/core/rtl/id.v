@@ -150,24 +150,18 @@ module id(
                                rv64_auipc    ,
                                rv64_system
                             };
-
     // ALU INFO
     assign id_alu_info_o = {
-                            (rv64_add  | rv64_addi) ,
-                            (rv64_addw | rv64_addiw), 
-                             rv64_sub               ,
-                             rv64_subw              ,
-                            (rv64_sll  |  rv64_slli),
-                            (rv64_sllw | rv64_slliw),
-                            (rv64_slt  | rv64_slti) ,
-                            (rv64_sltu | rv64_sltui),
-                            (rv64_xor  | rv64_xori) ,
-                            (rv64_srl  | rv64_srli) ,
-                            (rv64_srlw | rv64_srliw),
-                            (rv64_sra  | rv64_srai) ,
-                            (rv64_sraw | rv64_sraiw),
-                            (rv64_or   | rv64_ori)  ,
-                            (rv64_and  | rv64_andi)
+                            (rv64_add  | rv64_addi | rv64_addw | rv64_addiw),  // 9
+                            (rv64_sub  | rv64_subw),                            // 8
+                            (rv64_sll  | rv64_slli | rv64_sllw | rv64_slliw),   // 7
+                            (rv64_slt  | rv64_slti),                            // 6
+                            (rv64_sltu | rv64_sltui),                           // 5
+                            (rv64_xor  | rv64_xori),                            // 4
+                            (rv64_srl  | rv64_srli | rv64_srlw | rv64_srliw),   // 3
+                            (rv64_sra  | rv64_srai | rv64_sraw | rv64_sraiw),   // 2
+                            (rv64_or   | rv64_ori),                             // 1
+                            (rv64_and  | rv64_andi)                             // 0
                         };
     // BRANCH INFO
     assign id_branch_info_o = {

@@ -22,19 +22,14 @@
 // ALU INFO
 `define ALU_INFO_WIDTH 15
 
-`define ALU_ADD   14
-`define ALU_ADD_W 13
-`define ALU_SUB   12
-`define ALU_SUB_W 11
-`define ALU_SLL   10
-`define ALU_SLLU  9
-`define ALU_SLT   8
-`define ALU_SLTU  7
-`define ALU_XOR   6
-`define ALU_SRL   5
-`define ALU_SRL_W 4
-`define ALU_SRA   3
-`define ALU_SRA_W 2
+`define ALU_ADD   9
+`define ALU_SUB   8
+`define ALU_SLL   7
+`define ALU_SLT   6
+`define ALU_SLTU  5
+`define ALU_XOR   4
+`define ALU_SRL   3
+`define ALU_SRA   2
 `define ALU_OR    1
 `define ALU_AND   0
 
@@ -72,7 +67,6 @@
 `define CSR_CSRWI 2
 `define CSR_CSRSI 1
 `define CSR_CSRCI 0
-
 
 // REGFILE
 `define REG_X0 0
