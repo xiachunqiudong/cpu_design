@@ -66,7 +66,7 @@
 // SYSTEM INFO
 `define CSR_INFO_WIDTH 6
 
-`define CSR_CSRW  6
+`define CSR_CSRW  5
 `define CSR_CSRS  4
 `define CSR_CSRC  3
 `define CSR_CSRWI 2

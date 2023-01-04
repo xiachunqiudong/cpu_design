@@ -208,14 +208,13 @@ module id(
     assign id_mret_o   = rv64_mret;
 
 //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
-// 源寄存器, 目的寄存器解析 id_rs1_en id_rs2_en
+// 源寄存器, 目的寄存器解析 id_rs1_en id_rs2_en id_rd_en
 //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
     // RV64I不需要rs1的有:
     // 1. lui/auipc
     // 2. jal
     // 3. csrrwi/csrrsi/csrrci
     // 4. ecall/ebreak/mret
-    // 5. fence/fence_i
     wire rv64_need_rs1 = (~rv64_lui)    & (~rv64_auipc)  & (~rv64_jal)
                        & (~rv64_csrrwi) & (~rv64_csrrsi) & (~rv64_csrrci)
                        & (~rv64_ecall)  & (~rv64_ebreak) & (~rv64_mret);
@@ -231,7 +230,7 @@ module id(
     // 2. fence/fence_i
     // 3. branch
     // 4. store
-    wire rv64_need_rd = (~rv64_ecall)  & (~rv64_ebreak) 
+    wire rv64_need_rd = (~rv64_ecall)  & (~rv64_ebreak) & (~rv64_mret)
                       & (~rv64_branch) & (~rv64_store);
 
 
