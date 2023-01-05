@@ -63,6 +63,14 @@ module cpu(
     wire id_mret;
 
 //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
+// EX WIRES
+//xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
+    wire [`XLEN-1:0] ex_alu_rd_wdata;
+    wire [`XLEN-1:0] ex_agu_mem_addr;
+    wire             ex_branch_jump;
+
+
+//xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
 // PC REG
 //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
     pc_reg pc_reg_u(
@@ -164,6 +172,23 @@ module cpu(
 //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
 // EXECUTION
 //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
+
+    ex ex_u(
+        .opcode_info_i     ( id_opcode_info  ),
+        .alu_info_i        ( id_alu_info     ),
+        .branch_info_i     ( id_branch_info  ),
+        .ld_st_info_i      ( id_ld_st_info   ),
+        .csr_info_i        ( id_csr_info     ),
+        
+        .pc_i              ( IF_pc           ),
+        .rs1_rdata_i       ( id_rs1_rdata    ),
+        .rs2_rdata_i       ( id_rs2_rdata    ),
+        .imm_i             ( id_imm          ),
+        
+        .ex_alu_rd_wdata_o ( ex_alu_rd_wdata ),
+        .ex_agu_mem_addr_o ( ex_agu_mem_addr ),
+        .ex_branch_jump_o  ( ex_branch_jump  )
+    );
 
 //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
 // MEMORY

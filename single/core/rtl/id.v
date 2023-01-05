@@ -137,22 +137,22 @@ module id(
 
     // OP INFO
     assign id_opcode_info_o = {
-                               rv64_alu_imm  ,
-                               rv64_alu_imm_w,
-                               rv64_alu      ,
-                               rv64_alu_w    ,
-                               rv64_branch   ,
-                               rv64_jal      ,
-                               rv64_jalr     ,
-                               rv64_load     ,
-                               rv64_store    ,
-                               rv64_lui      ,
-                               rv64_auipc    ,
-                               rv64_system
+                               rv64_alu_imm  , // 11
+                               rv64_alu_imm_w, // 10
+                               rv64_alu      , // 9
+                               rv64_alu_w    , // 8
+                               rv64_branch   , // 7
+                               rv64_jal      , // 6
+                               rv64_jalr     , // 5
+                               rv64_load     , // 4
+                               rv64_store    , // 3
+                               rv64_lui      , // 2
+                               rv64_auipc    , // 1
+                               rv64_system     // 0
                             };
     // ALU INFO
     assign id_alu_info_o = {
-                            (rv64_add  | rv64_addi | rv64_addw | rv64_addiw),  // 9
+                            (rv64_add  | rv64_addi | rv64_addw | rv64_addiw),   // 9
                             (rv64_sub  | rv64_subw),                            // 8
                             (rv64_sll  | rv64_slli | rv64_sllw | rv64_slliw),   // 7
                             (rv64_slt  | rv64_slti),                            // 6
@@ -165,35 +165,35 @@ module id(
                         };
     // BRANCH INFO
     assign id_branch_info_o = {
-                               rv64_beq ,
-                               rv64_bne ,
-                               rv64_blt ,
-                               rv64_bge ,
-                               rv64_bltu,
-                               rv64_bgeu
+                               rv64_beq , // 5
+                               rv64_bne , // 4
+                               rv64_blt , // 3
+                               rv64_bge , // 2
+                               rv64_bltu, // 1
+                               rv64_bgeu  // 0
                             };
     // LOAD STORE INFO
     assign id_ld_st_info_o = {
-                              rv64_lb ,
-                              rv64_lh ,
-                              rv64_lw ,
-                              rv64_ld ,
-                              rv64_lbu,
-                              rv64_lhu,
-                              rv64_lwu,
-                              rv64_sb ,
-                              rv64_sh ,
-                              rv64_sw ,
-                              rv64_sd
+                              rv64_lb , // 10
+                              rv64_lh , // 9
+                              rv64_lw , // 8
+                              rv64_ld , // 7
+                              rv64_lbu, // 6
+                              rv64_lhu, // 5
+                              rv64_lwu, // 4
+                              rv64_sb , // 3
+                              rv64_sh , // 2
+                              rv64_sw , // 1
+                              rv64_sd   // 0
                             };
     // CSR INFO
     assign id_csr_info_o = {
-                            rv64_csrrw ,
-                            rv64_csrrs ,
-                            rv64_csrrc ,
-                            rv64_csrrwi,
-                            rv64_csrrsi,
-                            rv64_csrrci
+                            rv64_csrrw , // 5
+                            rv64_csrrs , // 4
+                            rv64_csrrc , // 3
+                            rv64_csrrwi, // 2
+                            rv64_csrrsi, // 1
+                            rv64_csrrci  // 0
                         };
 
     // excp

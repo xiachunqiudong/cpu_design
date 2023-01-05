@@ -20,7 +20,7 @@
 `define OP_SYSTEM     0
 
 // ALU INFO
-`define ALU_INFO_WIDTH 15
+`define ALU_INFO_WIDTH 10
 
 `define ALU_ADD   9
 `define ALU_SUB   8
