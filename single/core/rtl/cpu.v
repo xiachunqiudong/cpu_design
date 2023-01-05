@@ -71,6 +71,14 @@ module cpu(
 
 
 //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
+// WB WIRES
+//xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
+    wire             wb_rd_en;
+    wire [4:0]       wb_rd_idx;
+    wire [`XLEN-1:0] wb_rd_wdata;
+
+
+//xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
 // PC REG
 //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
     pc_reg pc_reg_u(
@@ -147,9 +155,9 @@ module cpu(
         
         // wb x regfile
         // from wb
-        .rd_en_i                (                        ),
-        .rd_idx_i               (                        ),
-        .rd_wdata_i             (                        ),
+        .rd_en_i                ( wb_rd_en               ),
+        .rd_idx_i               ( wb_rd_idx              ),
+        .rd_wdata_i             ( wb_rd_wdata            ),
         
         // id x regfile
         // from id
@@ -197,5 +205,19 @@ module cpu(
 //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
 // WRITE BACK
 //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
+
+
+    wb u_wb(
+        .rd_en_i        ( id_rd_en        ),
+        .rd_idx_i       ( id_rd_idx       ),
+        
+        .alu_rd_wdata_i ( ex_alu_rd_wdata ),
+        .mem_rd_wdata_i (                 ),
+        .csr_rd_wdata_i (                 ),
+        
+        .wb_rd_en_o     ( wb_rd_en        ),
+        .wb_rd_idx_o    ( wb_rd_idx       ),
+        .wb_rd_wdata_o  ( wb_rd_wdata     )
+    );
 
 endmodule

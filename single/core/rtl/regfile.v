@@ -52,8 +52,8 @@ module regfile(
         if(~rs1_en_i | (rs1_idx_i == `REG_X0)) begin
             rf_rs1_rdata_o = `XLEN'b0;
         // 寄存器内部前递
-        end else if(rs1_idx_i == rd_idx_i) begin
-            rf_rs1_rdata_o = rd_wdata_i;
+        //end else if(rs1_idx_i == rd_idx_i) begin
+        //    rf_rs1_rdata_o = rd_wdata_i;
         end else begin
             rf_rs1_rdata_o = reg_data[rs1_idx_i];
         end
@@ -65,8 +65,8 @@ module regfile(
         if(~rs2_en_i | (rs2_idx_i == `REG_X0)) begin
             rf_rs2_rdata_o = `XLEN'b0;
         // 寄存器内部前递
-        end else if(rs2_idx_i == rd_idx_i) begin
-            rf_rs2_rdata_o = rd_wdata_i;
+        //end else if(rs2_idx_i == rd_idx_i) begin
+        //    rf_rs2_rdata_o = rd_wdata_i;
         end else begin
             rf_rs2_rdata_o = reg_data[rs2_idx_i];
         end
@@ -77,10 +77,9 @@ module regfile(
     always @(*) begin: jalr_rs1_read
         if(~jalr_rs1_en_i | (jalr_rs1_idx_i == `REG_X0)) begin
             rf_jalr_rs1_rdata_o = `XLEN'b0;
-        end
         // 寄存器内部前递
-        else if(jalr_rs1_idx_i == rd_idx_i) begin
-            rf_jalr_rs1_rdata_o = rd_wdata_i;
+        //end else if(jalr_rs1_idx_i == rd_idx_i) begin
+          //  rf_jalr_rs1_rdata_o = rd_wdata_i;
         end else begin
             rf_jalr_rs1_rdata_o = reg_data[jalr_rs1_idx_i];
         end

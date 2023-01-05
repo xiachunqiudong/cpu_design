@@ -233,6 +233,9 @@ module id(
     assign id_rs2_en_o = rv64_need_rs2;
     assign id_rd_en_o  = rv64_need_rd;
 
+    assign id_rs1_rdata_o = rf_rs1_rdata_i;
+    assign id_rs2_rdata_o = rf_rs2_rdata_i;
+
 //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
 //  立即数解析
 //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
