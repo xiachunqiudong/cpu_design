@@ -61,12 +61,12 @@
 // SYSTEM INFO
 `define CSR_INFO_WIDTH 6
 
-`define CSR_CSRW  5
-`define CSR_CSRS  4
-`define CSR_CSRC  3
-`define CSR_CSRWI 2
-`define CSR_CSRSI 1
-`define CSR_CSRCI 0
+`define CSR_CSRRW  5
+`define CSR_CSRRS  4
+`define CSR_CSRRC  3
+`define CSR_CSRRWI 2
+`define CSR_CSRRSI 1
+`define CSR_CSRRCI 0
 
 // REGFILE
 `define REG_X0 0

@@ -39,10 +39,11 @@ module cpu(
     // from regfile
     wire [`XLEN-1:0] rf_rs1_rdata;
     wire [`XLEN-1:0] rf_rs2_rdata;
-    
-    // to wb
-    wire       id_rd_en;
-    wire [4:0] id_rd_idx;
+
+    // id x csr
+    wire             id_csr_en;
+    wire [11:0]      id_csr_idx;
+    wire [`XLEN-1:0] csr_rdata;
     
     // to ex
     // op infomation
@@ -55,7 +56,12 @@ module cpu(
     wire [`XLEN-1:0]              id_rs1_rdata;
     wire [`XLEN-1:0]              id_rs2_rdata;
     wire [`XLEN-1:0]              id_imm;
-   
+    // csr index
+    wire [11:0]                   id_csr_idx;
+    // to wb
+    wire             id_rd_en;
+    wire [4:0]       id_rd_idx;
+    wire [`XLEN-1:0] id_csr_rdata;
     // excp
     wire id_ilegl_inst;
     wire id_ecall;
@@ -67,6 +73,7 @@ module cpu(
 //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
     wire [`XLEN-1:0] ex_alu_rd_wdata;
     wire [`XLEN-1:0] ex_agu_mem_addr;
+    wire [`XLEN-1:0] ex_cgu_csr_wdata;
     wire             ex_branch_jump;
 
 
@@ -114,7 +121,7 @@ module cpu(
     id id_u(
         // from if
         .instr_i          ( if_instr       ),
-        
+        // id x regfile
         // to regfile
         .id_rs1_en_o      ( id_rs1_en      ),
         .id_rs1_idx_o     ( id_rs1_idx     ),
@@ -124,12 +131,13 @@ module cpu(
         .rf_rs1_rdata_i   ( rf_rs1_rdata   ),
         .rf_rs2_rdata_i   ( rf_rs2_rdata   ),
         
-        // to wb
-        .id_rd_en_o       ( id_rd_en       ),
-        .id_rd_idx_o      ( id_rd_idx      ),
-        
+        // id x csr
+        .id_csr_en_o      ( id_csr_en      ),
+        .id_csr_idx_o     ( id_csr_idx     ),
+        .csr_rdata_i      ( csr_rdata      ),
+
         // to ex
-        // op information
+        // op info
         .id_opcode_info_o ( id_opcode_info ),
         .id_alu_info_o    ( id_alu_info    ),
         .id_branch_info_o ( id_branch_info ),
@@ -139,14 +147,17 @@ module cpu(
         .id_rs1_rdata_o   ( id_rs1_rdata   ),
         .id_rs2_rdata_o   ( id_rs2_rdata   ),
         .id_imm_o         ( id_imm         ),
-        
+
+        // to wb
+        .id_rd_en_o       ( id_rd_en       ),
+        .id_rd_idx_o      ( id_rd_idx      ),
+        .id_csr_rdata_o   ( id_csr_rdata   ),
         // exception
         .id_ilegl_instr_o ( id_ilegl_inst  ),
         .id_ecall_o       ( id_ecall       ),
         .id_ebreak_o      ( id_ebreak      ),
         .id_mret_o        ( id_mret        )
     );
-
 
     // REGFILE
     regfile regfile_u(
@@ -180,22 +191,23 @@ module cpu(
 //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
 // EXECUTION
 //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
-
     ex ex_u(
-        .opcode_info_i     ( id_opcode_info  ),
-        .alu_info_i        ( id_alu_info     ),
-        .branch_info_i     ( id_branch_info  ),
-        .ld_st_info_i      ( id_ld_st_info   ),
-        .csr_info_i        ( id_csr_info     ),
+        // OP INFO
+        .opcode_info_i      ( id_opcode_info   ),
+        .alu_info_i         ( id_alu_info      ),
+        .branch_info_i      ( id_branch_info   ),
+        .ld_st_info_i       ( id_ld_st_info    ),
+        .csr_info_i         ( id_csr_info      ),
+        // OP NUMBER
+        .pc_i               ( IF_pc            ),
+        .rs1_rdata_i        ( id_rs1_rdata     ),
+        .rs2_rdata_i        ( id_rs2_rdata     ),
+        .imm_i              ( id_imm           ),
         
-        .pc_i              ( IF_pc           ),
-        .rs1_rdata_i       ( id_rs1_rdata    ),
-        .rs2_rdata_i       ( id_rs2_rdata    ),
-        .imm_i             ( id_imm          ),
-        
-        .ex_alu_rd_wdata_o ( ex_alu_rd_wdata ),
-        .ex_agu_mem_addr_o ( ex_agu_mem_addr ),
-        .ex_branch_jump_o  ( ex_branch_jump  )
+        .ex_alu_rd_wdata_o  ( ex_alu_rd_wdata  ),
+        .ex_agu_mem_addr_o  ( ex_agu_mem_addr  ),
+        .ex_cgu_csr_wdata_o ( ex_cgu_csr_wdata ),
+        .ex_branch_jump_o   ( ex_branch_jump   )
     );
 
 //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
@@ -205,8 +217,6 @@ module cpu(
 //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
 // WRITE BACK
 //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
-
-
     wb u_wb(
         .rd_en_i        ( id_rd_en        ),
         .rd_idx_i       ( id_rd_idx       ),

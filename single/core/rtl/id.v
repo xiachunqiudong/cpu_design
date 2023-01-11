@@ -3,7 +3,7 @@
 module id(
     input [`INSTR_WIDTH-1:0] instr_i,
         
-    // to regfile
+    // id x regfile
     output             id_rs1_en_o,
     output [4:0]       id_rs1_idx_o,
     output             id_rs2_en_o,
@@ -12,21 +12,30 @@ module id(
     input  [`XLEN-1:0] rf_rs1_rdata_i,
     input  [`XLEN-1:0] rf_rs2_rdata_i,
     
-    // write back
-    output             id_rd_en_o,
-    output [4:0]       id_rd_idx_o,
-
+    // id x csr
+    // to csr
+    output                          id_csr_en_o,// csr指令既要读也要写,x0在csr内部处理
+    output [11:0]                   id_csr_idx_o,
+    // from csr
+    input  [`XLEN-1:0]              csr_rdata_i,
+    
     // to ex
+    // op info
     output [`OP_INFO_WIDTH-1:0]     id_opcode_info_o,
     output [`ALU_INFO_WIDTH-1:0]    id_alu_info_o,
     output [`BRANCH_INFO_WIDTH-1:0] id_branch_info_o,
     output [`LD_ST_INFO_WIDTH-1:0]  id_ld_st_info_o,
     output [`CSR_INFO_WIDTH-1:0]    id_csr_info_o,
-
+    // op number
     output [`XLEN-1:0]              id_rs1_rdata_o,
     output [`XLEN-1:0]              id_rs2_rdata_o,
     output [`XLEN-1:0]              id_imm_o,
 
+
+    // to write back
+    output                          id_rd_en_o,
+    output [4:0]                    id_rd_idx_o,
+    output [`XLEN-1:0]              id_csr_rdata_o,
     // excp
     output id_ilegl_instr_o,
     output id_ecall_o,
@@ -47,6 +56,7 @@ module id(
     assign id_rs1_idx_o = rs1;
     assign id_rs2_idx_o = rs2;
     assign id_rd_idx_o  = rd;
+    assign id_csr_idx_o = instr_i[31:20];
 
 //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
 // RV64I译码部分
@@ -202,7 +212,8 @@ module id(
     assign id_mret_o   = rv64_mret;
 
 //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
-// 源寄存器, 目的寄存器解析 id_rs1_en id_rs2_en id_rd_en
+// 源寄存器, 目的寄存器解析 id_rs1_en id_rs2_en id_rd_en 
+// CSR解析 id_csr_en
 //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
     // RV64I不需要rs1的有:
     // 1. lui/auipc
@@ -228,10 +239,18 @@ module id(
                       & (~rv64_branch) & (~rv64_store);
 
 
+    // RV64I需要读写csr的有
+    // csrrw  csrrs  csrrc
+    // csrrwi csrrsi csrrci
+    wire rv64_need_csr = rv64_csrrw  | rv64_csrrs  | rv64_csrrc
+                       | rv64_csrrwi | rv64_csrrsi | rv64_csrrci;
+
+
     // id_rs1_en id_rs2_en id_rd_en
     assign id_rs1_en_o = rv64_need_rs1;
     assign id_rs2_en_o = rv64_need_rs2;
     assign id_rd_en_o  = rv64_need_rd;
+    assign id_csr_en_o = rv64_need_csr;
 
     assign id_rs1_rdata_o = rf_rs1_rdata_i;
     assign id_rs2_rdata_o = rf_rs2_rdata_i;

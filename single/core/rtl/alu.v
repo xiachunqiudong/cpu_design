@@ -164,8 +164,8 @@ module alu(
 //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
 // 分支计算计算
 //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
-    wire eq = ~(|alu_xor_res);
-    wire ne = ~eq;
+    wire ne = (|alu_xor_res);
+    wire eq = ~ne;
     wire lt =  alu_add_sub_res[`XLEN-1];
     wire ge = ~alu_add_sub_res[`XLEN-1] | eq;
     wire ltu ;
