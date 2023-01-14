@@ -6,5 +6,5 @@ obj = cpu
 .PHONY: git
 git:
 	git add .
-	git commit -m "2023/1/4"
+	git commit -m "2023/1/14"
 	git push

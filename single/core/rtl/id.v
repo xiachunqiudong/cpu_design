@@ -31,7 +31,6 @@ module id(
     output [`XLEN-1:0]              id_rs2_rdata_o,
     output [`XLEN-1:0]              id_imm_o,
 
-
     // to write back
     output                          id_rd_en_o,
     output [4:0]                    id_rd_idx_o,
