@@ -11,11 +11,11 @@
 using namespace std;
 
 string opcode_info_name[12] = {"SYSTEM", "AUIPC", "LUI", "STORE", "LOAD", "JALR", "JAL",
-                          "BRANCH", "ALU_W", "ALU", "ALI_IMM_W", "ALU_IMM"};
-
-string alu_info_name[10] = {"ADD", "SUB", "SLL", "SLT", "SLTU", "XOR", "SRL", "SRA", "OR", "AND"};
-
+                               "BRANCH", "ALU_W", "ALU", "ALI_IMM_W", "ALU_IMM"};
+string alu_info_name[10]   = {"ADD", "SUB", "SLL", "SLT", "SLTU", "XOR", "SRL", "SRA", "OR", "AND"};
+string branch_info_name[6] = {"BEQ", "BNE", "BLT", "BGE", "BLTU", "BGEU"};
 string ld_st_info_name[11] = {"LB", "LH", "LW", "LD", "LBU", "LHU", "LWU", "SB", "SH", "SW", "SD"};
+string csr_info_name[6]    = {"CSRRW", "CSRRS", "CSRRC", "CSRRWI", "CSRRSI", "CSRRCI"};
 
 vluint64_t main_time = 0;
 
@@ -23,8 +23,7 @@ double sc_time_stamp(){
 	return main_time;
 }
 
-int main(int argc, char** argv, char** env) {
-
+int main(int argc, char* argv[]) {
     // 读入指令
     ifstream in("decode.hex");
 
@@ -65,13 +64,14 @@ int main(int argc, char** argv, char** env) {
     int index = 0;
     while (main_time < instr_vec.size() && !contextp->gotFinish()) {
         string instr_str = instr_vec[index % instr_vec.size()];
-
+        
+        // int instr = stoi(instr_str, 0, 16);
         long instr = stol(instr_str, 0, 16);
         
         id->instr_i = instr;
         id->eval();
         // id单元输出
-        printf("----------------------------%d-----------------------------\n", (index + 1));
+        printf("-----------------------------%d------------------------------\n", (index + 1));
         // c
         vector<string> decode_info;
         string code = decode(instr, decode_info);
@@ -114,26 +114,35 @@ int main(int argc, char** argv, char** env) {
         
         puts("");
         puts("INFO:");
-
         string opcode_info = get_bin(id_opcode_info_o, 12);
         for(int i = 0; i < 12; i++) {
             if( opcode_info[i] == '1') {
                 cout << "instr type: " << opcode_info_name[11 - i] << endl;
             }            
         }
-        
-
         string alu_info = get_bin(id_alu_info_o, 10);
         for(int i = 0; i < 10; i++) {
             if( alu_info[i] == '1') {
                 cout << "alu info:   " << alu_info_name[i] << endl;
             }            
         }
+        string branch_info = get_bin(id_branch_info_o, 6);
+        for(int i = 0; i < 6; i++) {
+            if(branch_info[i] == '1') {
+                cout << "branch info: " << branch_info_name[i] << endl;
+            }
+        }
         string ld_st_info = get_bin(id_ld_st_info_o, 11);
         for(int i = 0; i < 11; i++) {
             if( ld_st_info[i] == '1') {
-                cout << "ld_st info:   " << ld_st_info_name[i] << endl;
+                cout << "ld_st info: " << ld_st_info_name[i] << endl;
             }            
+        }
+        string csr_info = get_bin(id_csr_info_o, 6);
+        for(int i = 0; i < 6; i++) {
+            if(csr_info[i] == '1') {
+                cout << "csr info: " << csr_info_name[i] << endl;
+            }
         }
 
         // OPCODE

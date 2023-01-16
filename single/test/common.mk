@@ -1,5 +1,5 @@
 RV = riscv64-unknown-linux-gnu-
-CFLAGS = -nostdlib
+CFLAGS = -nostdlib -O0
 
 CC = ${RV}gcc
 OBJDUMP = ${RV}objdump
