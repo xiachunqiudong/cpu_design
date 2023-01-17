@@ -17,13 +17,11 @@ module if_mini_dec(
 
     id idu(
         .instr_i          (instr_i),
-        .id_rs1_en_o      (),
         .id_rs1_idx_o     (mini_dec_jalr_rs1_idx_o),
-        .id_rs2_en_o      (),
         .id_rs2_idx_o     (),
         .rf_rs1_rdata_i   (),
         .rf_rs2_rdata_i   (),
-        .id_csr_en_o      (),
+        .id_csr_wen_o     (),
         .id_csr_idx_o     (),
         .csr_rdata_i      (),
         .id_opcode_info_o (opcode_info),
@@ -34,7 +32,7 @@ module if_mini_dec(
         .id_rs1_rdata_o   (),
         .id_rs2_rdata_o   (),
         .id_imm_o         (mini_dec_imm_o),
-        .id_rd_en_o       (),
+        .id_rd_wen_o      (),
         .id_rd_idx_o      (),
         .id_csr_rdata_o   (),
         .id_ilegl_instr_o (),

@@ -2,12 +2,11 @@
 
 module instr_fetch(
     input  [`PC_WIDTH-1:0]    pc_i,
-    output [`PC_WIDTH-1:0]    if_pc_next_o,
+    //output [`PC_WIDTH-1:0]    if_pc_next_o,
     
     output [`INSTR_WIDTH-1:0] if_instr_o,
 
     // to reffile
-    output                    if_jalr_rs1_en_o,
     output [4:0]              if_jalr_rs1_idx_o,
     // from regfile
     input  [`XLEN-1:0]        jalr_rs1_rdata_i,
@@ -59,9 +58,7 @@ module instr_fetch(
         .mini_dec_imm_o          ( mini_dec_imm      )
     );
 
-    assign if_jalr_rs1_en_o = mini_dec_jalr;
 
-    wire bj = mini_dec_branch | mini_dec_jal | mini_dec_jalr;
 
     
     // jal & branch pc_next = pc + imm   -> PC相对跳转
@@ -71,13 +68,6 @@ module instr_fetch(
                                                                       : 0;
 
     wire [`PC_WIDTH-1:0] bj_pc_op2 = mini_dec_imm;
-
-    // 跳转:   pc_next = bj_pc_op1 + bj_pc_op2
-    // 不跳转: pc_next = pc + 4
-    wire [`PC_WIDTH-1:0] pc_add_op1 = bj ? bj_pc_op1 : pc_i;
-    wire [`PC_WIDTH-1:0] pc_add_op2 = bj ? bj_pc_op2 : 4;
-
-    assign if_pc_next_o = pc_add_op1 + pc_add_op2;
 
 
 endmodule

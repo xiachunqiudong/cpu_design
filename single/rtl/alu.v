@@ -114,20 +114,21 @@ module alu(
     wire [`XLEN-1:0] alu_or_res;
     wire [`XLEN-1:0] alu_and_res;
 
+    wire [5:0] shift_op2 = (op_alu_imm_w | op_alu_w) ? {1'b0, alu_op2[4:0]} : alu_op2[5:0];
     // 加减
     assign alu_add_sub_res = alu_op1 + ({`XLEN{res_sel_sub}} ^ alu_op2) + (res_sel_sub ? 1 : 0);
     // sll
-    assign alu_sll_res     = alu_op1 << alu_op2[5:0];
+    assign alu_sll_res     = alu_op1 << shift_op2;
     // slt
-    assign alu_slt_res     = lt ? 1  : 0;
+    assign alu_slt_res     = lt ? 1 : 0;
     // sltu
     assign alu_sltu_res    = ltu ? 1 : 0;
     // xor
     assign alu_xor_res     = alu_op1 ^ alu_op2;
     // srl
-    assign alu_srl_res     = alu_op1 >> alu_op2[5:0];
+    assign alu_srl_res     = alu_op1 >> shift_op2;
     // sra
-    assign alu_sra_res     = $signed(alu_op1) >>> alu_op2[5:0];
+    assign alu_sra_res     = $signed(alu_op1) >>> shift_op2;
     // or
     assign alu_or_res      = alu_op1 | alu_op2;
     // and
@@ -148,7 +149,6 @@ module alu(
                              | ({`XLEN{res_sel_or}}      & alu_or_res)
                              | ({`XLEN{res_sel_and}}     & alu_and_res);
 
-
     // 对于ALU_W ALU_IMM_W
     // 1. 将结果截断至32位 
     // 2. 将截断结果符号扩展后放入rd
@@ -164,11 +164,19 @@ module alu(
 //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
 // 分支计算计算
 //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
-    wire ne = (|alu_xor_res);
-    wire eq = ~ne;
-    wire lt =  alu_add_sub_res[`XLEN-1];
-    wire ge = ~alu_add_sub_res[`XLEN-1] | eq;
-    wire ltu ;
-    wire geu ;
+    wire ne  = (|alu_xor_res);
+    wire eq  = ~ne;
+    wire lt  = $signed(alu_op1) < $signed(alu_op2);
+    wire ge  = $signed(alu_op1) > $signed(alu_op2);
+    wire ltu = alu_op1 < alu_op2;
+    wire geu = alu_op1 > alu_op2;
+
+    assign alu_branch_jump_o = (branch_beq  & eq)
+                             | (branch_bne  & ne)
+                             | (branch_blt  & lt)
+                             | (branch_bge  & ge)
+                             | (branch_bltu & ltu)
+                             | (branch_bgeu & geu);
+    
 
 endmodule

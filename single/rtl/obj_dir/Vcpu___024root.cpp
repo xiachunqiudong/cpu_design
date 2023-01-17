@@ -917,58 +917,109 @@ VL_INLINE_OPT void Vcpu___024root___sequent__TOP__2(Vcpu___024root* vlSelf) {
                                                                            (0x707fU 
                                                                             & vlSelf->cpu__DOT__if_instr)))))))))))));
     vlSelf->cpu__DOT__instr_fetch_u__DOT__if_mini_dec_u__DOT__idu__DOT__rv64_imm 
-        = (((((- (QData)((IData)(((((0x13U == (0x7fU 
-                                               & vlSelf->cpu__DOT__if_instr)) 
-                                    | (0x1bU == (0x7fU 
-                                                 & vlSelf->cpu__DOT__if_instr))) 
-                                   | (3U == (0x7fU 
-                                             & vlSelf->cpu__DOT__if_instr))) 
-                                  | (0x67U == (0x7fU 
-                                               & vlSelf->cpu__DOT__if_instr)))))) 
-              & (((- (QData)((IData)((vlSelf->cpu__DOT__if_instr 
-                                      >> 0x1fU)))) 
-                  << 0xcU) | (QData)((IData)((vlSelf->cpu__DOT__if_instr 
-                                              >> 0x14U))))) 
-             | ((- (QData)((IData)((0x23U == (0x7fU 
+        = ((((((- (QData)((IData)(((((0x13U == (0x7fU 
+                                                & vlSelf->cpu__DOT__if_instr)) 
+                                     | (0x1bU == (0x7fU 
+                                                  & vlSelf->cpu__DOT__if_instr))) 
+                                    | (3U == (0x7fU 
+                                              & vlSelf->cpu__DOT__if_instr))) 
+                                   | (0x67U == (0x7fU 
+                                                & vlSelf->cpu__DOT__if_instr)))))) 
+               & (((- (QData)((IData)((vlSelf->cpu__DOT__if_instr 
+                                       >> 0x1fU)))) 
+                   << 0xcU) | (QData)((IData)((vlSelf->cpu__DOT__if_instr 
+                                               >> 0x14U))))) 
+              | ((- (QData)((IData)((0x23U == (0x7fU 
+                                               & vlSelf->cpu__DOT__if_instr))))) 
+                 & (((- (QData)((IData)((vlSelf->cpu__DOT__if_instr 
+                                         >> 0x1fU)))) 
+                     << 0xcU) | (QData)((IData)(((0xfe0U 
+                                                  & (vlSelf->cpu__DOT__if_instr 
+                                                     >> 0x14U)) 
+                                                 | (0x1fU 
+                                                    & (vlSelf->cpu__DOT__if_instr 
+                                                       >> 7U)))))))) 
+             | ((- (QData)((IData)((0x63U == (0x7fU 
                                               & vlSelf->cpu__DOT__if_instr))))) 
                 & (((- (QData)((IData)((vlSelf->cpu__DOT__if_instr 
                                         >> 0x1fU)))) 
-                    << 0xcU) | (QData)((IData)(((0xfe0U 
+                    << 0xdU) | (QData)((IData)(((0x1000U 
                                                  & (vlSelf->cpu__DOT__if_instr 
-                                                    >> 0x14U)) 
-                                                | (0x1fU 
-                                                   & (vlSelf->cpu__DOT__if_instr 
-                                                      >> 7U)))))))) 
-            | ((- (QData)((IData)((0x63U == (0x7fU 
+                                                    >> 0x13U)) 
+                                                | ((0x800U 
+                                                    & (vlSelf->cpu__DOT__if_instr 
+                                                       << 4U)) 
+                                                   | ((0x7e0U 
+                                                       & (vlSelf->cpu__DOT__if_instr 
+                                                          >> 0x14U)) 
+                                                      | (0x1eU 
+                                                         & (vlSelf->cpu__DOT__if_instr 
+                                                            >> 7U)))))))))) 
+            | ((- (QData)((IData)((0x6fU == (0x7fU 
                                              & vlSelf->cpu__DOT__if_instr))))) 
                & (((- (QData)((IData)((vlSelf->cpu__DOT__if_instr 
                                        >> 0x1fU)))) 
-                   << 0xdU) | (QData)((IData)(((0x1000U 
-                                                & (vlSelf->cpu__DOT__if_instr 
-                                                   >> 0x13U)) 
-                                               | ((0x800U 
-                                                   & (vlSelf->cpu__DOT__if_instr 
-                                                      << 4U)) 
-                                                  | ((0x7e0U 
-                                                      & (vlSelf->cpu__DOT__if_instr 
-                                                         >> 0x14U)) 
-                                                     | (0x1eU 
-                                                        & (vlSelf->cpu__DOT__if_instr 
-                                                           >> 7U)))))))))) 
-           | ((- (QData)((IData)((0x6fU == (0x7fU & vlSelf->cpu__DOT__if_instr))))) 
-              & (((- (QData)((IData)((vlSelf->cpu__DOT__if_instr 
-                                      >> 0x1fU)))) 
-                  << 0x15U) | (QData)((IData)(((0x100000U 
-                                                & (vlSelf->cpu__DOT__if_instr 
-                                                   >> 0xbU)) 
-                                               | ((0xff000U 
-                                                   & vlSelf->cpu__DOT__if_instr) 
-                                                  | ((0x800U 
-                                                      & (vlSelf->cpu__DOT__if_instr 
-                                                         >> 9U)) 
-                                                     | (0x7feU 
-                                                        & (vlSelf->cpu__DOT__if_instr 
-                                                           >> 0x14U))))))))));
+                   << 0x15U) | (QData)((IData)(((0x100000U 
+                                                 & (vlSelf->cpu__DOT__if_instr 
+                                                    >> 0xbU)) 
+                                                | ((0xff000U 
+                                                    & vlSelf->cpu__DOT__if_instr) 
+                                                   | ((0x800U 
+                                                       & (vlSelf->cpu__DOT__if_instr 
+                                                          >> 9U)) 
+                                                      | (0x7feU 
+                                                         & (vlSelf->cpu__DOT__if_instr 
+                                                            >> 0x14U)))))))))) 
+           | ((- (QData)((IData)(((0x37U == (0x7fU 
+                                             & vlSelf->cpu__DOT__if_instr)) 
+                                  | (0x17U == (0x7fU 
+                                               & vlSelf->cpu__DOT__if_instr)))))) 
+              & (((QData)((IData)((- (IData)((vlSelf->cpu__DOT__if_instr 
+                                              >> 0x1fU))))) 
+                  << 0x20U) | (QData)((IData)((0xfffff000U 
+                                               & vlSelf->cpu__DOT__if_instr))))));
+    vlSelf->cpu__DOT__id_u__DOT__rv64_ecall = ((IData)(
+                                                       (0x73U 
+                                                        == 
+                                                        (0x707fU 
+                                                         & vlSelf->cpu__DOT__if_instr))) 
+                                               & (0U 
+                                                  == 
+                                                  (vlSelf->cpu__DOT__if_instr 
+                                                   >> 0x14U)));
+    vlSelf->cpu__DOT__id_u__DOT__rv64_ebreak = ((IData)(
+                                                        (0x73U 
+                                                         == 
+                                                         (0x707fU 
+                                                          & vlSelf->cpu__DOT__if_instr))) 
+                                                & (1U 
+                                                   == 
+                                                   (vlSelf->cpu__DOT__if_instr 
+                                                    >> 0x14U)));
+    vlSelf->cpu__DOT__id_u__DOT__rv64_mret = ((IData)(
+                                                      (0x73U 
+                                                       == 
+                                                       (0x707fU 
+                                                        & vlSelf->cpu__DOT__if_instr))) 
+                                              & (0x302U 
+                                                 == 
+                                                 (vlSelf->cpu__DOT__if_instr 
+                                                  >> 0x14U)));
+    vlSelf->cpu__DOT__id_u__DOT__rv64_csrrwi = (IData)(
+                                                       (0x5073U 
+                                                        == 
+                                                        (0x707fU 
+                                                         & vlSelf->cpu__DOT__if_instr)));
+    vlSelf->cpu__DOT__id_u__DOT__rv64_csrrsi = (IData)(
+                                                       (0x6073U 
+                                                        == 
+                                                        (0x707fU 
+                                                         & vlSelf->cpu__DOT__if_instr)));
+    vlSelf->cpu__DOT__id_u__DOT__rv64_csrrci = (IData)(
+                                                       (0x7073U 
+                                                        == 
+                                                        (0x707fU 
+                                                         & vlSelf->cpu__DOT__if_instr)));
     vlSelf->cpu__DOT__instr_fetch_u__DOT__if_mini_dec_u__DOT__opcode_info 
         = (((0x13U == (0x7fU & vlSelf->cpu__DOT__if_instr)) 
             << 0xbU) | (((0x1bU == (0x7fU & vlSelf->cpu__DOT__if_instr)) 
@@ -1246,131 +1297,122 @@ VL_INLINE_OPT void Vcpu___024root___sequent__TOP__2(Vcpu___024root* vlSelf) {
                                                                                 == 
                                                                                 (0x707fU 
                                                                                 & vlSelf->cpu__DOT__if_instr)))))))))))));
-    vlSelf->cpu__DOT__id_u__DOT__rv64_imm = (((((- (QData)((IData)(
-                                                                   ((((0x13U 
-                                                                       == 
-                                                                       (0x7fU 
-                                                                        & vlSelf->cpu__DOT__if_instr)) 
-                                                                      | (0x1bU 
+    vlSelf->cpu__DOT__rf_rs1_rdata = ((0U == (0x1fU 
+                                              & (vlSelf->cpu__DOT__if_instr 
+                                                 >> 0xfU)))
+                                       ? 0ULL : ((0x1eU 
+                                                  >= 
+                                                  (0x1fU 
+                                                   & ((vlSelf->cpu__DOT__if_instr 
+                                                       >> 0xfU) 
+                                                      - (IData)(1U))))
+                                                  ? 
+                                                 vlSelf->cpu__DOT__regfile_u__DOT__reg_data
+                                                 [(0x1fU 
+                                                   & ((vlSelf->cpu__DOT__if_instr 
+                                                       >> 0xfU) 
+                                                      - (IData)(1U)))]
+                                                  : 0ULL));
+    vlSelf->cpu__DOT__id_u__DOT__rv64_imm = ((((((- (QData)((IData)(
+                                                                    ((((0x13U 
+                                                                        == 
+                                                                        (0x7fU 
+                                                                         & vlSelf->cpu__DOT__if_instr)) 
+                                                                       | (0x1bU 
+                                                                          == 
+                                                                          (0x7fU 
+                                                                           & vlSelf->cpu__DOT__if_instr))) 
+                                                                      | (3U 
                                                                          == 
                                                                          (0x7fU 
                                                                           & vlSelf->cpu__DOT__if_instr))) 
-                                                                     | (3U 
+                                                                     | (0x67U 
                                                                         == 
                                                                         (0x7fU 
-                                                                         & vlSelf->cpu__DOT__if_instr))) 
-                                                                    | (0x67U 
+                                                                         & vlSelf->cpu__DOT__if_instr)))))) 
+                                                 & (((- (QData)((IData)(
+                                                                        (vlSelf->cpu__DOT__if_instr 
+                                                                         >> 0x1fU)))) 
+                                                     << 0xcU) 
+                                                    | (QData)((IData)(
+                                                                      (vlSelf->cpu__DOT__if_instr 
+                                                                       >> 0x14U))))) 
+                                                | ((- (QData)((IData)(
+                                                                      (0x23U 
                                                                        == 
                                                                        (0x7fU 
-                                                                        & vlSelf->cpu__DOT__if_instr)))))) 
-                                                & (((- (QData)((IData)(
-                                                                       (vlSelf->cpu__DOT__if_instr 
-                                                                        >> 0x1fU)))) 
-                                                    << 0xcU) 
-                                                   | (QData)((IData)(
-                                                                     (vlSelf->cpu__DOT__if_instr 
-                                                                      >> 0x14U))))) 
+                                                                        & vlSelf->cpu__DOT__if_instr))))) 
+                                                   & (((- (QData)((IData)(
+                                                                          (vlSelf->cpu__DOT__if_instr 
+                                                                           >> 0x1fU)))) 
+                                                       << 0xcU) 
+                                                      | (QData)((IData)(
+                                                                        ((0xfe0U 
+                                                                          & (vlSelf->cpu__DOT__if_instr 
+                                                                             >> 0x14U)) 
+                                                                         | (0x1fU 
+                                                                            & (vlSelf->cpu__DOT__if_instr 
+                                                                               >> 7U)))))))) 
                                                | ((- (QData)((IData)(
-                                                                     (0x23U 
+                                                                     (0x63U 
                                                                       == 
                                                                       (0x7fU 
                                                                        & vlSelf->cpu__DOT__if_instr))))) 
                                                   & (((- (QData)((IData)(
                                                                          (vlSelf->cpu__DOT__if_instr 
                                                                           >> 0x1fU)))) 
-                                                      << 0xcU) 
+                                                      << 0xdU) 
                                                      | (QData)((IData)(
-                                                                       ((0xfe0U 
+                                                                       ((0x1000U 
                                                                          & (vlSelf->cpu__DOT__if_instr 
-                                                                            >> 0x14U)) 
-                                                                        | (0x1fU 
-                                                                           & (vlSelf->cpu__DOT__if_instr 
-                                                                              >> 7U)))))))) 
+                                                                            >> 0x13U)) 
+                                                                        | ((0x800U 
+                                                                            & (vlSelf->cpu__DOT__if_instr 
+                                                                               << 4U)) 
+                                                                           | ((0x7e0U 
+                                                                               & (vlSelf->cpu__DOT__if_instr 
+                                                                                >> 0x14U)) 
+                                                                              | (0x1eU 
+                                                                                & (vlSelf->cpu__DOT__if_instr 
+                                                                                >> 7U)))))))))) 
                                               | ((- (QData)((IData)(
-                                                                    (0x63U 
+                                                                    (0x6fU 
                                                                      == 
                                                                      (0x7fU 
                                                                       & vlSelf->cpu__DOT__if_instr))))) 
                                                  & (((- (QData)((IData)(
                                                                         (vlSelf->cpu__DOT__if_instr 
                                                                          >> 0x1fU)))) 
-                                                     << 0xdU) 
+                                                     << 0x15U) 
                                                     | (QData)((IData)(
-                                                                      ((0x1000U 
+                                                                      ((0x100000U 
                                                                         & (vlSelf->cpu__DOT__if_instr 
-                                                                           >> 0x13U)) 
-                                                                       | ((0x800U 
-                                                                           & (vlSelf->cpu__DOT__if_instr 
-                                                                              << 4U)) 
-                                                                          | ((0x7e0U 
+                                                                           >> 0xbU)) 
+                                                                       | ((0xff000U 
+                                                                           & vlSelf->cpu__DOT__if_instr) 
+                                                                          | ((0x800U 
                                                                               & (vlSelf->cpu__DOT__if_instr 
-                                                                                >> 0x14U)) 
-                                                                             | (0x1eU 
-                                                                                & (vlSelf->cpu__DOT__if_instr 
-                                                                                >> 7U)))))))))) 
-                                             | ((- (QData)((IData)(
-                                                                   (0x6fU 
-                                                                    == 
-                                                                    (0x7fU 
-                                                                     & vlSelf->cpu__DOT__if_instr))))) 
-                                                & (((- (QData)((IData)(
-                                                                       (vlSelf->cpu__DOT__if_instr 
-                                                                        >> 0x1fU)))) 
-                                                    << 0x15U) 
-                                                   | (QData)((IData)(
-                                                                     ((0x100000U 
-                                                                       & (vlSelf->cpu__DOT__if_instr 
-                                                                          >> 0xbU)) 
-                                                                      | ((0xff000U 
-                                                                          & vlSelf->cpu__DOT__if_instr) 
-                                                                         | ((0x800U 
-                                                                             & (vlSelf->cpu__DOT__if_instr 
                                                                                 >> 9U)) 
-                                                                            | (0x7feU 
-                                                                               & (vlSelf->cpu__DOT__if_instr 
-                                                                                >> 0x14U))))))))));
-    vlSelf->cpu__DOT__id_u__DOT__rv64_ecall = ((IData)(
-                                                       (0x73U 
-                                                        == 
-                                                        (0x707fU 
-                                                         & vlSelf->cpu__DOT__if_instr))) 
-                                               & (0U 
-                                                  == 
-                                                  (vlSelf->cpu__DOT__if_instr 
-                                                   >> 0x14U)));
-    vlSelf->cpu__DOT__id_u__DOT__rv64_ebreak = ((IData)(
-                                                        (0x73U 
-                                                         == 
-                                                         (0x707fU 
-                                                          & vlSelf->cpu__DOT__if_instr))) 
-                                                & (1U 
-                                                   == 
-                                                   (vlSelf->cpu__DOT__if_instr 
-                                                    >> 0x14U)));
-    vlSelf->cpu__DOT__id_u__DOT__rv64_mret = ((IData)(
-                                                      (0x73U 
-                                                       == 
-                                                       (0x707fU 
-                                                        & vlSelf->cpu__DOT__if_instr))) 
-                                              & (0x302U 
-                                                 == 
-                                                 (vlSelf->cpu__DOT__if_instr 
-                                                  >> 0x14U)));
-    vlSelf->cpu__DOT__id_u__DOT__rv64_csrrwi = (IData)(
-                                                       (0x5073U 
-                                                        == 
-                                                        (0x707fU 
-                                                         & vlSelf->cpu__DOT__if_instr)));
-    vlSelf->cpu__DOT__id_u__DOT__rv64_csrrsi = (IData)(
-                                                       (0x6073U 
-                                                        == 
-                                                        (0x707fU 
-                                                         & vlSelf->cpu__DOT__if_instr)));
-    vlSelf->cpu__DOT__id_u__DOT__rv64_csrrci = (IData)(
-                                                       (0x7073U 
-                                                        == 
-                                                        (0x707fU 
-                                                         & vlSelf->cpu__DOT__if_instr)));
+                                                                             | (0x7feU 
+                                                                                & (vlSelf->cpu__DOT__if_instr 
+                                                                                >> 0x14U)))))))))) 
+                                             | ((- (QData)((IData)(
+                                                                   ((0x37U 
+                                                                     == 
+                                                                     (0x7fU 
+                                                                      & vlSelf->cpu__DOT__if_instr)) 
+                                                                    | (0x17U 
+                                                                       == 
+                                                                       (0x7fU 
+                                                                        & vlSelf->cpu__DOT__if_instr)))))) 
+                                                & (((QData)((IData)(
+                                                                    (- (IData)(
+                                                                               (vlSelf->cpu__DOT__if_instr 
+                                                                                >> 0x1fU))))) 
+                                                    << 0x20U) 
+                                                   | (QData)((IData)(
+                                                                     (0xfffff000U 
+                                                                      & vlSelf->cpu__DOT__if_instr))))));
     vlSelf->cpu__DOT__id_opcode_info = (((0x13U == 
                                           (0x7fU & vlSelf->cpu__DOT__if_instr)) 
                                          << 0xbU) | 
@@ -1430,62 +1472,21 @@ VL_INLINE_OPT void Vcpu___024root___sequent__TOP__2(Vcpu___024root* vlSelf) {
                                                         != 
                                                         (0xe0U 
                                                          & (IData)(vlSelf->cpu__DOT__instr_fetch_u__DOT__if_mini_dec_u__DOT__opcode_info))));
-    vlSelf->cpu__DOT__rf_rs1_rdata = ((1U & ((~ (((
-                                                   ((((((0x37U 
-                                                         != 
-                                                         (0x7fU 
-                                                          & vlSelf->cpu__DOT__if_instr)) 
-                                                        & (0x17U 
-                                                           != 
-                                                           (0x7fU 
-                                                            & vlSelf->cpu__DOT__if_instr))) 
-                                                       & (0x6fU 
-                                                          != 
-                                                          (0x7fU 
-                                                           & vlSelf->cpu__DOT__if_instr))) 
-                                                      & (~ (IData)(vlSelf->cpu__DOT__id_u__DOT__rv64_csrrwi))) 
-                                                     & (~ (IData)(vlSelf->cpu__DOT__id_u__DOT__rv64_csrrsi))) 
-                                                    & (~ (IData)(vlSelf->cpu__DOT__id_u__DOT__rv64_csrrci))) 
-                                                   & (~ (IData)(vlSelf->cpu__DOT__id_u__DOT__rv64_ecall))) 
-                                                  & (~ (IData)(vlSelf->cpu__DOT__id_u__DOT__rv64_ebreak))) 
-                                                 & (~ (IData)(vlSelf->cpu__DOT__id_u__DOT__rv64_mret)))) 
-                                             | (0U 
-                                                == 
-                                                (0x1fU 
-                                                 & (vlSelf->cpu__DOT__if_instr 
-                                                    >> 0xfU)))))
-                                       ? 0ULL : ((0x1eU 
-                                                  >= 
-                                                  (0x1fU 
-                                                   & ((vlSelf->cpu__DOT__if_instr 
-                                                       >> 0xfU) 
-                                                      - (IData)(1U))))
-                                                  ? 
-                                                 vlSelf->cpu__DOT__regfile_u__DOT__reg_data
-                                                 [(0x1fU 
-                                                   & ((vlSelf->cpu__DOT__if_instr 
-                                                       >> 0xfU) 
-                                                      - (IData)(1U)))]
-                                                  : 0ULL));
     vlSelf->cpu__DOT__ex_u__DOT__alu_u__DOT__res_sel_sub 
         = (1U & (((IData)(vlSelf->cpu__DOT__id_alu_info) 
                   >> 8U) | ((IData)(vlSelf->cpu__DOT__id_opcode_info) 
                             >> 7U)));
+    vlSelf->cpu__DOT__ex_u__DOT__alu_u__DOT__alu_op1 
+        = ((IData)((0U != (0x62U & (IData)(vlSelf->cpu__DOT__id_opcode_info))))
+            ? vlSelf->cpu__DOT__pc_reg_u__DOT__pc_dff__DOT__q_r
+            : ((4U & (IData)(vlSelf->cpu__DOT__id_opcode_info))
+                ? 0ULL : vlSelf->cpu__DOT__rf_rs1_rdata));
     vlSelf->cpu__DOT__ex_u__DOT__alu_u__DOT__alu_op2 
         = ((IData)((0U != (0xc06U & (IData)(vlSelf->cpu__DOT__id_opcode_info))))
             ? vlSelf->cpu__DOT__id_u__DOT__rv64_imm
             : ((IData)((0U != (0x60U & (IData)(vlSelf->cpu__DOT__id_opcode_info))))
-                ? 4ULL : ((1U & ((~ ((((0x33U == (0x7fU 
-                                                  & vlSelf->cpu__DOT__if_instr)) 
-                                       | (0x3bU == 
-                                          (0x7fU & vlSelf->cpu__DOT__if_instr))) 
-                                      | (0x63U == (0x7fU 
-                                                   & vlSelf->cpu__DOT__if_instr))) 
-                                     | (0x23U == (0x7fU 
-                                                  & vlSelf->cpu__DOT__if_instr)))) 
-                                 | (0U == (0x1fU & 
-                                           (vlSelf->cpu__DOT__if_instr 
-                                            >> 0x14U)))))
+                ? 4ULL : ((0U == (0x1fU & (vlSelf->cpu__DOT__if_instr 
+                                           >> 0x14U)))
                            ? 0ULL : ((0x1eU >= (0x1fU 
                                                 & ((vlSelf->cpu__DOT__if_instr 
                                                     >> 0x14U) 
@@ -1515,11 +1516,6 @@ VL_INLINE_OPT void Vcpu___024root___sequent__TOP__2(Vcpu___024root* vlSelf) {
                                              - (IData)(1U)))]
                                    : 0ULL)) : 0ULL))
             : vlSelf->cpu__DOT__pc_reg_u__DOT__pc_dff__DOT__q_r);
-    vlSelf->cpu__DOT__ex_u__DOT__alu_u__DOT__alu_op1 
-        = ((IData)((0U != (0x62U & (IData)(vlSelf->cpu__DOT__id_opcode_info))))
-            ? vlSelf->cpu__DOT__pc_reg_u__DOT__pc_dff__DOT__q_r
-            : ((4U & (IData)(vlSelf->cpu__DOT__id_opcode_info))
-                ? 0ULL : vlSelf->cpu__DOT__rf_rs1_rdata));
     vlSelf->cpu__DOT__ex_u__DOT__alu_u__DOT__alu_xor_res 
         = (vlSelf->cpu__DOT__ex_u__DOT__alu_u__DOT__alu_op1 
            ^ vlSelf->cpu__DOT__ex_u__DOT__alu_u__DOT__alu_op2);

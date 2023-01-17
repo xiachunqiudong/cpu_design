@@ -1,9 +1,42 @@
 `include "defines.v"
 
-module cpu(
+module top_sim(
     input clk,
-    input reset
+    input reset,
+    output [`PC_WIDTH-1:0] IF_pc_o,
+
+    // regfile
+    output [`XLEN-1:0] reg_data_o [1:31],
+    output [4:0]       id_rs1_idx_o,
+    output [`XLEN-1:0] id_rs1_rdata_o,
+    output [4:0]       id_rs2_idx_o,
+    output [`XLEN-1:0] id_rs2_rdata_o,
+    output [`XLEN-1:0] id_imm_o,
+
+    output             id_rd_wen_o,
+    output [4:0]       id_rd_idx_o,
+
+    output [`XLEN-1:0] ex_alu_rd_wdata_o,
+    output [`XLEN-1:0] ex_agu_mem_addr_o,
+    output             ex_branch_jump_o
 );
+
+assign IF_pc_o = IF_pc;
+
+assign id_rs1_idx_o = id_rs1_idx;
+assign id_rs1_rdata_o = id_rs1_rdata;
+assign id_rs2_idx_o = id_rs2_idx;
+assign id_rs2_rdata_o = id_rs2_rdata;
+assign id_imm_o = id_imm;
+
+assign id_rd_wen_o = id_rd_wen;
+assign id_rd_idx_o = id_rd_idx;
+
+// ex
+assign ex_alu_rd_wdata_o = ex_alu_rd_wdata;
+assign ex_agu_mem_addr_o = ex_agu_mem_addr;
+assign ex_branch_jump_o  = ex_branch_jump;
+
 
 //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
 // PC_REG WIRES
@@ -12,13 +45,12 @@ module cpu(
     // to if
     wire [`PC_WIDTH-1:0] IF_pc;
     // form if
-    wire [`PC_WIDTH-1:0] if_pc_next;
+    wire [`PC_WIDTH-1:0] pc_next;
 
 //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
 // IF WIRES
 //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
     // if x regfile
-    wire             if_jalr_rs1_en;
     wire [4:0]       if_jalr_rs1_idx;
     wire [`XLEN-1:0] rf_jalr_rs1_rdata;
 
@@ -32,16 +64,14 @@ module cpu(
 //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
     // id x regfile
     // to regfile
-    wire             id_rs1_en;
     wire [4:0]       id_rs1_idx;
-    wire             id_rs2_en;
     wire [4:0]       id_rs2_idx;
     // from regfile
     wire [`XLEN-1:0] rf_rs1_rdata;
     wire [`XLEN-1:0] rf_rs2_rdata;
 
     // id x csr
-    wire             id_csr_en;
+    wire             id_csr_wen;
     wire [11:0]      id_csr_idx;
     wire [`XLEN-1:0] csr_rdata;
     
@@ -59,7 +89,7 @@ module cpu(
     // csr index
     wire [11:0]                   id_csr_idx;
     // to wb
-    wire             id_rd_en;
+    wire             id_rd_wen;
     wire [4:0]       id_rd_idx;
     wire [`XLEN-1:0] id_csr_rdata;
     // excp
@@ -80,7 +110,7 @@ module cpu(
 //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
 // WB WIRES
 //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
-    wire             wb_rd_en;
+    wire             wb_rd_wen;
     wire [4:0]       wb_rd_idx;
     wire [`XLEN-1:0] wb_rd_wdata;
 
@@ -91,7 +121,7 @@ module cpu(
     pc_reg pc_reg_u(
         .clk       ( clk        ),
         .rst       ( reset      ),
-        .pc_next_i ( if_pc_next ),
+        .pc_next_i ( pc_next    ),
         .IF_pc_o   ( IF_pc      )
     );
 
@@ -100,12 +130,11 @@ module cpu(
 //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
     instr_fetch instr_fetch_u(
         .pc_i              ( IF_pc          ),
-        .if_pc_next_o      ( if_pc_next     ),
+        //.if_pc_next_o      ( if_pc_next     ),
         // to id
         .if_instr_o        ( if_instr       ),
 
         // to regfile
-        .if_jalr_rs1_en_o  (if_jalr_rs1_en),
         .if_jalr_rs1_idx_o (if_jalr_rs1_idx),
         // from regfile
         .jalr_rs1_rdata_i  (rf_jalr_rs1_rdata),
@@ -123,16 +152,14 @@ module cpu(
         .instr_i          ( if_instr       ),
         // id x regfile
         // to regfile
-        .id_rs1_en_o      ( id_rs1_en      ),
         .id_rs1_idx_o     ( id_rs1_idx     ),
-        .id_rs2_en_o      ( id_rs2_en      ),
         .id_rs2_idx_o     ( id_rs2_idx     ),
         // from regfile
         .rf_rs1_rdata_i   ( rf_rs1_rdata   ),
         .rf_rs2_rdata_i   ( rf_rs2_rdata   ),
         
         // id x csr
-        .id_csr_en_o      ( id_csr_en      ),
+        .id_csr_wen_o     ( id_csr_wen      ),
         .id_csr_idx_o     ( id_csr_idx     ),
         .csr_rdata_i      ( csr_rdata      ),
 
@@ -149,7 +176,7 @@ module cpu(
         .id_imm_o         ( id_imm         ),
 
         // to wb
-        .id_rd_en_o       ( id_rd_en       ),
+        .id_rd_wen_o      ( id_rd_wen      ),
         .id_rd_idx_o      ( id_rd_idx      ),
         .id_csr_rdata_o   ( id_csr_rdata   ),
         // exception
@@ -166,15 +193,13 @@ module cpu(
         
         // wb x regfile
         // from wb
-        .rd_en_i                ( wb_rd_en               ),
+        .rd_wen_i               ( wb_rd_wen              ),
         .rd_idx_i               ( wb_rd_idx              ),
         .rd_wdata_i             ( wb_rd_wdata            ),
         
         // id x regfile
         // from id
-        .rs1_en_i               ( id_rs1_en              ),
         .rs1_idx_i              ( id_rs1_idx             ),
-        .rs2_en_i               ( id_rs2_en              ),
         .rs2_idx_i              ( id_rs2_idx             ),
         // to id
         .rf_rs1_rdata_o         ( rf_rs1_rdata           ),
@@ -182,10 +207,11 @@ module cpu(
         
         // if x regfile
         // form if
-        .jalr_rs1_en_i          ( if_jalr_rs1_en         ),
         .jalr_rs1_idx_i         ( if_jalr_rs1_idx        ),
         // to if
-        .rf_jalr_rs1_rdata_o    ( rf_jalr_rs1_rdata      )
+        .rf_jalr_rs1_rdata_o    ( rf_jalr_rs1_rdata      ),
+        
+        .reg_data_o             (reg_data_o              )
     );
 
 //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
@@ -218,16 +244,32 @@ module cpu(
 // WRITE BACK
 //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
     wb u_wb(
-        .rd_en_i        ( id_rd_en        ),
+        .rd_en_i        ( id_rd_wen       ),
         .rd_idx_i       ( id_rd_idx       ),
         
         .alu_rd_wdata_i ( ex_alu_rd_wdata ),
         .mem_rd_wdata_i (                 ),
         .csr_rd_wdata_i (                 ),
         
-        .wb_rd_en_o     ( wb_rd_en        ),
+        .wb_rd_en_o     ( wb_rd_wen       ),
         .wb_rd_idx_o    ( wb_rd_idx       ),
         .wb_rd_wdata_o  ( wb_rd_wdata     )
     );
 
+
+    wire jal_i    = id_opcode_info[`OP_JAL];
+    wire jalr_i   = id_opcode_info[`OP_JALR];
+    wire branch_i = id_opcode_info[`OP_BRANCH];
+
+    pc_next_gen pc_next_gen_u(
+        .pc_i(IF_pc),
+        .jal_i(jal_i),
+        .jalr_i(jalr_i),
+        .branch_i(branch_i),
+        .branch_jump_i(ex_branch_jump),
+        .imm_i(id_imm),
+        .jalr_rs1_rdata_i(id_rs1_rdata),
+        .pc_next_o(pc_next)
+    );
+    
 endmodule

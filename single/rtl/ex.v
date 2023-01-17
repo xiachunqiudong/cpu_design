@@ -59,10 +59,4 @@ module ex(
         .cgu_csr_wdata_o  ( ex_cgu_csr_wdata_o  )
     );
 
-
-
-    
-    
-    
-
 endmodule
