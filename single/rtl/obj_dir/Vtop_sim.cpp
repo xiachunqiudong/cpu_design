@@ -10,10 +10,11 @@
 
 Vtop_sim::Vtop_sim(VerilatedContext* _vcontextp__, const char* _vcname__)
     : vlSymsp{new Vtop_sim__Syms(_vcontextp__, _vcname__, this)}
+    , reg_data_o{vlSymsp->TOP.reg_data_o}
+    , ram_data_o{vlSymsp->TOP.ram_data_o}
+    , IF_pc_o{vlSymsp->TOP.IF_pc_o}
     , clk{vlSymsp->TOP.clk}
     , reset{vlSymsp->TOP.reset}
-    , IF_pc_o{vlSymsp->TOP.IF_pc_o}
-    , reg_data_o{vlSymsp->TOP.reg_data_o}
     , id_rs1_idx_o{vlSymsp->TOP.id_rs1_idx_o}
     , id_rs1_rdata_o{vlSymsp->TOP.id_rs1_rdata_o}
     , id_rs2_idx_o{vlSymsp->TOP.id_rs2_idx_o}
@@ -21,9 +22,10 @@ Vtop_sim::Vtop_sim(VerilatedContext* _vcontextp__, const char* _vcname__)
     , id_imm_o{vlSymsp->TOP.id_imm_o}
     , id_rd_wen_o{vlSymsp->TOP.id_rd_wen_o}
     , id_rd_idx_o{vlSymsp->TOP.id_rd_idx_o}
-    , ex_alu_rd_wdata_o{vlSymsp->TOP.ex_alu_rd_wdata_o}
-    , ex_agu_mem_addr_o{vlSymsp->TOP.ex_agu_mem_addr_o}
+    , ex_alu_res_o{vlSymsp->TOP.ex_alu_res_o}
+    , ex_mem_addr_o{vlSymsp->TOP.ex_mem_addr_o}
     , ex_branch_jump_o{vlSymsp->TOP.ex_branch_jump_o}
+    , mem_rdata_o{vlSymsp->TOP.mem_rdata_o}
     , rootp{&(vlSymsp->TOP)}
 {
 }

@@ -5,9 +5,10 @@
 // 1. ALU
 // 2. ALU_IMM
 // 3. BRANCH
-// 4. JAL JALR
-// 5. LUI
-// 6. AUIPC
+// 4. LD_ST
+// 5. JAL JALR
+// 6. LUI
+// 7. AUIPC
 
 module alu(
     // opcode info
@@ -24,6 +25,8 @@ module alu(
     input [`XLEN-1:0]     imm_i,
     // ALU计算结果
     output [`XLEN-1:0]    alu_res_o,
+    // MEM 地址结果
+    output [`XLEN-1:0]    mem_addr_o,
     // 分支跳转结果
     output                alu_branch_jump_o
 );
@@ -36,6 +39,8 @@ module alu(
     wire op_branch    = opcode_info_i[`OP_BRANCH];
     wire op_jal       = opcode_info_i[`OP_JAL];
     wire op_jalr      = opcode_info_i[`OP_JALR];
+    wire op_load      = opcode_info_i[`OP_LOAD];
+    wire op_store     = opcode_info_i[`OP_STORE];
     wire op_lui       = opcode_info_i[`OP_LUI];
     wire op_auipc     = opcode_info_i[`OP_AUIPC];
 
@@ -60,8 +65,8 @@ module alu(
     wire branch_bgeu = branch_info_i[`BRANCH_BGEU];
 
     // ALU 结果选择
-    wire res_sel_add     = alu_add     | op_jal       | op_jalr | op_lui | op_auipc;
-    wire res_sel_sub     = alu_sub     | op_branch;
+    wire res_sel_add     = alu_add | op_jal | op_jalr | op_lui | op_auipc;
+    wire res_sel_sub     = alu_sub;
     wire res_sel_add_sub = res_sel_add | res_sel_sub;
     wire res_sel_sll     = alu_sll;
     wire res_sel_slt     = alu_slt;
@@ -96,7 +101,7 @@ module alu(
                    :  op_lui ? 0
                    :  rs1_rdata_i;
 
-    assign alu_op2 = (op_lui | op_auipc | op_alu_imm | op_alu_imm_w) ? imm_i
+    assign alu_op2 = (op_lui | op_auipc | op_alu_imm | op_alu_imm_w | op_load | op_store) ? imm_i
                    : (op_jal | op_jalr) ? 4
                    : rs2_rdata_i;
 
@@ -138,6 +143,10 @@ module alu(
 //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
 // ALU结果选择
 //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
+
+
+    // mem addr
+    assign mem_addr_o = alu_add_sub_res;
 
     wire [`XLEN-1:0] alu_res = ({`XLEN{res_sel_add_sub}} & alu_add_sub_res) 
                              | ({`XLEN{res_sel_sll}}     & alu_sll_res)

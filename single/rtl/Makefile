@@ -2,13 +2,13 @@ include ../test/common.mk
 
 obj = top_sim
 
-all: code
+all:
 	verilator ${VFLAGS} ${obj}_main.cpp util.cpp ${obj}.v
 	./obj_dir/V${obj} > log.txt
 
 .PHONY: code
 code: 
-	${CC} ${CFLAGS} -c code.s -o code.elf
+	${CC} ${CFLAGS}  code.s -o code.elf
 	${OBJCOPY} -O binary code.elf code.bin
 	hexdump -e '1/1 "%02x\n"'  code.bin > code.txt
 
@@ -19,5 +19,5 @@ show:
 .PHONY: git
 git:
 	git add .
-	git commit -m "2023/1/17"
+	git commit -m "2023/1/18"
 	git push

@@ -1,12 +1,15 @@
 `include "defines.v"
 
 module top_sim(
+    // 监视cpu状态 
+    output [`XLEN-1:0] reg_data_o [1:31], // reg
+    output [7:0] ram_data_o [0:1023],
+    output [`PC_WIDTH-1:0] IF_pc_o,
+    
     input clk,
     input reset,
-    output [`PC_WIDTH-1:0] IF_pc_o,
 
     // regfile
-    output [`XLEN-1:0] reg_data_o [1:31],
     output [4:0]       id_rs1_idx_o,
     output [`XLEN-1:0] id_rs1_rdata_o,
     output [4:0]       id_rs2_idx_o,
@@ -16,9 +19,12 @@ module top_sim(
     output             id_rd_wen_o,
     output [4:0]       id_rd_idx_o,
 
-    output [`XLEN-1:0] ex_alu_rd_wdata_o,
-    output [`XLEN-1:0] ex_agu_mem_addr_o,
-    output             ex_branch_jump_o
+    output [`XLEN-1:0] ex_alu_res_o,
+    output [`XLEN-1:0] ex_mem_addr_o,
+    output             ex_branch_jump_o,
+
+    // mem
+    output [`XLEN-1:0] mem_rdata_o
 );
 
 assign IF_pc_o = IF_pc;
@@ -33,9 +39,12 @@ assign id_rd_wen_o = id_rd_wen;
 assign id_rd_idx_o = id_rd_idx;
 
 // ex
-assign ex_alu_rd_wdata_o = ex_alu_rd_wdata;
-assign ex_agu_mem_addr_o = ex_agu_mem_addr;
-assign ex_branch_jump_o  = ex_branch_jump;
+assign ex_alu_res_o     = ex_alu_res;
+assign ex_mem_addr_o    = ex_mem_addr;
+assign ex_branch_jump_o = ex_branch_jump;
+
+// mem 
+assign mem_rdata_o = mem_rdata;
 
 
 //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
@@ -101,11 +110,22 @@ assign ex_branch_jump_o  = ex_branch_jump;
 //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
 // EX WIRES
 //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
-    wire [`XLEN-1:0] ex_alu_rd_wdata;
-    wire [`XLEN-1:0] ex_agu_mem_addr;
+    wire [`XLEN-1:0] ex_alu_res;
+    wire [`XLEN-1:0] ex_mem_addr;
     wire [`XLEN-1:0] ex_cgu_csr_wdata;
     wire             ex_branch_jump;
 
+//xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
+// MEM WIRES
+//xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
+    
+    wire [`XLEN-1:0] mem_rdata;
+    // mem x ram
+    wire [`XLEN-1:0] ram_addr;
+    wire             ram_wen;
+    wire [`XLEN-1:0] ram_wdata;
+    wire [1:0]       ram_wmask;
+    wire [`XLEN-1:0] ram_rdata;
 
 //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
 // WB WIRES
@@ -113,7 +133,6 @@ assign ex_branch_jump_o  = ex_branch_jump;
     wire             wb_rd_wen;
     wire [4:0]       wb_rd_idx;
     wire [`XLEN-1:0] wb_rd_wdata;
-
 
 //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
 // PC REG
@@ -211,7 +230,7 @@ assign ex_branch_jump_o  = ex_branch_jump;
         // to if
         .rf_jalr_rs1_rdata_o    ( rf_jalr_rs1_rdata      ),
         
-        .reg_data_o             (reg_data_o              )
+        .reg_data_o             ( reg_data_o             )
     );
 
 //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
@@ -230,8 +249,8 @@ assign ex_branch_jump_o  = ex_branch_jump;
         .rs2_rdata_i        ( id_rs2_rdata     ),
         .imm_i              ( id_imm           ),
         
-        .ex_alu_rd_wdata_o  ( ex_alu_rd_wdata  ),
-        .ex_agu_mem_addr_o  ( ex_agu_mem_addr  ),
+        .ex_alu_res_o       ( ex_alu_res       ),
+        .ex_mem_addr_o      ( ex_mem_addr      ),
         .ex_cgu_csr_wdata_o ( ex_cgu_csr_wdata ),
         .ex_branch_jump_o   ( ex_branch_jump   )
     );
@@ -239,23 +258,46 @@ assign ex_branch_jump_o  = ex_branch_jump;
 //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
 // MEMORY
 //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
+    mem mem_u(
+        .ld_st_info_i ( id_ld_st_info   ),
+        .mem_addr_i   ( ex_mem_addr     ),
+        .mem_wdata_i  ( id_rs2_rdata    ),
+        .mem_rdata_o  ( mem_rdata       ),
+        // mem x ram
+        .ram_addr_o   ( ram_addr        ),
+        .ram_wen_o    ( ram_wen         ),
+        .ram_wdata_o  ( ram_wdata       ),
+        .ram_wmask_o  ( ram_wmask       ),
+        .ram_rdata_i  ( ram_rdata       )
+    );
+
+    ram ram_u(
+        .clk     ( clk       ),
+        .addr_i  ( ram_addr  ),
+        .wen_i   ( ram_wen   ),
+        .wdata_i ( ram_wdata ),
+        .wmask_i ( ram_wmask ),
+        .rdata_o ( ram_rdata ),
+        
+        .ram_data_o( ram_data_o)
+    );
 
 //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
 // WRITE BACK
 //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
-    wb u_wb(
-        .rd_en_i        ( id_rd_wen       ),
+    wb wb_u(
+        .rd_wen_i       ( id_rd_wen       ),
         .rd_idx_i       ( id_rd_idx       ),
+        .opcode_info_i  ( id_opcode_info  ),
+
+        .alu_rd_wdata_i ( ex_alu_res      ),
+        .mem_rd_wdata_i ( mem_rdata       ),
+        .csr_rd_wdata_i ( id_csr_rdata    ),
         
-        .alu_rd_wdata_i ( ex_alu_rd_wdata ),
-        .mem_rd_wdata_i (                 ),
-        .csr_rd_wdata_i (                 ),
-        
-        .wb_rd_en_o     ( wb_rd_wen       ),
+        .wb_rd_wen_o    ( wb_rd_wen       ),
         .wb_rd_idx_o    ( wb_rd_idx       ),
         .wb_rd_wdata_o  ( wb_rd_wdata     )
     );
-
 
     wire jal_i    = id_opcode_info[`OP_JAL];
     wire jalr_i   = id_opcode_info[`OP_JALR];

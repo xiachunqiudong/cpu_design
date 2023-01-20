@@ -14,9 +14,9 @@ module ex(
 
     // to mem/wb
     // ALU 写回数据
-    output [`XLEN-1:0] ex_alu_rd_wdata_o,
+    output [`XLEN-1:0] ex_alu_res_o,
     // MEM 读写地址
-    output [`XLEN-1:0] ex_agu_mem_addr_o,
+    output [`XLEN-1:0] ex_mem_addr_o,
     // 写回CSR寄存器
     output [`XLEN-1:0] ex_cgu_csr_wdata_o,
     // BRANCH JUMP
@@ -36,18 +36,11 @@ module ex(
         .rs2_rdata_i        ( rs2_rdata_i       ),
         .imm_i              ( imm_i             ),
 
-        .alu_res_o          ( ex_alu_rd_wdata_o ),
+        .alu_res_o          ( ex_alu_res_o      ),
+        .mem_addr_o         ( ex_mem_addr_o     ),        
         .alu_branch_jump_o  ( ex_branch_jump_o  )
     );
 
-//xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
-// AGU单元
-//xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
-    agu agu_u(
-        .rs1_rdata_i     ( rs1_rdata_i        ),
-        .imm_i           ( imm_i              ),
-        .agu_mem_addr_o  ( ex_agu_mem_addr_o  )
-    );
 
 //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
 // CGU单元

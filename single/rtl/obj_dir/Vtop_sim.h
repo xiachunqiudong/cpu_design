@@ -27,10 +27,11 @@ class Vtop_sim VL_NOT_FINAL {
     // PORTS
     // The application code writes and reads these signals to
     // propagate new values into/out from the Verilated model.
+    VL_OUT64((&reg_data_o)[31],63,0);
+    VL_OUT8((&ram_data_o)[1024],7,0);
+    VL_OUT64(&IF_pc_o,63,0);
     VL_IN8(&clk,0,0);
     VL_IN8(&reset,0,0);
-    VL_OUT64(&IF_pc_o,63,0);
-    VL_OUT64((&reg_data_o)[31],63,0);
     VL_OUT8(&id_rs1_idx_o,4,0);
     VL_OUT64(&id_rs1_rdata_o,63,0);
     VL_OUT8(&id_rs2_idx_o,4,0);
@@ -38,9 +39,10 @@ class Vtop_sim VL_NOT_FINAL {
     VL_OUT64(&id_imm_o,63,0);
     VL_OUT8(&id_rd_wen_o,0,0);
     VL_OUT8(&id_rd_idx_o,4,0);
-    VL_OUT64(&ex_alu_rd_wdata_o,63,0);
-    VL_OUT64(&ex_agu_mem_addr_o,63,0);
+    VL_OUT64(&ex_alu_res_o,63,0);
+    VL_OUT64(&ex_mem_addr_o,63,0);
     VL_OUT8(&ex_branch_jump_o,0,0);
+    VL_OUT64(&mem_rdata_o,63,0);
 
     // CELLS
     // Public to allow access to /* verilator public */ items.

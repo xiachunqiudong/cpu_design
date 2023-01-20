@@ -43,7 +43,7 @@ module id(
 );
 
 //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
-// 前递操作
+// 前递
 //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
 
     assign id_rs1_rdata_o = rf_rs1_rdata_i;
@@ -256,7 +256,7 @@ module id(
     assign id_csr_wen_o = rv64_need_csr;
 
 //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
-//  立即数解析
+//  立即数生成
 //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
     // 所有立即数都是有符号数 需要进行符号扩展至64位
     wire [`XLEN-1:0] rv64_i_imm = { {52{instr_i[31]}}, instr_i[31:20] };
