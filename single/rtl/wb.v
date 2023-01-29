@@ -1,11 +1,11 @@
 module wb(
-    input       rd_wen_i,
-    input [4:0] rd_idx_i,
+    input                      rd_wen_i,
+    input                      [4:0] rd_idx_i,
     input [`OP_INFO_WIDTH-1:0] opcode_info_i,
 
-    input [`XLEN-1:0] alu_res_i,
-    input [`XLEN-1:0] mem_rdata_i,
-    input [`XLEN-1:0] csr_rdata_i,
+    input [`XLEN-1:0]          alu_res_i,
+    input [`XLEN-1:0]          mem_rdata_i,
+    input [`XLEN-1:0]          csr_rdata_i,
 
     // 写回寄存器文件
     output              wb_rd_wen_o,

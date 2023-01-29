@@ -123,8 +123,9 @@ assign mem_rdata_o = mem_rdata;
     // mem x ram
     wire [`XLEN-1:0] ram_addr;
     wire             ram_wen;
+    wire [7:0]       ram_byte_en;
     wire [`XLEN-1:0] ram_wdata;
-    wire [1:0]       ram_wmask;
+    wire             ram_ren;
     wire [`XLEN-1:0] ram_rdata;
 
 //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
@@ -259,27 +260,29 @@ assign mem_rdata_o = mem_rdata;
 // MEMORY
 //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
     mem mem_u(
-        .ld_st_info_i ( id_ld_st_info   ),
-        .mem_addr_i   ( ex_mem_addr     ),
-        .mem_wdata_i  ( id_rs2_rdata    ),
-        .mem_rdata_o  ( mem_rdata       ),
+        .ld_st_info_i  ( id_ld_st_info   ),
+        .mem_addr_i    ( ex_mem_addr     ),
+        .mem_wdata_i   ( id_rs2_rdata    ),
+        .mem_rdata_o   ( mem_rdata       ),
         // mem x ram
-        .ram_addr_o   ( ram_addr        ),
-        .ram_wen_o    ( ram_wen         ),
-        .ram_wdata_o  ( ram_wdata       ),
-        .ram_wmask_o  ( ram_wmask       ),
-        .ram_rdata_i  ( ram_rdata       )
+        .ram_addr_o    ( ram_addr        ),
+        .ram_wen_o     ( ram_wen         ),
+        .ram_byte_en_o ( ram_byte_en     ),
+        .ram_wdata_o   ( ram_wdata       ),
+        .ram_ren_o     ( ram_ren         ),
+        .ram_rdata_i   ( ram_rdata       )
     );
 
     ram ram_u(
-        .clk     ( clk       ),
-        .addr_i  ( ram_addr  ),
-        .wen_i   ( ram_wen   ),
-        .wdata_i ( ram_wdata ),
-        .wmask_i ( ram_wmask ),
-        .rdata_o ( ram_rdata ),
+        .clk        ( clk         ),
+        .addr_i     ( ram_addr    ),
+        .wen_i      ( ram_wen     ),
+        .byte_en_i  ( ram_byte_en ),
+        .wdata_i    ( ram_wdata   ),
+        .ren_i      ( ram_ren     ),
+        .rdata_o    ( ram_rdata   ),
         
-        .ram_data_o( ram_data_o)
+        .ram_data_o ( ram_data_o  )
     );
 
 //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
@@ -290,9 +293,9 @@ assign mem_rdata_o = mem_rdata;
         .rd_idx_i       ( id_rd_idx       ),
         .opcode_info_i  ( id_opcode_info  ),
 
-        .alu_rd_wdata_i ( ex_alu_res      ),
-        .mem_rd_wdata_i ( mem_rdata       ),
-        .csr_rd_wdata_i ( id_csr_rdata    ),
+        .alu_res_i      ( ex_alu_res      ),
+        .mem_rdata_i    ( mem_rdata       ),
+        .csr_rdata_i    ( id_csr_rdata    ),
         
         .wb_rd_wen_o    ( wb_rd_wen       ),
         .wb_rd_idx_o    ( wb_rd_idx       ),

@@ -74,10 +74,3 @@
 // REGFILE
 `define REG_X0 0
 `define REG_X1 1
-
-
-// MEM
-`define MASK_BYTE   2'b00
-`define MASK_HALF   2'b01
-`define MASK_WORD   2'b10
-`define MASK_DOUBLE 2'b11

@@ -6,8 +6,9 @@ module ram
     input              clk,
     input  [`XLEN-1:0] addr_i,
     input              wen_i,
+    input  [7:0]       byte_en_i,
     input  [`XLEN-1:0] wdata_i,
-    input  [1:0]       wmask_i,
+    input              ren_i,
     output [`XLEN-1:0] rdata_o,
     
     output [7:0] ram_data_o [0:SIZE-1]
@@ -20,29 +21,22 @@ module ram
     wire [9:0] addr = addr_i[9:0];
 
     // read
-    assign rdata_o = {ram_data[addr+7], ram_data[addr+6], ram_data[addr+5], ram_data[addr+4],
-                      ram_data[addr+3], ram_data[addr+2], ram_data[addr+1], ram_data[addr+0]};
+    wire [`XLEN-1:0] rdata = {ram_data[addr+7], ram_data[addr+6], ram_data[addr+5], ram_data[addr+4],
+                              ram_data[addr+3], ram_data[addr+2], ram_data[addr+1], ram_data[addr+0]};
+    assign rdata_o = ren_i ? rdata : 0;
 
-    // write
+    wire [`XLEN-1:0] mask = {{8{byte_en_i[7]}}, {8{byte_en_i[6]}}, {8{byte_en_i[5]}}, {8{byte_en_i[4]}}, 
+                             {8{byte_en_i[3]}}, {8{byte_en_i[2]}}, {8{byte_en_i[1]}}, {8{byte_en_i[0]}}};   
+
+    wire [`XLEN-1:0] wdata;
+
+    assign wdata = ((wdata_i & mask) | (rdata & (~mask)));
+
     always @(posedge clk) begin
         if(wen_i) begin
-            case(wmask_i)
-                `MASK_BYTE: begin
-                    ram_data[addr] <= wdata_i[7:0];
-                end
-                `MASK_HALF: begin
-                    {ram_data[addr+1], ram_data[addr]} <= wdata_i[15:0];
-                end
-                `MASK_WORD: begin
-                    {ram_data[addr+3], ram_data[addr+2], ram_data[addr+1], ram_data[addr]} <= wdata_i[31:0];
-                end 
-                `MASK_DOUBLE: begin
-                    {ram_data[addr+7], ram_data[addr+6], ram_data[addr+5], ram_data[addr+4],
-                     ram_data[addr+3], ram_data[addr+2], ram_data[addr+1], ram_data[addr+0]} <= wdata_i;
-                end  
-            endcase
-        end
+            {ram_data[addr+7], ram_data[addr+6], ram_data[addr+5], ram_data[addr+4],
+             ram_data[addr+3], ram_data[addr+2], ram_data[addr+1], ram_data[addr+0]} <= wdata;
+        end    
     end
-
 
 endmodule

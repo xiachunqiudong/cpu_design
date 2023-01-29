@@ -12,7 +12,7 @@ module mem(
     output [`XLEN-1:0] ram_addr_o,
     // write
     output             ram_wen_o,
-    output reg [7:0]   ram_byte_en_o,
+    output [7:0]       ram_byte_en_o,
     output [`XLEN-1:0] ram_wdata_o,
     // read
     output             ram_ren_o,
@@ -35,7 +35,7 @@ module mem(
     // RAM位宽为64bit
     assign ram_addr_o = {mem_addr_i[63:3], 3'b0};
 
-    // load指令
+    // LOAD
     // 读使能
     assign ram_ren_o   = (lb | lh | lw | ld | lbu | lhu | lwu);
     // lb
@@ -51,6 +51,7 @@ module mem(
             3'b101: lb_rdata = ram_rdata_i[47:40];
             3'b110: lb_rdata = ram_rdata_i[55:48];
             3'b111: lb_rdata = ram_rdata_i[63:56];
+            default: lb_rdata = 8'b0;
         endcase
     end
     // lh
@@ -61,6 +62,7 @@ module mem(
             2'b01: lh_rdata = ram_rdata_i[31:16];
             2'b10: lh_rdata = ram_rdata_i[47:32];
             2'b11: lh_rdata = ram_rdata_i[63:48];
+            default lh_rdata = 16'b0;
         endcase
     end
     // lw
@@ -78,7 +80,7 @@ module mem(
     wire [`XLEN-1:0] mem_rdata_lw  = {{32{lw_rdata[31]}}, lw_rdata};
     wire [`XLEN-1:0] mem_rdata_ld  = ram_rdata_i;
     // 无符号扩展
-    wire [`XLEN-1:0] mem_rdata_lbu = {{56'b0}, lh_rdata};
+    wire [`XLEN-1:0] mem_rdata_lbu = {{56'b0}, lb_rdata};
     wire [`XLEN-1:0] mem_rdata_lhu = {{48'b0}, lh_rdata};
     wire [`XLEN-1:0] mem_rdata_lwu = {{32'b0}, lw_rdata};
     
@@ -91,7 +93,7 @@ module mem(
                        | {{`XLEN{lhu}} & mem_rdata_lhu}
                        | {{`XLEN{lwu}} & mem_rdata_lwu};
 
-    // store指令
+    // STORE
     // 写使能
     assign ram_wen_o   = (sb | sh | sw | sd);
     // 写字节使能
@@ -112,13 +114,34 @@ module mem(
     end
     // sh
     reg [7:0] sh_byte_en;
-    // sw
     always @(*) begin
         case(mem_addr_i[2:1])
             2'b00: sh_byte_en = 8'b0000_0011;
-        endcase`
+            2'b01: sh_byte_en = 8'b0000_1100;
+            2'b10: sh_byte_en = 8'b0011_0000;
+            2'b11: sh_byte_en = 8'b1100_0000;
+            default: sh_byte_en = 8'b0000_0000;
+        endcase
     end
-    // sd
+    // sw
+    reg [7:0] sw_byte_en;
+    always @(*) begin
+        case(mem_addr_i[2])
+            1'b0: sw_byte_en = 8'b0000_1111;
+            1'b1: sw_byte_en = 8'b1111_0000;
+            default: sw_byte_en = 8'b0000_0000;
+        endcase
+    end
 
+    // 字节使能
+    assign ram_byte_en_o = ({8{sb}} & sb_byte_en)
+                         | ({8{sh}} & sh_byte_en)
+                         | ({8{sw}} & sw_byte_en)
+                         | ({8{sd}} & 8'b1111_1111);
+
+    assign ram_wdata_o = ({64{sb}} & {8{mem_wdata_i[7:0]}})
+                       | ({64{sh}} & {4{mem_wdata_i[15:0]}})
+                       | ({64{sw}} & {2{mem_wdata_i[31:0]}})
+                       | ({64{sd}} & mem_wdata_i);
 
 endmodule

@@ -7,7 +7,7 @@ memory status:
 
 -----------------------------1------------------------------
 pc = 0
-instr = addi x2, x0, 80
+instr = addi sp, x0, 256
 regfile status:
 x1	 = 0	x2	 = 0	x3	 = 0	x4	 = 0	x5	 = 0	
 x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
@@ -16,52 +16,26 @@ memory status:
 
 
 id_rs1_idx = 0 id_rs1_rdata = 0
-id_rs2_idx = 16 id_rs2_rdata = 0
-id_imm = 80
+id_rs2_idx = 0 id_rs2_rdata = 0
+id_imm = 256
 id_rd_wen = 1 id_rd_idx = 2
-ex_alu_res = 80
-ex_mem_addr = 80
+ex_alu_res = 256
+ex_mem_addr = 256
 ex_branch_jump = 0
 mem_rdata = 0
 
 After:
 regfile status:
-x1	 = 0	x2	 = 80	x3	 = 0	x4	 = 0	x5	 = 0	
-x6	 = 0	x7	 = 0	[x8	 = 0]	x9	 = 0	x10	 = 0	
+x1	 = 0	x2	 = 256	x3	 = 0	x4	 = 0	[x5	 = 0]	
+x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
 
 memory status:
 
 -----------------------------2------------------------------
 pc = 4
-instr = jal x1, main
+instr = addi x4, x0, 5
 regfile status:
-x1	 = 0	x2	 = 80	x3	 = 0	x4	 = 0	x5	 = 0	
-x6	 = 0	x7	 = 0	[x8	 = 0]	x9	 = 0	x10	 = 0	
-
-memory status:
-
-
-id_rs1_idx = 0 id_rs1_rdata = 0
-id_rs2_idx = 8 id_rs2_rdata = 0
-id_imm = 8
-id_rd_wen = 1 id_rd_idx = 1
-ex_alu_res = 8
-ex_mem_addr = 8
-ex_branch_jump = 0
-mem_rdata = 0
-
-After:
-regfile status:
-x1	 = 8	x2	 = 80	x3	 = 0	x4	 = 0	[x5	 = 0]	
-x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
-
-memory status:
-
------------------------------4------------------------------
-pc = 12
-instr = addi x5,  x0, 5
-regfile status:
-x1	 = 8	x2	 = 80	x3	 = 0	x4	 = 0	[x5	 = 0]	
+x1	 = 0	x2	 = 256	x3	 = 0	x4	 = 0	[x5	 = 0]	
 x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
 
 memory status:
@@ -70,7 +44,7 @@ memory status:
 id_rs1_idx = 0 id_rs1_rdata = 0
 id_rs2_idx = 5 id_rs2_rdata = 0
 id_imm = 5
-id_rd_wen = 1 id_rd_idx = 5
+id_rd_wen = 1 id_rd_idx = 4
 ex_alu_res = 5
 ex_mem_addr = 5
 ex_branch_jump = 0
@@ -78,258 +52,76 @@ mem_rdata = 0
 
 After:
 regfile status:
-x1	 = 8	x2	 = 80	x3	 = 0	x4	 = 0	x5	 = 5	
-[x6	 = 0]	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
-
-memory status:
-
------------------------------5------------------------------
-pc = 16
-instr = addi x6,  x0, 6
-regfile status:
-x1	 = 8	x2	 = 80	x3	 = 0	x4	 = 0	x5	 = 5	
-[x6	 = 0]	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
-
-memory status:
-
-
-id_rs1_idx = 0 id_rs1_rdata = 0
-id_rs2_idx = 6 id_rs2_rdata = 0
-id_imm = 6
-id_rd_wen = 1 id_rd_idx = 6
-ex_alu_res = 6
-ex_mem_addr = 6
-ex_branch_jump = 0
-mem_rdata = 0
-
-After:
-regfile status:
-x1	 = 8	x2	 = 80	x3	 = 0	x4	 = 0	[x5	 = 5]	
-[x6	 = 6]	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
-
-memory status:
-
------------------------------6------------------------------
-pc = 20
-instr = add  x10, x5, x6
-regfile status:
-x1	 = 8	x2	 = 80	x3	 = 0	x4	 = 0	[x5	 = 5]	
-[x6	 = 6]	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
-
-memory status:
-
-
-id_rs1_idx = 5 id_rs1_rdata = 5
-id_rs2_idx = 6 id_rs2_rdata = 6
-id_imm = 0
-id_rd_wen = 1 id_rd_idx = 10
-ex_alu_res = 11
-ex_mem_addr = 11
-ex_branch_jump = 0
-mem_rdata = 0
-
-After:
-regfile status:
-[x1	 = 8]	x2	 = 80	x3	 = 0	x4	 = 0	x5	 = 5	
-x6	 = 6	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 11	
-
-memory status:
-
------------------------------7------------------------------
-pc = 24
-instr = ret
-regfile status:
-[x1	 = 8]	x2	 = 80	x3	 = 0	x4	 = 0	x5	 = 5	
-x6	 = 6	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 11	
-
-memory status:
-
-
-id_rs1_idx = 1 id_rs1_rdata = 8
-id_rs2_idx = 0 id_rs2_rdata = 0
-id_imm = 0
-id_rd_wen = 1 id_rd_idx = 0
-ex_alu_res = 28
-ex_mem_addr = 28
-ex_branch_jump = 0
-mem_rdata = 0
-
-After:
-regfile status:
-x1	 = 8	[x2	 = 80]	x3	 = 0	x4	 = 0	x5	 = 5	
-x6	 = 6	x7	 = 0	x8	 = 0	x9	 = 0	[x10	 = 11]	
+x1	 = 0	x2	 = 256	x3	 = 0	x4	 = 5	x5	 = 0	
+x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
 
 memory status:
 
 -----------------------------3------------------------------
 pc = 8
-instr = sb x10, 0(x2)
+instr = jal x0, test 
 regfile status:
-x1	 = 8	[x2	 = 80]	x3	 = 0	x4	 = 0	x5	 = 5	
-x6	 = 6	x7	 = 0	x8	 = 0	x9	 = 0	[x10	 = 11]	
-
-memory status:
-
-
-id_rs1_idx = 2 id_rs1_rdata = 80
-id_rs2_idx = 10 id_rs2_rdata = 11
-id_imm = 0
-id_rd_wen = 0 id_rd_idx = 0
-ex_alu_res = 0
-ex_mem_addr = 80
-ex_branch_jump = 0
-mem_rdata = 0
-
-After:
-regfile status:
-x1	 = 8	x2	 = 80	x3	 = 0	x4	 = 0	[x5	 = 5]	
-x6	 = 6	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 11	
-
-memory status:
-ram[80]	: 0	 -> 11	| 
------------------------------4------------------------------
-pc = 12
-instr = addi x5,  x0, 5
-regfile status:
-x1	 = 8	x2	 = 80	x3	 = 0	x4	 = 0	[x5	 = 5]	
-x6	 = 6	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 11	
+x1	 = 0	x2	 = 256	x3	 = 0	x4	 = 5	x5	 = 0	
+x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
 
 memory status:
 
 
 id_rs1_idx = 0 id_rs1_rdata = 0
-id_rs2_idx = 5 id_rs2_rdata = 5
-id_imm = 5
-id_rd_wen = 1 id_rd_idx = 5
-ex_alu_res = 5
-ex_mem_addr = 5
+id_rs2_idx = 16 id_rs2_rdata = 0
+id_imm = 16
+id_rd_wen = 1 id_rd_idx = 0
+ex_alu_res = 12
+ex_mem_addr = 12
 ex_branch_jump = 0
 mem_rdata = 0
 
 After:
 regfile status:
-x1	 = 8	x2	 = 80	x3	 = 0	x4	 = 0	x5	 = 5	
-[x6	 = 6]	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 11	
-
-memory status:
-
------------------------------5------------------------------
-pc = 16
-instr = addi x6,  x0, 6
-regfile status:
-x1	 = 8	x2	 = 80	x3	 = 0	x4	 = 0	x5	 = 5	
-[x6	 = 6]	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 11	
-
-memory status:
-
-
-id_rs1_idx = 0 id_rs1_rdata = 0
-id_rs2_idx = 6 id_rs2_rdata = 6
-id_imm = 6
-id_rd_wen = 1 id_rd_idx = 6
-ex_alu_res = 6
-ex_mem_addr = 6
-ex_branch_jump = 0
-mem_rdata = 0
-
-After:
-regfile status:
-x1	 = 8	x2	 = 80	x3	 = 0	x4	 = 0	[x5	 = 5]	
-[x6	 = 6]	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 11	
-
-memory status:
-
------------------------------6------------------------------
-pc = 20
-instr = add  x10, x5, x6
-regfile status:
-x1	 = 8	x2	 = 80	x3	 = 0	x4	 = 0	[x5	 = 5]	
-[x6	 = 6]	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 11	
-
-memory status:
-
-
-id_rs1_idx = 5 id_rs1_rdata = 5
-id_rs2_idx = 6 id_rs2_rdata = 6
-id_imm = 0
-id_rd_wen = 1 id_rd_idx = 10
-ex_alu_res = 11
-ex_mem_addr = 11
-ex_branch_jump = 0
-mem_rdata = 0
-
-After:
-regfile status:
-[x1	 = 8]	x2	 = 80	x3	 = 0	x4	 = 0	x5	 = 5	
-x6	 = 6	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 11	
+x1	 = 0	x2	 = 256	x3	 = 0	[x4	 = 5]	x5	 = 0	
+x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
 
 memory status:
 
 -----------------------------7------------------------------
 pc = 24
-instr = ret
+instr = bne x4, x0, loop
 regfile status:
-[x1	 = 8]	x2	 = 80	x3	 = 0	x4	 = 0	x5	 = 5	
-x6	 = 6	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 11	
+x1	 = 0	x2	 = 256	x3	 = 0	[x4	 = 5]	x5	 = 0	
+x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
 
 memory status:
 
 
-id_rs1_idx = 1 id_rs1_rdata = 8
+id_rs1_idx = 4 id_rs1_rdata = 5
 id_rs2_idx = 0 id_rs2_rdata = 0
-id_imm = 0
-id_rd_wen = 1 id_rd_idx = 0
-ex_alu_res = 28
-ex_mem_addr = 28
-ex_branch_jump = 0
+id_imm = -12
+id_rd_wen = 0 id_rd_idx = 21
+ex_alu_res = 5
+ex_mem_addr = 5
+ex_branch_jump = 1
 mem_rdata = 0
 
 After:
 regfile status:
-x1	 = 8	[x2	 = 80]	x3	 = 0	x4	 = 0	x5	 = 5	
-x6	 = 6	x7	 = 0	x8	 = 0	x9	 = 0	[x10	 = 11]	
-
-memory status:
-
------------------------------3------------------------------
-pc = 8
-instr = sb x10, 0(x2)
-regfile status:
-x1	 = 8	[x2	 = 80]	x3	 = 0	x4	 = 0	x5	 = 5	
-x6	 = 6	x7	 = 0	x8	 = 0	x9	 = 0	[x10	 = 11]	
-
-memory status:
-
-
-id_rs1_idx = 2 id_rs1_rdata = 80
-id_rs2_idx = 10 id_rs2_rdata = 11
-id_imm = 0
-id_rd_wen = 0 id_rd_idx = 0
-ex_alu_res = 0
-ex_mem_addr = 80
-ex_branch_jump = 0
-mem_rdata = 0
-
-After:
-regfile status:
-x1	 = 8	x2	 = 80	x3	 = 0	x4	 = 0	[x5	 = 5]	
-x6	 = 6	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 11	
+x1	 = 0	x2	 = 256	x3	 = 0	[x4	 = 5]	x5	 = 0	
+x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
 
 memory status:
 
 -----------------------------4------------------------------
 pc = 12
-instr = addi x5,  x0, 5
+instr = add x5, x0, x4
 regfile status:
-x1	 = 8	x2	 = 80	x3	 = 0	x4	 = 0	[x5	 = 5]	
-x6	 = 6	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 11	
+x1	 = 0	x2	 = 256	x3	 = 0	[x4	 = 5]	x5	 = 0	
+x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
 
 memory status:
 
 
 id_rs1_idx = 0 id_rs1_rdata = 0
-id_rs2_idx = 5 id_rs2_rdata = 5
-id_imm = 5
+id_rs2_idx = 4 id_rs2_rdata = 5
+id_imm = 0
 id_rd_wen = 1 id_rd_idx = 5
 ex_alu_res = 5
 ex_mem_addr = 5
@@ -338,937 +130,1145 @@ mem_rdata = 0
 
 After:
 regfile status:
-x1	 = 8	x2	 = 80	x3	 = 0	x4	 = 0	x5	 = 5	
-[x6	 = 6]	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 11	
+x1	 = 0	x2	 = 256	x3	 = 0	x4	 = 5	x5	 = 5	
+x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
 
 memory status:
 
 -----------------------------5------------------------------
 pc = 16
-instr = addi x6,  x0, 6
+instr = jal x1, foo
 regfile status:
-x1	 = 8	x2	 = 80	x3	 = 0	x4	 = 0	x5	 = 5	
-[x6	 = 6]	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 11	
+x1	 = 0	x2	 = 256	x3	 = 0	x4	 = 5	x5	 = 5	
+x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
 
 memory status:
 
 
 id_rs1_idx = 0 id_rs1_rdata = 0
-id_rs2_idx = 6 id_rs2_rdata = 6
-id_imm = 6
-id_rd_wen = 1 id_rd_idx = 6
-ex_alu_res = 6
-ex_mem_addr = 6
+id_rs2_idx = 12 id_rs2_rdata = 0
+id_imm = 12
+id_rd_wen = 1 id_rd_idx = 1
+ex_alu_res = 20
+ex_mem_addr = 20
 ex_branch_jump = 0
 mem_rdata = 0
 
 After:
 regfile status:
-x1	 = 8	x2	 = 80	x3	 = 0	x4	 = 0	[x5	 = 5]	
-[x6	 = 6]	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 11	
+x1	 = 20	[x2	 = 256]	x3	 = 0	x4	 = 5	[x5	 = 5]	
+x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
+
+memory status:
+
+-----------------------------8------------------------------
+pc = 28
+instr = sb x5, 0(sp)
+regfile status:
+x1	 = 20	[x2	 = 256]	x3	 = 0	x4	 = 5	[x5	 = 5]	
+x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
+
+memory status:
+
+
+id_rs1_idx = 2 id_rs1_rdata = 256
+id_rs2_idx = 5 id_rs2_rdata = 5
+id_imm = 0
+id_rd_wen = 0 id_rd_idx = 0
+ex_alu_res = 0
+ex_mem_addr = 256
+ex_branch_jump = 0
+mem_rdata = 0
+
+After:
+regfile status:
+x1	 = 20	[x2	 = 256]	x3	 = 0	x4	 = 5	x5	 = 5	
+x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
+
+memory status:
+ram[256]	: 0	 -> 5	| 
+-----------------------------9------------------------------
+pc = 32
+instr = addi sp, sp, -1
+regfile status:
+x1	 = 20	[x2	 = 256]	x3	 = 0	x4	 = 5	x5	 = 5	
+x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
+
+memory status:
+
+
+id_rs1_idx = 2 id_rs1_rdata = 256
+id_rs2_idx = 31 id_rs2_rdata = 0
+id_imm = -1
+id_rd_wen = 1 id_rd_idx = 2
+ex_alu_res = 255
+ex_mem_addr = 255
+ex_branch_jump = 0
+mem_rdata = 0
+
+After:
+regfile status:
+[x1	 = 20]	x2	 = 255	x3	 = 0	x4	 = 5	x5	 = 5	
+x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
+
+memory status:
+
+-----------------------------10------------------------------
+pc = 36
+instr = ret
+regfile status:
+[x1	 = 20]	x2	 = 255	x3	 = 0	x4	 = 5	x5	 = 5	
+x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
+
+memory status:
+
+
+id_rs1_idx = 1 id_rs1_rdata = 20
+id_rs2_idx = 0 id_rs2_rdata = 0
+id_imm = 0
+id_rd_wen = 1 id_rd_idx = 0
+ex_alu_res = 40
+ex_mem_addr = 40
+ex_branch_jump = 0
+mem_rdata = 0
+
+After:
+regfile status:
+x1	 = 20	x2	 = 255	x3	 = 0	[x4	 = 5]	x5	 = 5	
+x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
 
 memory status:
 
 -----------------------------6------------------------------
 pc = 20
-instr = add  x10, x5, x6
+instr = addi x4, x4, -1
 regfile status:
-x1	 = 8	x2	 = 80	x3	 = 0	x4	 = 0	[x5	 = 5]	
-[x6	 = 6]	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 11	
+x1	 = 20	x2	 = 255	x3	 = 0	[x4	 = 5]	x5	 = 5	
+x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
 
 memory status:
 
 
-id_rs1_idx = 5 id_rs1_rdata = 5
-id_rs2_idx = 6 id_rs2_rdata = 6
-id_imm = 0
-id_rd_wen = 1 id_rd_idx = 10
-ex_alu_res = 11
-ex_mem_addr = 11
+id_rs1_idx = 4 id_rs1_rdata = 5
+id_rs2_idx = 31 id_rs2_rdata = 0
+id_imm = -1
+id_rd_wen = 1 id_rd_idx = 4
+ex_alu_res = 4
+ex_mem_addr = 4
 ex_branch_jump = 0
 mem_rdata = 0
 
 After:
 regfile status:
-[x1	 = 8]	x2	 = 80	x3	 = 0	x4	 = 0	x5	 = 5	
-x6	 = 6	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 11	
+x1	 = 20	x2	 = 255	x3	 = 0	[x4	 = 4]	x5	 = 5	
+x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
 
 memory status:
 
 -----------------------------7------------------------------
 pc = 24
-instr = ret
+instr = bne x4, x0, loop
 regfile status:
-[x1	 = 8]	x2	 = 80	x3	 = 0	x4	 = 0	x5	 = 5	
-x6	 = 6	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 11	
+x1	 = 20	x2	 = 255	x3	 = 0	[x4	 = 4]	x5	 = 5	
+x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
 
 memory status:
 
 
-id_rs1_idx = 1 id_rs1_rdata = 8
+id_rs1_idx = 4 id_rs1_rdata = 4
 id_rs2_idx = 0 id_rs2_rdata = 0
-id_imm = 0
-id_rd_wen = 1 id_rd_idx = 0
-ex_alu_res = 28
-ex_mem_addr = 28
-ex_branch_jump = 0
+id_imm = -12
+id_rd_wen = 0 id_rd_idx = 21
+ex_alu_res = 4
+ex_mem_addr = 4
+ex_branch_jump = 1
 mem_rdata = 0
 
 After:
 regfile status:
-x1	 = 8	[x2	 = 80]	x3	 = 0	x4	 = 0	x5	 = 5	
-x6	 = 6	x7	 = 0	x8	 = 0	x9	 = 0	[x10	 = 11]	
-
-memory status:
-
------------------------------3------------------------------
-pc = 8
-instr = sb x10, 0(x2)
-regfile status:
-x1	 = 8	[x2	 = 80]	x3	 = 0	x4	 = 0	x5	 = 5	
-x6	 = 6	x7	 = 0	x8	 = 0	x9	 = 0	[x10	 = 11]	
-
-memory status:
-
-
-id_rs1_idx = 2 id_rs1_rdata = 80
-id_rs2_idx = 10 id_rs2_rdata = 11
-id_imm = 0
-id_rd_wen = 0 id_rd_idx = 0
-ex_alu_res = 0
-ex_mem_addr = 80
-ex_branch_jump = 0
-mem_rdata = 0
-
-After:
-regfile status:
-x1	 = 8	x2	 = 80	x3	 = 0	x4	 = 0	[x5	 = 5]	
-x6	 = 6	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 11	
+x1	 = 20	x2	 = 255	x3	 = 0	[x4	 = 4]	x5	 = 5	
+x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
 
 memory status:
 
 -----------------------------4------------------------------
 pc = 12
-instr = addi x5,  x0, 5
+instr = add x5, x0, x4
 regfile status:
-x1	 = 8	x2	 = 80	x3	 = 0	x4	 = 0	[x5	 = 5]	
-x6	 = 6	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 11	
+x1	 = 20	x2	 = 255	x3	 = 0	[x4	 = 4]	x5	 = 5	
+x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
 
 memory status:
 
 
 id_rs1_idx = 0 id_rs1_rdata = 0
-id_rs2_idx = 5 id_rs2_rdata = 5
-id_imm = 5
+id_rs2_idx = 4 id_rs2_rdata = 4
+id_imm = 0
 id_rd_wen = 1 id_rd_idx = 5
-ex_alu_res = 5
-ex_mem_addr = 5
+ex_alu_res = 4
+ex_mem_addr = 4
 ex_branch_jump = 0
 mem_rdata = 0
 
 After:
 regfile status:
-x1	 = 8	x2	 = 80	x3	 = 0	x4	 = 0	x5	 = 5	
-[x6	 = 6]	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 11	
+x1	 = 20	x2	 = 255	x3	 = 0	x4	 = 4	x5	 = 4	
+x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
 
 memory status:
 
 -----------------------------5------------------------------
 pc = 16
-instr = addi x6,  x0, 6
+instr = jal x1, foo
 regfile status:
-x1	 = 8	x2	 = 80	x3	 = 0	x4	 = 0	x5	 = 5	
-[x6	 = 6]	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 11	
+x1	 = 20	x2	 = 255	x3	 = 0	x4	 = 4	x5	 = 4	
+x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
 
 memory status:
 
 
 id_rs1_idx = 0 id_rs1_rdata = 0
-id_rs2_idx = 6 id_rs2_rdata = 6
-id_imm = 6
-id_rd_wen = 1 id_rd_idx = 6
-ex_alu_res = 6
-ex_mem_addr = 6
+id_rs2_idx = 12 id_rs2_rdata = 0
+id_imm = 12
+id_rd_wen = 1 id_rd_idx = 1
+ex_alu_res = 20
+ex_mem_addr = 20
 ex_branch_jump = 0
 mem_rdata = 0
 
 After:
 regfile status:
-x1	 = 8	x2	 = 80	x3	 = 0	x4	 = 0	[x5	 = 5]	
-[x6	 = 6]	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 11	
+x1	 = 20	[x2	 = 255]	x3	 = 0	x4	 = 4	[x5	 = 4]	
+x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
+
+memory status:
+
+-----------------------------8------------------------------
+pc = 28
+instr = sb x5, 0(sp)
+regfile status:
+x1	 = 20	[x2	 = 255]	x3	 = 0	x4	 = 4	[x5	 = 4]	
+x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
+
+memory status:
+
+
+id_rs1_idx = 2 id_rs1_rdata = 255
+id_rs2_idx = 5 id_rs2_rdata = 4
+id_imm = 0
+id_rd_wen = 0 id_rd_idx = 0
+ex_alu_res = 0
+ex_mem_addr = 255
+ex_branch_jump = 0
+mem_rdata = 0
+
+After:
+regfile status:
+x1	 = 20	[x2	 = 255]	x3	 = 0	x4	 = 4	x5	 = 4	
+x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
+
+memory status:
+ram[255]	: 0	 -> 4	| 
+-----------------------------9------------------------------
+pc = 32
+instr = addi sp, sp, -1
+regfile status:
+x1	 = 20	[x2	 = 255]	x3	 = 0	x4	 = 4	x5	 = 4	
+x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
+
+memory status:
+
+
+id_rs1_idx = 2 id_rs1_rdata = 255
+id_rs2_idx = 31 id_rs2_rdata = 0
+id_imm = -1
+id_rd_wen = 1 id_rd_idx = 2
+ex_alu_res = 254
+ex_mem_addr = 254
+ex_branch_jump = 0
+mem_rdata = 0
+
+After:
+regfile status:
+[x1	 = 20]	x2	 = 254	x3	 = 0	x4	 = 4	x5	 = 4	
+x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
+
+memory status:
+
+-----------------------------10------------------------------
+pc = 36
+instr = ret
+regfile status:
+[x1	 = 20]	x2	 = 254	x3	 = 0	x4	 = 4	x5	 = 4	
+x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
+
+memory status:
+
+
+id_rs1_idx = 1 id_rs1_rdata = 20
+id_rs2_idx = 0 id_rs2_rdata = 0
+id_imm = 0
+id_rd_wen = 1 id_rd_idx = 0
+ex_alu_res = 40
+ex_mem_addr = 40
+ex_branch_jump = 0
+mem_rdata = 0
+
+After:
+regfile status:
+x1	 = 20	x2	 = 254	x3	 = 0	[x4	 = 4]	x5	 = 4	
+x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
 
 memory status:
 
 -----------------------------6------------------------------
 pc = 20
-instr = add  x10, x5, x6
+instr = addi x4, x4, -1
 regfile status:
-x1	 = 8	x2	 = 80	x3	 = 0	x4	 = 0	[x5	 = 5]	
-[x6	 = 6]	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 11	
+x1	 = 20	x2	 = 254	x3	 = 0	[x4	 = 4]	x5	 = 4	
+x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
 
 memory status:
 
 
-id_rs1_idx = 5 id_rs1_rdata = 5
-id_rs2_idx = 6 id_rs2_rdata = 6
-id_imm = 0
-id_rd_wen = 1 id_rd_idx = 10
-ex_alu_res = 11
-ex_mem_addr = 11
+id_rs1_idx = 4 id_rs1_rdata = 4
+id_rs2_idx = 31 id_rs2_rdata = 0
+id_imm = -1
+id_rd_wen = 1 id_rd_idx = 4
+ex_alu_res = 3
+ex_mem_addr = 3
 ex_branch_jump = 0
 mem_rdata = 0
 
 After:
 regfile status:
-[x1	 = 8]	x2	 = 80	x3	 = 0	x4	 = 0	x5	 = 5	
-x6	 = 6	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 11	
+x1	 = 20	x2	 = 254	x3	 = 0	[x4	 = 3]	x5	 = 4	
+x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
 
 memory status:
 
 -----------------------------7------------------------------
 pc = 24
-instr = ret
+instr = bne x4, x0, loop
 regfile status:
-[x1	 = 8]	x2	 = 80	x3	 = 0	x4	 = 0	x5	 = 5	
-x6	 = 6	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 11	
+x1	 = 20	x2	 = 254	x3	 = 0	[x4	 = 3]	x5	 = 4	
+x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
 
 memory status:
 
 
-id_rs1_idx = 1 id_rs1_rdata = 8
+id_rs1_idx = 4 id_rs1_rdata = 3
 id_rs2_idx = 0 id_rs2_rdata = 0
-id_imm = 0
-id_rd_wen = 1 id_rd_idx = 0
-ex_alu_res = 28
-ex_mem_addr = 28
-ex_branch_jump = 0
+id_imm = -12
+id_rd_wen = 0 id_rd_idx = 21
+ex_alu_res = 3
+ex_mem_addr = 3
+ex_branch_jump = 1
 mem_rdata = 0
 
 After:
 regfile status:
-x1	 = 8	[x2	 = 80]	x3	 = 0	x4	 = 0	x5	 = 5	
-x6	 = 6	x7	 = 0	x8	 = 0	x9	 = 0	[x10	 = 11]	
-
-memory status:
-
------------------------------3------------------------------
-pc = 8
-instr = sb x10, 0(x2)
-regfile status:
-x1	 = 8	[x2	 = 80]	x3	 = 0	x4	 = 0	x5	 = 5	
-x6	 = 6	x7	 = 0	x8	 = 0	x9	 = 0	[x10	 = 11]	
-
-memory status:
-
-
-id_rs1_idx = 2 id_rs1_rdata = 80
-id_rs2_idx = 10 id_rs2_rdata = 11
-id_imm = 0
-id_rd_wen = 0 id_rd_idx = 0
-ex_alu_res = 0
-ex_mem_addr = 80
-ex_branch_jump = 0
-mem_rdata = 0
-
-After:
-regfile status:
-x1	 = 8	x2	 = 80	x3	 = 0	x4	 = 0	[x5	 = 5]	
-x6	 = 6	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 11	
+x1	 = 20	x2	 = 254	x3	 = 0	[x4	 = 3]	x5	 = 4	
+x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
 
 memory status:
 
 -----------------------------4------------------------------
 pc = 12
-instr = addi x5,  x0, 5
+instr = add x5, x0, x4
 regfile status:
-x1	 = 8	x2	 = 80	x3	 = 0	x4	 = 0	[x5	 = 5]	
-x6	 = 6	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 11	
+x1	 = 20	x2	 = 254	x3	 = 0	[x4	 = 3]	x5	 = 4	
+x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
 
 memory status:
 
 
 id_rs1_idx = 0 id_rs1_rdata = 0
-id_rs2_idx = 5 id_rs2_rdata = 5
-id_imm = 5
+id_rs2_idx = 4 id_rs2_rdata = 3
+id_imm = 0
 id_rd_wen = 1 id_rd_idx = 5
-ex_alu_res = 5
-ex_mem_addr = 5
+ex_alu_res = 3
+ex_mem_addr = 3
 ex_branch_jump = 0
 mem_rdata = 0
 
 After:
 regfile status:
-x1	 = 8	x2	 = 80	x3	 = 0	x4	 = 0	x5	 = 5	
-[x6	 = 6]	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 11	
+x1	 = 20	x2	 = 254	x3	 = 0	x4	 = 3	x5	 = 3	
+x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
 
 memory status:
 
 -----------------------------5------------------------------
 pc = 16
-instr = addi x6,  x0, 6
+instr = jal x1, foo
 regfile status:
-x1	 = 8	x2	 = 80	x3	 = 0	x4	 = 0	x5	 = 5	
-[x6	 = 6]	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 11	
+x1	 = 20	x2	 = 254	x3	 = 0	x4	 = 3	x5	 = 3	
+x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
 
 memory status:
 
 
 id_rs1_idx = 0 id_rs1_rdata = 0
-id_rs2_idx = 6 id_rs2_rdata = 6
-id_imm = 6
-id_rd_wen = 1 id_rd_idx = 6
-ex_alu_res = 6
-ex_mem_addr = 6
+id_rs2_idx = 12 id_rs2_rdata = 0
+id_imm = 12
+id_rd_wen = 1 id_rd_idx = 1
+ex_alu_res = 20
+ex_mem_addr = 20
 ex_branch_jump = 0
 mem_rdata = 0
 
 After:
 regfile status:
-x1	 = 8	x2	 = 80	x3	 = 0	x4	 = 0	[x5	 = 5]	
-[x6	 = 6]	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 11	
+x1	 = 20	[x2	 = 254]	x3	 = 0	x4	 = 3	[x5	 = 3]	
+x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
+
+memory status:
+
+-----------------------------8------------------------------
+pc = 28
+instr = sb x5, 0(sp)
+regfile status:
+x1	 = 20	[x2	 = 254]	x3	 = 0	x4	 = 3	[x5	 = 3]	
+x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
+
+memory status:
+
+
+id_rs1_idx = 2 id_rs1_rdata = 254
+id_rs2_idx = 5 id_rs2_rdata = 3
+id_imm = 0
+id_rd_wen = 0 id_rd_idx = 0
+ex_alu_res = 0
+ex_mem_addr = 254
+ex_branch_jump = 0
+mem_rdata = 0
+
+After:
+regfile status:
+x1	 = 20	[x2	 = 254]	x3	 = 0	x4	 = 3	x5	 = 3	
+x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
+
+memory status:
+ram[254]	: 0	 -> 3	| 
+-----------------------------9------------------------------
+pc = 32
+instr = addi sp, sp, -1
+regfile status:
+x1	 = 20	[x2	 = 254]	x3	 = 0	x4	 = 3	x5	 = 3	
+x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
+
+memory status:
+
+
+id_rs1_idx = 2 id_rs1_rdata = 254
+id_rs2_idx = 31 id_rs2_rdata = 0
+id_imm = -1
+id_rd_wen = 1 id_rd_idx = 2
+ex_alu_res = 253
+ex_mem_addr = 253
+ex_branch_jump = 0
+mem_rdata = 0
+
+After:
+regfile status:
+[x1	 = 20]	x2	 = 253	x3	 = 0	x4	 = 3	x5	 = 3	
+x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
+
+memory status:
+
+-----------------------------10------------------------------
+pc = 36
+instr = ret
+regfile status:
+[x1	 = 20]	x2	 = 253	x3	 = 0	x4	 = 3	x5	 = 3	
+x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
+
+memory status:
+
+
+id_rs1_idx = 1 id_rs1_rdata = 20
+id_rs2_idx = 0 id_rs2_rdata = 0
+id_imm = 0
+id_rd_wen = 1 id_rd_idx = 0
+ex_alu_res = 40
+ex_mem_addr = 40
+ex_branch_jump = 0
+mem_rdata = 0
+
+After:
+regfile status:
+x1	 = 20	x2	 = 253	x3	 = 0	[x4	 = 3]	x5	 = 3	
+x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
 
 memory status:
 
 -----------------------------6------------------------------
 pc = 20
-instr = add  x10, x5, x6
+instr = addi x4, x4, -1
 regfile status:
-x1	 = 8	x2	 = 80	x3	 = 0	x4	 = 0	[x5	 = 5]	
-[x6	 = 6]	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 11	
+x1	 = 20	x2	 = 253	x3	 = 0	[x4	 = 3]	x5	 = 3	
+x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
 
 memory status:
 
 
-id_rs1_idx = 5 id_rs1_rdata = 5
-id_rs2_idx = 6 id_rs2_rdata = 6
-id_imm = 0
-id_rd_wen = 1 id_rd_idx = 10
-ex_alu_res = 11
-ex_mem_addr = 11
+id_rs1_idx = 4 id_rs1_rdata = 3
+id_rs2_idx = 31 id_rs2_rdata = 0
+id_imm = -1
+id_rd_wen = 1 id_rd_idx = 4
+ex_alu_res = 2
+ex_mem_addr = 2
 ex_branch_jump = 0
 mem_rdata = 0
 
 After:
 regfile status:
-[x1	 = 8]	x2	 = 80	x3	 = 0	x4	 = 0	x5	 = 5	
-x6	 = 6	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 11	
+x1	 = 20	x2	 = 253	x3	 = 0	[x4	 = 2]	x5	 = 3	
+x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
 
 memory status:
 
 -----------------------------7------------------------------
 pc = 24
-instr = ret
+instr = bne x4, x0, loop
 regfile status:
-[x1	 = 8]	x2	 = 80	x3	 = 0	x4	 = 0	x5	 = 5	
-x6	 = 6	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 11	
+x1	 = 20	x2	 = 253	x3	 = 0	[x4	 = 2]	x5	 = 3	
+x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
 
 memory status:
 
 
-id_rs1_idx = 1 id_rs1_rdata = 8
+id_rs1_idx = 4 id_rs1_rdata = 2
 id_rs2_idx = 0 id_rs2_rdata = 0
-id_imm = 0
-id_rd_wen = 1 id_rd_idx = 0
-ex_alu_res = 28
-ex_mem_addr = 28
-ex_branch_jump = 0
+id_imm = -12
+id_rd_wen = 0 id_rd_idx = 21
+ex_alu_res = 2
+ex_mem_addr = 2
+ex_branch_jump = 1
 mem_rdata = 0
 
 After:
 regfile status:
-x1	 = 8	[x2	 = 80]	x3	 = 0	x4	 = 0	x5	 = 5	
-x6	 = 6	x7	 = 0	x8	 = 0	x9	 = 0	[x10	 = 11]	
-
-memory status:
-
------------------------------3------------------------------
-pc = 8
-instr = sb x10, 0(x2)
-regfile status:
-x1	 = 8	[x2	 = 80]	x3	 = 0	x4	 = 0	x5	 = 5	
-x6	 = 6	x7	 = 0	x8	 = 0	x9	 = 0	[x10	 = 11]	
-
-memory status:
-
-
-id_rs1_idx = 2 id_rs1_rdata = 80
-id_rs2_idx = 10 id_rs2_rdata = 11
-id_imm = 0
-id_rd_wen = 0 id_rd_idx = 0
-ex_alu_res = 0
-ex_mem_addr = 80
-ex_branch_jump = 0
-mem_rdata = 0
-
-After:
-regfile status:
-x1	 = 8	x2	 = 80	x3	 = 0	x4	 = 0	[x5	 = 5]	
-x6	 = 6	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 11	
+x1	 = 20	x2	 = 253	x3	 = 0	[x4	 = 2]	x5	 = 3	
+x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
 
 memory status:
 
 -----------------------------4------------------------------
 pc = 12
-instr = addi x5,  x0, 5
+instr = add x5, x0, x4
 regfile status:
-x1	 = 8	x2	 = 80	x3	 = 0	x4	 = 0	[x5	 = 5]	
-x6	 = 6	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 11	
+x1	 = 20	x2	 = 253	x3	 = 0	[x4	 = 2]	x5	 = 3	
+x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
 
 memory status:
 
 
 id_rs1_idx = 0 id_rs1_rdata = 0
-id_rs2_idx = 5 id_rs2_rdata = 5
-id_imm = 5
+id_rs2_idx = 4 id_rs2_rdata = 2
+id_imm = 0
 id_rd_wen = 1 id_rd_idx = 5
-ex_alu_res = 5
-ex_mem_addr = 5
+ex_alu_res = 2
+ex_mem_addr = 2
 ex_branch_jump = 0
 mem_rdata = 0
 
 After:
 regfile status:
-x1	 = 8	x2	 = 80	x3	 = 0	x4	 = 0	x5	 = 5	
-[x6	 = 6]	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 11	
+x1	 = 20	x2	 = 253	x3	 = 0	x4	 = 2	x5	 = 2	
+x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
 
 memory status:
 
 -----------------------------5------------------------------
 pc = 16
-instr = addi x6,  x0, 6
+instr = jal x1, foo
 regfile status:
-x1	 = 8	x2	 = 80	x3	 = 0	x4	 = 0	x5	 = 5	
-[x6	 = 6]	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 11	
+x1	 = 20	x2	 = 253	x3	 = 0	x4	 = 2	x5	 = 2	
+x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
 
 memory status:
 
 
 id_rs1_idx = 0 id_rs1_rdata = 0
-id_rs2_idx = 6 id_rs2_rdata = 6
-id_imm = 6
-id_rd_wen = 1 id_rd_idx = 6
-ex_alu_res = 6
-ex_mem_addr = 6
+id_rs2_idx = 12 id_rs2_rdata = 0
+id_imm = 12
+id_rd_wen = 1 id_rd_idx = 1
+ex_alu_res = 20
+ex_mem_addr = 20
 ex_branch_jump = 0
 mem_rdata = 0
 
 After:
 regfile status:
-x1	 = 8	x2	 = 80	x3	 = 0	x4	 = 0	[x5	 = 5]	
-[x6	 = 6]	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 11	
+x1	 = 20	[x2	 = 253]	x3	 = 0	x4	 = 2	[x5	 = 2]	
+x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
+
+memory status:
+
+-----------------------------8------------------------------
+pc = 28
+instr = sb x5, 0(sp)
+regfile status:
+x1	 = 20	[x2	 = 253]	x3	 = 0	x4	 = 2	[x5	 = 2]	
+x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
+
+memory status:
+
+
+id_rs1_idx = 2 id_rs1_rdata = 253
+id_rs2_idx = 5 id_rs2_rdata = 2
+id_imm = 0
+id_rd_wen = 0 id_rd_idx = 0
+ex_alu_res = 0
+ex_mem_addr = 253
+ex_branch_jump = 0
+mem_rdata = 0
+
+After:
+regfile status:
+x1	 = 20	[x2	 = 253]	x3	 = 0	x4	 = 2	x5	 = 2	
+x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
+
+memory status:
+ram[253]	: 0	 -> 2	| 
+-----------------------------9------------------------------
+pc = 32
+instr = addi sp, sp, -1
+regfile status:
+x1	 = 20	[x2	 = 253]	x3	 = 0	x4	 = 2	x5	 = 2	
+x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
+
+memory status:
+
+
+id_rs1_idx = 2 id_rs1_rdata = 253
+id_rs2_idx = 31 id_rs2_rdata = 0
+id_imm = -1
+id_rd_wen = 1 id_rd_idx = 2
+ex_alu_res = 252
+ex_mem_addr = 252
+ex_branch_jump = 0
+mem_rdata = 0
+
+After:
+regfile status:
+[x1	 = 20]	x2	 = 252	x3	 = 0	x4	 = 2	x5	 = 2	
+x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
+
+memory status:
+
+-----------------------------10------------------------------
+pc = 36
+instr = ret
+regfile status:
+[x1	 = 20]	x2	 = 252	x3	 = 0	x4	 = 2	x5	 = 2	
+x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
+
+memory status:
+
+
+id_rs1_idx = 1 id_rs1_rdata = 20
+id_rs2_idx = 0 id_rs2_rdata = 0
+id_imm = 0
+id_rd_wen = 1 id_rd_idx = 0
+ex_alu_res = 40
+ex_mem_addr = 40
+ex_branch_jump = 0
+mem_rdata = 0
+
+After:
+regfile status:
+x1	 = 20	x2	 = 252	x3	 = 0	[x4	 = 2]	x5	 = 2	
+x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
 
 memory status:
 
 -----------------------------6------------------------------
 pc = 20
-instr = add  x10, x5, x6
+instr = addi x4, x4, -1
 regfile status:
-x1	 = 8	x2	 = 80	x3	 = 0	x4	 = 0	[x5	 = 5]	
-[x6	 = 6]	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 11	
+x1	 = 20	x2	 = 252	x3	 = 0	[x4	 = 2]	x5	 = 2	
+x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
 
 memory status:
 
 
-id_rs1_idx = 5 id_rs1_rdata = 5
-id_rs2_idx = 6 id_rs2_rdata = 6
-id_imm = 0
-id_rd_wen = 1 id_rd_idx = 10
-ex_alu_res = 11
-ex_mem_addr = 11
+id_rs1_idx = 4 id_rs1_rdata = 2
+id_rs2_idx = 31 id_rs2_rdata = 0
+id_imm = -1
+id_rd_wen = 1 id_rd_idx = 4
+ex_alu_res = 1
+ex_mem_addr = 1
 ex_branch_jump = 0
 mem_rdata = 0
 
 After:
 regfile status:
-[x1	 = 8]	x2	 = 80	x3	 = 0	x4	 = 0	x5	 = 5	
-x6	 = 6	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 11	
+x1	 = 20	x2	 = 252	x3	 = 0	[x4	 = 1]	x5	 = 2	
+x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
 
 memory status:
 
 -----------------------------7------------------------------
 pc = 24
-instr = ret
+instr = bne x4, x0, loop
 regfile status:
-[x1	 = 8]	x2	 = 80	x3	 = 0	x4	 = 0	x5	 = 5	
-x6	 = 6	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 11	
+x1	 = 20	x2	 = 252	x3	 = 0	[x4	 = 1]	x5	 = 2	
+x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
 
 memory status:
 
 
-id_rs1_idx = 1 id_rs1_rdata = 8
+id_rs1_idx = 4 id_rs1_rdata = 1
 id_rs2_idx = 0 id_rs2_rdata = 0
-id_imm = 0
-id_rd_wen = 1 id_rd_idx = 0
-ex_alu_res = 28
-ex_mem_addr = 28
-ex_branch_jump = 0
+id_imm = -12
+id_rd_wen = 0 id_rd_idx = 21
+ex_alu_res = 1
+ex_mem_addr = 1
+ex_branch_jump = 1
 mem_rdata = 0
 
 After:
 regfile status:
-x1	 = 8	[x2	 = 80]	x3	 = 0	x4	 = 0	x5	 = 5	
-x6	 = 6	x7	 = 0	x8	 = 0	x9	 = 0	[x10	 = 11]	
-
-memory status:
-
------------------------------3------------------------------
-pc = 8
-instr = sb x10, 0(x2)
-regfile status:
-x1	 = 8	[x2	 = 80]	x3	 = 0	x4	 = 0	x5	 = 5	
-x6	 = 6	x7	 = 0	x8	 = 0	x9	 = 0	[x10	 = 11]	
-
-memory status:
-
-
-id_rs1_idx = 2 id_rs1_rdata = 80
-id_rs2_idx = 10 id_rs2_rdata = 11
-id_imm = 0
-id_rd_wen = 0 id_rd_idx = 0
-ex_alu_res = 0
-ex_mem_addr = 80
-ex_branch_jump = 0
-mem_rdata = 0
-
-After:
-regfile status:
-x1	 = 8	x2	 = 80	x3	 = 0	x4	 = 0	[x5	 = 5]	
-x6	 = 6	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 11	
+x1	 = 20	x2	 = 252	x3	 = 0	[x4	 = 1]	x5	 = 2	
+x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
 
 memory status:
 
 -----------------------------4------------------------------
 pc = 12
-instr = addi x5,  x0, 5
+instr = add x5, x0, x4
 regfile status:
-x1	 = 8	x2	 = 80	x3	 = 0	x4	 = 0	[x5	 = 5]	
-x6	 = 6	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 11	
+x1	 = 20	x2	 = 252	x3	 = 0	[x4	 = 1]	x5	 = 2	
+x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
 
 memory status:
 
 
 id_rs1_idx = 0 id_rs1_rdata = 0
-id_rs2_idx = 5 id_rs2_rdata = 5
-id_imm = 5
+id_rs2_idx = 4 id_rs2_rdata = 1
+id_imm = 0
 id_rd_wen = 1 id_rd_idx = 5
-ex_alu_res = 5
-ex_mem_addr = 5
+ex_alu_res = 1
+ex_mem_addr = 1
 ex_branch_jump = 0
 mem_rdata = 0
 
 After:
 regfile status:
-x1	 = 8	x2	 = 80	x3	 = 0	x4	 = 0	x5	 = 5	
-[x6	 = 6]	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 11	
+x1	 = 20	x2	 = 252	x3	 = 0	x4	 = 1	x5	 = 1	
+x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
 
 memory status:
 
 -----------------------------5------------------------------
 pc = 16
-instr = addi x6,  x0, 6
+instr = jal x1, foo
 regfile status:
-x1	 = 8	x2	 = 80	x3	 = 0	x4	 = 0	x5	 = 5	
-[x6	 = 6]	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 11	
+x1	 = 20	x2	 = 252	x3	 = 0	x4	 = 1	x5	 = 1	
+x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
 
 memory status:
 
 
 id_rs1_idx = 0 id_rs1_rdata = 0
-id_rs2_idx = 6 id_rs2_rdata = 6
-id_imm = 6
-id_rd_wen = 1 id_rd_idx = 6
-ex_alu_res = 6
-ex_mem_addr = 6
+id_rs2_idx = 12 id_rs2_rdata = 0
+id_imm = 12
+id_rd_wen = 1 id_rd_idx = 1
+ex_alu_res = 20
+ex_mem_addr = 20
 ex_branch_jump = 0
 mem_rdata = 0
 
 After:
 regfile status:
-x1	 = 8	x2	 = 80	x3	 = 0	x4	 = 0	[x5	 = 5]	
-[x6	 = 6]	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 11	
+x1	 = 20	[x2	 = 252]	x3	 = 0	x4	 = 1	[x5	 = 1]	
+x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
+
+memory status:
+
+-----------------------------8------------------------------
+pc = 28
+instr = sb x5, 0(sp)
+regfile status:
+x1	 = 20	[x2	 = 252]	x3	 = 0	x4	 = 1	[x5	 = 1]	
+x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
+
+memory status:
+
+
+id_rs1_idx = 2 id_rs1_rdata = 252
+id_rs2_idx = 5 id_rs2_rdata = 1
+id_imm = 0
+id_rd_wen = 0 id_rd_idx = 0
+ex_alu_res = 0
+ex_mem_addr = 252
+ex_branch_jump = 0
+mem_rdata = 0
+
+After:
+regfile status:
+x1	 = 20	[x2	 = 252]	x3	 = 0	x4	 = 1	x5	 = 1	
+x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
+
+memory status:
+ram[252]	: 0	 -> 1	| 
+-----------------------------9------------------------------
+pc = 32
+instr = addi sp, sp, -1
+regfile status:
+x1	 = 20	[x2	 = 252]	x3	 = 0	x4	 = 1	x5	 = 1	
+x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
+
+memory status:
+
+
+id_rs1_idx = 2 id_rs1_rdata = 252
+id_rs2_idx = 31 id_rs2_rdata = 0
+id_imm = -1
+id_rd_wen = 1 id_rd_idx = 2
+ex_alu_res = 251
+ex_mem_addr = 251
+ex_branch_jump = 0
+mem_rdata = 0
+
+After:
+regfile status:
+[x1	 = 20]	x2	 = 251	x3	 = 0	x4	 = 1	x5	 = 1	
+x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
+
+memory status:
+
+-----------------------------10------------------------------
+pc = 36
+instr = ret
+regfile status:
+[x1	 = 20]	x2	 = 251	x3	 = 0	x4	 = 1	x5	 = 1	
+x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
+
+memory status:
+
+
+id_rs1_idx = 1 id_rs1_rdata = 20
+id_rs2_idx = 0 id_rs2_rdata = 0
+id_imm = 0
+id_rd_wen = 1 id_rd_idx = 0
+ex_alu_res = 40
+ex_mem_addr = 40
+ex_branch_jump = 0
+mem_rdata = 0
+
+After:
+regfile status:
+x1	 = 20	x2	 = 251	x3	 = 0	[x4	 = 1]	x5	 = 1	
+x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
 
 memory status:
 
 -----------------------------6------------------------------
 pc = 20
-instr = add  x10, x5, x6
+instr = addi x4, x4, -1
 regfile status:
-x1	 = 8	x2	 = 80	x3	 = 0	x4	 = 0	[x5	 = 5]	
-[x6	 = 6]	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 11	
+x1	 = 20	x2	 = 251	x3	 = 0	[x4	 = 1]	x5	 = 1	
+x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
 
 memory status:
 
 
-id_rs1_idx = 5 id_rs1_rdata = 5
-id_rs2_idx = 6 id_rs2_rdata = 6
-id_imm = 0
-id_rd_wen = 1 id_rd_idx = 10
-ex_alu_res = 11
-ex_mem_addr = 11
+id_rs1_idx = 4 id_rs1_rdata = 1
+id_rs2_idx = 31 id_rs2_rdata = 0
+id_imm = -1
+id_rd_wen = 1 id_rd_idx = 4
+ex_alu_res = 0
+ex_mem_addr = 0
 ex_branch_jump = 0
 mem_rdata = 0
 
 After:
 regfile status:
-[x1	 = 8]	x2	 = 80	x3	 = 0	x4	 = 0	x5	 = 5	
-x6	 = 6	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 11	
+x1	 = 20	x2	 = 251	x3	 = 0	[x4	 = 0]	x5	 = 1	
+x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
 
 memory status:
 
 -----------------------------7------------------------------
 pc = 24
-instr = ret
+instr = bne x4, x0, loop
 regfile status:
-[x1	 = 8]	x2	 = 80	x3	 = 0	x4	 = 0	x5	 = 5	
-x6	 = 6	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 11	
+x1	 = 20	x2	 = 251	x3	 = 0	[x4	 = 0]	x5	 = 1	
+x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
 
 memory status:
 
 
-id_rs1_idx = 1 id_rs1_rdata = 8
+id_rs1_idx = 4 id_rs1_rdata = 0
 id_rs2_idx = 0 id_rs2_rdata = 0
-id_imm = 0
-id_rd_wen = 1 id_rd_idx = 0
-ex_alu_res = 28
-ex_mem_addr = 28
+id_imm = -12
+id_rd_wen = 0 id_rd_idx = 21
+ex_alu_res = 0
+ex_mem_addr = 0
 ex_branch_jump = 0
 mem_rdata = 0
 
 After:
 regfile status:
-x1	 = 8	[x2	 = 80]	x3	 = 0	x4	 = 0	x5	 = 5	
-x6	 = 6	x7	 = 0	x8	 = 0	x9	 = 0	[x10	 = 11]	
+x1	 = 20	[x2	 = 251]	x3	 = 0	x4	 = 0	[x5	 = 1]	
+x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
 
 memory status:
 
------------------------------3------------------------------
-pc = 8
-instr = sb x10, 0(x2)
+-----------------------------8------------------------------
+pc = 28
+instr = sb x5, 0(sp)
 regfile status:
-x1	 = 8	[x2	 = 80]	x3	 = 0	x4	 = 0	x5	 = 5	
-x6	 = 6	x7	 = 0	x8	 = 0	x9	 = 0	[x10	 = 11]	
+x1	 = 20	[x2	 = 251]	x3	 = 0	x4	 = 0	[x5	 = 1]	
+x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
 
 memory status:
 
 
-id_rs1_idx = 2 id_rs1_rdata = 80
-id_rs2_idx = 10 id_rs2_rdata = 11
+id_rs1_idx = 2 id_rs1_rdata = 251
+id_rs2_idx = 5 id_rs2_rdata = 1
 id_imm = 0
 id_rd_wen = 0 id_rd_idx = 0
 ex_alu_res = 0
-ex_mem_addr = 80
+ex_mem_addr = 251
 ex_branch_jump = 0
 mem_rdata = 0
 
 After:
 regfile status:
-x1	 = 8	x2	 = 80	x3	 = 0	x4	 = 0	[x5	 = 5]	
-x6	 = 6	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 11	
+x1	 = 20	[x2	 = 251]	x3	 = 0	x4	 = 0	x5	 = 1	
+x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
 
 memory status:
-
------------------------------4------------------------------
-pc = 12
-instr = addi x5,  x0, 5
+ram[251]	: 0	 -> 1	| 
+-----------------------------9------------------------------
+pc = 32
+instr = addi sp, sp, -1
 regfile status:
-x1	 = 8	x2	 = 80	x3	 = 0	x4	 = 0	[x5	 = 5]	
-x6	 = 6	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 11	
+x1	 = 20	[x2	 = 251]	x3	 = 0	x4	 = 0	x5	 = 1	
+x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
 
 memory status:
 
 
-id_rs1_idx = 0 id_rs1_rdata = 0
-id_rs2_idx = 5 id_rs2_rdata = 5
-id_imm = 5
-id_rd_wen = 1 id_rd_idx = 5
-ex_alu_res = 5
-ex_mem_addr = 5
+id_rs1_idx = 2 id_rs1_rdata = 251
+id_rs2_idx = 31 id_rs2_rdata = 0
+id_imm = -1
+id_rd_wen = 1 id_rd_idx = 2
+ex_alu_res = 250
+ex_mem_addr = 250
 ex_branch_jump = 0
 mem_rdata = 0
 
 After:
 regfile status:
-x1	 = 8	x2	 = 80	x3	 = 0	x4	 = 0	x5	 = 5	
-[x6	 = 6]	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 11	
+[x1	 = 20]	x2	 = 250	x3	 = 0	x4	 = 0	x5	 = 1	
+x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
 
 memory status:
 
------------------------------5------------------------------
-pc = 16
-instr = addi x6,  x0, 6
+-----------------------------10------------------------------
+pc = 36
+instr = ret
 regfile status:
-x1	 = 8	x2	 = 80	x3	 = 0	x4	 = 0	x5	 = 5	
-[x6	 = 6]	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 11	
+[x1	 = 20]	x2	 = 250	x3	 = 0	x4	 = 0	x5	 = 1	
+x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
 
 memory status:
 
 
-id_rs1_idx = 0 id_rs1_rdata = 0
-id_rs2_idx = 6 id_rs2_rdata = 6
-id_imm = 6
-id_rd_wen = 1 id_rd_idx = 6
-ex_alu_res = 6
-ex_mem_addr = 6
+id_rs1_idx = 1 id_rs1_rdata = 20
+id_rs2_idx = 0 id_rs2_rdata = 0
+id_imm = 0
+id_rd_wen = 1 id_rd_idx = 0
+ex_alu_res = 40
+ex_mem_addr = 40
 ex_branch_jump = 0
 mem_rdata = 0
 
 After:
 regfile status:
-x1	 = 8	x2	 = 80	x3	 = 0	x4	 = 0	[x5	 = 5]	
-[x6	 = 6]	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 11	
+x1	 = 20	x2	 = 250	x3	 = 0	[x4	 = 0]	x5	 = 1	
+x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
 
 memory status:
 
 -----------------------------6------------------------------
 pc = 20
-instr = add  x10, x5, x6
+instr = addi x4, x4, -1
 regfile status:
-x1	 = 8	x2	 = 80	x3	 = 0	x4	 = 0	[x5	 = 5]	
-[x6	 = 6]	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 11	
+x1	 = 20	x2	 = 250	x3	 = 0	[x4	 = 0]	x5	 = 1	
+x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
 
 memory status:
 
 
-id_rs1_idx = 5 id_rs1_rdata = 5
-id_rs2_idx = 6 id_rs2_rdata = 6
-id_imm = 0
-id_rd_wen = 1 id_rd_idx = 10
-ex_alu_res = 11
-ex_mem_addr = 11
+id_rs1_idx = 4 id_rs1_rdata = 0
+id_rs2_idx = 31 id_rs2_rdata = 0
+id_imm = -1
+id_rd_wen = 1 id_rd_idx = 4
+ex_alu_res = -1
+ex_mem_addr = -1
 ex_branch_jump = 0
 mem_rdata = 0
 
 After:
 regfile status:
-[x1	 = 8]	x2	 = 80	x3	 = 0	x4	 = 0	x5	 = 5	
-x6	 = 6	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 11	
+x1	 = 20	x2	 = 250	x3	 = 0	[x4	 = -1]	x5	 = 1	
+x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
 
 memory status:
 
 -----------------------------7------------------------------
 pc = 24
-instr = ret
+instr = bne x4, x0, loop
 regfile status:
-[x1	 = 8]	x2	 = 80	x3	 = 0	x4	 = 0	x5	 = 5	
-x6	 = 6	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 11	
+x1	 = 20	x2	 = 250	x3	 = 0	[x4	 = -1]	x5	 = 1	
+x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
 
 memory status:
 
 
-id_rs1_idx = 1 id_rs1_rdata = 8
+id_rs1_idx = 4 id_rs1_rdata = -1
 id_rs2_idx = 0 id_rs2_rdata = 0
-id_imm = 0
-id_rd_wen = 1 id_rd_idx = 0
-ex_alu_res = 28
-ex_mem_addr = 28
-ex_branch_jump = 0
+id_imm = -12
+id_rd_wen = 0 id_rd_idx = 21
+ex_alu_res = -1
+ex_mem_addr = -1
+ex_branch_jump = 1
 mem_rdata = 0
 
 After:
 regfile status:
-x1	 = 8	[x2	 = 80]	x3	 = 0	x4	 = 0	x5	 = 5	
-x6	 = 6	x7	 = 0	x8	 = 0	x9	 = 0	[x10	 = 11]	
-
-memory status:
-
------------------------------3------------------------------
-pc = 8
-instr = sb x10, 0(x2)
-regfile status:
-x1	 = 8	[x2	 = 80]	x3	 = 0	x4	 = 0	x5	 = 5	
-x6	 = 6	x7	 = 0	x8	 = 0	x9	 = 0	[x10	 = 11]	
-
-memory status:
-
-
-id_rs1_idx = 2 id_rs1_rdata = 80
-id_rs2_idx = 10 id_rs2_rdata = 11
-id_imm = 0
-id_rd_wen = 0 id_rd_idx = 0
-ex_alu_res = 0
-ex_mem_addr = 80
-ex_branch_jump = 0
-mem_rdata = 0
-
-After:
-regfile status:
-x1	 = 8	x2	 = 80	x3	 = 0	x4	 = 0	[x5	 = 5]	
-x6	 = 6	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 11	
+x1	 = 20	x2	 = 250	x3	 = 0	[x4	 = -1]	x5	 = 1	
+x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
 
 memory status:
 
 -----------------------------4------------------------------
 pc = 12
-instr = addi x5,  x0, 5
+instr = add x5, x0, x4
 regfile status:
-x1	 = 8	x2	 = 80	x3	 = 0	x4	 = 0	[x5	 = 5]	
-x6	 = 6	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 11	
+x1	 = 20	x2	 = 250	x3	 = 0	[x4	 = -1]	x5	 = 1	
+x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
 
 memory status:
 
 
 id_rs1_idx = 0 id_rs1_rdata = 0
-id_rs2_idx = 5 id_rs2_rdata = 5
-id_imm = 5
+id_rs2_idx = 4 id_rs2_rdata = -1
+id_imm = 0
 id_rd_wen = 1 id_rd_idx = 5
-ex_alu_res = 5
-ex_mem_addr = 5
+ex_alu_res = -1
+ex_mem_addr = -1
 ex_branch_jump = 0
 mem_rdata = 0
 
 After:
 regfile status:
-x1	 = 8	x2	 = 80	x3	 = 0	x4	 = 0	x5	 = 5	
-[x6	 = 6]	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 11	
+x1	 = 20	x2	 = 250	x3	 = 0	x4	 = -1	x5	 = -1	
+x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
 
 memory status:
 
 -----------------------------5------------------------------
 pc = 16
-instr = addi x6,  x0, 6
+instr = jal x1, foo
 regfile status:
-x1	 = 8	x2	 = 80	x3	 = 0	x4	 = 0	x5	 = 5	
-[x6	 = 6]	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 11	
+x1	 = 20	x2	 = 250	x3	 = 0	x4	 = -1	x5	 = -1	
+x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
 
 memory status:
 
 
 id_rs1_idx = 0 id_rs1_rdata = 0
-id_rs2_idx = 6 id_rs2_rdata = 6
-id_imm = 6
-id_rd_wen = 1 id_rd_idx = 6
-ex_alu_res = 6
-ex_mem_addr = 6
+id_rs2_idx = 12 id_rs2_rdata = 0
+id_imm = 12
+id_rd_wen = 1 id_rd_idx = 1
+ex_alu_res = 20
+ex_mem_addr = 20
 ex_branch_jump = 0
 mem_rdata = 0
 
 After:
 regfile status:
-x1	 = 8	x2	 = 80	x3	 = 0	x4	 = 0	[x5	 = 5]	
-[x6	 = 6]	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 11	
+x1	 = 20	[x2	 = 250]	x3	 = 0	x4	 = -1	[x5	 = -1]	
+x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
 
 memory status:
 
------------------------------6------------------------------
-pc = 20
-instr = add  x10, x5, x6
+-----------------------------8------------------------------
+pc = 28
+instr = sb x5, 0(sp)
 regfile status:
-x1	 = 8	x2	 = 80	x3	 = 0	x4	 = 0	[x5	 = 5]	
-[x6	 = 6]	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 11	
+x1	 = 20	[x2	 = 250]	x3	 = 0	x4	 = -1	[x5	 = -1]	
+x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
 
 memory status:
 
 
-id_rs1_idx = 5 id_rs1_rdata = 5
-id_rs2_idx = 6 id_rs2_rdata = 6
-id_imm = 0
-id_rd_wen = 1 id_rd_idx = 10
-ex_alu_res = 11
-ex_mem_addr = 11
-ex_branch_jump = 0
-mem_rdata = 0
-
-After:
-regfile status:
-[x1	 = 8]	x2	 = 80	x3	 = 0	x4	 = 0	x5	 = 5	
-x6	 = 6	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 11	
-
-memory status:
-
------------------------------7------------------------------
-pc = 24
-instr = ret
-regfile status:
-[x1	 = 8]	x2	 = 80	x3	 = 0	x4	 = 0	x5	 = 5	
-x6	 = 6	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 11	
-
-memory status:
-
-
-id_rs1_idx = 1 id_rs1_rdata = 8
-id_rs2_idx = 0 id_rs2_rdata = 0
-id_imm = 0
-id_rd_wen = 1 id_rd_idx = 0
-ex_alu_res = 28
-ex_mem_addr = 28
-ex_branch_jump = 0
-mem_rdata = 0
-
-After:
-regfile status:
-x1	 = 8	[x2	 = 80]	x3	 = 0	x4	 = 0	x5	 = 5	
-x6	 = 6	x7	 = 0	x8	 = 0	x9	 = 0	[x10	 = 11]	
-
-memory status:
-
------------------------------3------------------------------
-pc = 8
-instr = sb x10, 0(x2)
-regfile status:
-x1	 = 8	[x2	 = 80]	x3	 = 0	x4	 = 0	x5	 = 5	
-x6	 = 6	x7	 = 0	x8	 = 0	x9	 = 0	[x10	 = 11]	
-
-memory status:
-
-
-id_rs1_idx = 2 id_rs1_rdata = 80
-id_rs2_idx = 10 id_rs2_rdata = 11
+id_rs1_idx = 2 id_rs1_rdata = 250
+id_rs2_idx = 5 id_rs2_rdata = -1
 id_imm = 0
 id_rd_wen = 0 id_rd_idx = 0
 ex_alu_res = 0
-ex_mem_addr = 80
+ex_mem_addr = 250
 ex_branch_jump = 0
 mem_rdata = 0
 
 After:
 regfile status:
-x1	 = 8	x2	 = 80	x3	 = 0	x4	 = 0	[x5	 = 5]	
-x6	 = 6	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 11	
+x1	 = 20	[x2	 = 250]	x3	 = 0	x4	 = -1	x5	 = -1	
+x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
 
 memory status:
-
------------------------------4------------------------------
-pc = 12
-instr = addi x5,  x0, 5
+ram[250]	: 0	 -> 255	| 
+-----------------------------9------------------------------
+pc = 32
+instr = addi sp, sp, -1
 regfile status:
-x1	 = 8	x2	 = 80	x3	 = 0	x4	 = 0	[x5	 = 5]	
-x6	 = 6	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 11	
+x1	 = 20	[x2	 = 250]	x3	 = 0	x4	 = -1	x5	 = -1	
+x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
 
 memory status:
 
 
-id_rs1_idx = 0 id_rs1_rdata = 0
-id_rs2_idx = 5 id_rs2_rdata = 5
-id_imm = 5
-id_rd_wen = 1 id_rd_idx = 5
-ex_alu_res = 5
-ex_mem_addr = 5
+id_rs1_idx = 2 id_rs1_rdata = 250
+id_rs2_idx = 31 id_rs2_rdata = 0
+id_imm = -1
+id_rd_wen = 1 id_rd_idx = 2
+ex_alu_res = 249
+ex_mem_addr = 249
 ex_branch_jump = 0
 mem_rdata = 0
 
 After:
 regfile status:
-x1	 = 8	x2	 = 80	x3	 = 0	x4	 = 0	x5	 = 5	
-[x6	 = 6]	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 11	
+[x1	 = 20]	x2	 = 249	x3	 = 0	x4	 = -1	x5	 = -1	
+x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
 
 memory status:
 
------------------------------5------------------------------
-pc = 16
-instr = addi x6,  x0, 6
+-----------------------------10------------------------------
+pc = 36
+instr = ret
 regfile status:
-x1	 = 8	x2	 = 80	x3	 = 0	x4	 = 0	x5	 = 5	
-[x6	 = 6]	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 11	
+[x1	 = 20]	x2	 = 249	x3	 = 0	x4	 = -1	x5	 = -1	
+x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
 
 memory status:
 
 
-id_rs1_idx = 0 id_rs1_rdata = 0
-id_rs2_idx = 6 id_rs2_rdata = 6
-id_imm = 6
-id_rd_wen = 1 id_rd_idx = 6
-ex_alu_res = 6
-ex_mem_addr = 6
+id_rs1_idx = 1 id_rs1_rdata = 20
+id_rs2_idx = 0 id_rs2_rdata = 0
+id_imm = 0
+id_rd_wen = 1 id_rd_idx = 0
+ex_alu_res = 40
+ex_mem_addr = 40
 ex_branch_jump = 0
 mem_rdata = 0
 
