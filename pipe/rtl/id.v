@@ -1,23 +1,14 @@
 `include "defines.v"
 
 module id(
-    input [`INSTR_WIDTH-1:0] instr_i,
-        
+    input [`INSTR_WIDTH-1:0]        instr_i,
     // id x regfile
     // to regfile
-    output [4:0]       id_rs1_idx_o,
-    output [4:0]       id_rs2_idx_o,
+    output [4:0]                    id_rs1_idx_o,
+    output [4:0]                    id_rs2_idx_o,
     // form regfile
-    input  [`XLEN-1:0] rf_rs1_rdata_i,
-    input  [`XLEN-1:0] rf_rs2_rdata_i,
-    
-    // id x csr
-    // to csr
-    output                          id_csr_wen_o,// csr指令既要读也要写,x0在csr内部处理
-    output [11:0]                   id_csr_idx_o,
-    // from csr
-    input  [`XLEN-1:0]              csr_rdata_i,
-    
+    input  [`XLEN-1:0]              rf_rs1_rdata_i,
+    input  [`XLEN-1:0]              rf_rs2_rdata_i,
     // to ex
     // op info
     output [`OP_INFO_WIDTH-1:0]     id_optype_info_o,
@@ -29,16 +20,17 @@ module id(
     output [`XLEN-1:0]              id_rs1_rdata_o,
     output [`XLEN-1:0]              id_rs2_rdata_o,
     output [`XLEN-1:0]              id_imm_o,
-
+    // csr
+    output                          id_csr_wen_o,
+    output [11:0]                   id_csr_idx_o,
+    // rd
     output                          id_rd_wen_o,
     output [4:0]                    id_rd_idx_o,
-    output [`XLEN-1:0]              id_csr_rdata_o,
-    
     // excp
-    output id_ilegl_instr_o,
-    output id_ecall_o,
-    output id_ebreak_o,
-    output id_mret_o
+    output                          id_ilegl_instr_o,
+    output                          id_ecall_o,
+    output                          id_ebreak_o,
+    output                          id_mret_o
 );
 
 //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//

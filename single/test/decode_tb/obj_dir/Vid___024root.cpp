@@ -12,6 +12,8 @@ VL_INLINE_OPT void Vid___024root___combo__TOP__1(Vid___024root* vlSelf) {
     Vid__Syms* const __restrict vlSymsp VL_ATTR_UNUSED = vlSelf->vlSymsp;
     VL_DEBUG_IF(VL_DBG_MSGF("+    Vid___024root___combo__TOP__1\n"); );
     // Body
+    vlSelf->id_rs1_rdata_o = vlSelf->rf_rs1_rdata_i;
+    vlSelf->id_rs2_rdata_o = vlSelf->rf_rs2_rdata_i;
     vlSelf->id_rs1_idx_o = (0x1fU & (vlSelf->instr_i 
                                      >> 0xfU));
     vlSelf->id_rs2_idx_o = (0x1fU & (vlSelf->instr_i 
@@ -385,12 +387,6 @@ VL_INLINE_OPT void Vid___024root___combo__TOP__1(Vid___024root* vlSelf) {
                                                                                == 
                                                                                (0x707fU 
                                                                                 & vlSelf->instr_i)))))))))))));
-    vlSelf->id_rs2_en_o = ((((0x33U == (0x7fU & vlSelf->instr_i)) 
-                             | (0x3bU == (0x7fU & vlSelf->instr_i))) 
-                            | (0x63U == (0x7fU & vlSelf->instr_i))) 
-                           | (0x23U == (0x7fU & vlSelf->instr_i)));
-    vlSelf->id_rs1_rdata_o = vlSelf->rf_rs1_rdata_i;
-    vlSelf->id_rs2_rdata_o = vlSelf->rf_rs2_rdata_i;
     vlSelf->id__DOT__rv64_imm = ((((((- (QData)((IData)(
                                                         ((((0x13U 
                                                             == 
@@ -489,15 +485,6 @@ VL_INLINE_OPT void Vid___024root___combo__TOP__1(Vid___024root* vlSelf) {
                                         << 0x20U) | (QData)((IData)(
                                                                     (0xfffff000U 
                                                                      & vlSelf->instr_i))))));
-    vlSelf->id__DOT__rv64_csrrw = (IData)((0x1073U 
-                                           == (0x707fU 
-                                               & vlSelf->instr_i)));
-    vlSelf->id__DOT__rv64_csrrs = (IData)((0x2073U 
-                                           == (0x707fU 
-                                               & vlSelf->instr_i)));
-    vlSelf->id__DOT__rv64_csrrc = (IData)((0x3073U 
-                                           == (0x707fU 
-                                               & vlSelf->instr_i)));
     vlSelf->id__DOT__rv64_ecall = ((IData)((0x73U == 
                                             (0x707fU 
                                              & vlSelf->instr_i))) 
@@ -513,6 +500,15 @@ VL_INLINE_OPT void Vid___024root___combo__TOP__1(Vid___024root* vlSelf) {
                                             & vlSelf->instr_i))) 
                                   & (0x302U == (vlSelf->instr_i 
                                                 >> 0x14U)));
+    vlSelf->id__DOT__rv64_csrrw = (IData)((0x1073U 
+                                           == (0x707fU 
+                                               & vlSelf->instr_i)));
+    vlSelf->id__DOT__rv64_csrrs = (IData)((0x2073U 
+                                           == (0x707fU 
+                                               & vlSelf->instr_i)));
+    vlSelf->id__DOT__rv64_csrrc = (IData)((0x3073U 
+                                           == (0x707fU 
+                                               & vlSelf->instr_i)));
     vlSelf->id__DOT__rv64_csrrwi = (IData)((0x5073U 
                                             == (0x707fU 
                                                 & vlSelf->instr_i)));
@@ -526,11 +522,11 @@ VL_INLINE_OPT void Vid___024root___combo__TOP__1(Vid___024root* vlSelf) {
     vlSelf->id_ecall_o = vlSelf->id__DOT__rv64_ecall;
     vlSelf->id_ebreak_o = vlSelf->id__DOT__rv64_ebreak;
     vlSelf->id_mret_o = vlSelf->id__DOT__rv64_mret;
-    vlSelf->id_rd_en_o = (((((~ (IData)(vlSelf->id__DOT__rv64_ecall)) 
-                             & (~ (IData)(vlSelf->id__DOT__rv64_ebreak))) 
-                            & (~ (IData)(vlSelf->id__DOT__rv64_mret))) 
-                           & (0x63U != (0x7fU & vlSelf->instr_i))) 
-                          & (0x23U != (0x7fU & vlSelf->instr_i)));
+    vlSelf->id_rd_wen_o = (((((~ (IData)(vlSelf->id__DOT__rv64_ecall)) 
+                              & (~ (IData)(vlSelf->id__DOT__rv64_ebreak))) 
+                             & (~ (IData)(vlSelf->id__DOT__rv64_mret))) 
+                            & (0x63U != (0x7fU & vlSelf->instr_i))) 
+                           & (0x23U != (0x7fU & vlSelf->instr_i)));
     vlSelf->id_csr_info_o = (((IData)(vlSelf->id__DOT__rv64_csrrw) 
                               << 5U) | (((IData)(vlSelf->id__DOT__rv64_csrrs) 
                                          << 4U) | (
@@ -541,24 +537,12 @@ VL_INLINE_OPT void Vid___024root___combo__TOP__1(Vid___024root* vlSelf) {
                                                       | (((IData)(vlSelf->id__DOT__rv64_csrrsi) 
                                                           << 1U) 
                                                          | (IData)(vlSelf->id__DOT__rv64_csrrci))))));
-    vlSelf->id_csr_en_o = ((((((IData)(vlSelf->id__DOT__rv64_csrrw) 
-                               | (IData)(vlSelf->id__DOT__rv64_csrrs)) 
-                              | (IData)(vlSelf->id__DOT__rv64_csrrc)) 
-                             | (IData)(vlSelf->id__DOT__rv64_csrrwi)) 
-                            | (IData)(vlSelf->id__DOT__rv64_csrrsi)) 
-                           | (IData)(vlSelf->id__DOT__rv64_csrrci));
-    vlSelf->id_rs1_en_o = (((((((((0x37U != (0x7fU 
-                                             & vlSelf->instr_i)) 
-                                  & (0x17U != (0x7fU 
-                                               & vlSelf->instr_i))) 
-                                 & (0x6fU != (0x7fU 
-                                              & vlSelf->instr_i))) 
-                                & (~ (IData)(vlSelf->id__DOT__rv64_csrrwi))) 
-                               & (~ (IData)(vlSelf->id__DOT__rv64_csrrsi))) 
-                              & (~ (IData)(vlSelf->id__DOT__rv64_csrrci))) 
-                             & (~ (IData)(vlSelf->id__DOT__rv64_ecall))) 
-                            & (~ (IData)(vlSelf->id__DOT__rv64_ebreak))) 
-                           & (~ (IData)(vlSelf->id__DOT__rv64_mret)));
+    vlSelf->id_csr_wen_o = ((((((IData)(vlSelf->id__DOT__rv64_csrrw) 
+                                | (IData)(vlSelf->id__DOT__rv64_csrrs)) 
+                               | (IData)(vlSelf->id__DOT__rv64_csrrc)) 
+                              | (IData)(vlSelf->id__DOT__rv64_csrrwi)) 
+                             | (IData)(vlSelf->id__DOT__rv64_csrrsi)) 
+                            | (IData)(vlSelf->id__DOT__rv64_csrrci));
 }
 
 void Vid___024root___eval(Vid___024root* vlSelf) {

@@ -28,7 +28,7 @@ HDLBITS刷题状态：
 
    rd <= csr
 
-   csr <= rs1 
+   csr <= rs1
 
    - 在译码阶段读取CSR寄存器的内容
    - 在写回阶段写CSR寄存器以及rd
@@ -41,6 +41,96 @@ HDLBITS刷题状态：
 
    - 不能写寄存器
    - 不能写内存
+
+### 1月15日
+
+1. HDLBITS刷题状态：
+
+![image-20230115113310939](/home/xia/.config/Typora/typora-user-images/image-20230115113310939.png)
+
+2. INSTR DECODE测试
+
+   有问题的指令:
+
+   - jal的立即数
+   - branch
+
+3. TRAP处理
+
+   mepc:发生trap的PC
+
+   - 异常的话就是异常的PC
+   - 中断是发生中断那一个时钟周期的处于取指阶段的PC吗?
+
+4. 单周期CPU数据流图
+
+### 1月29日
+
+1. 分享数据冒险
+
+2. 完成单周期CPU设计
+
+   - 访存单元
+   - 写回单元
+
+3. 测试
+
+   - 函数调用/返回
+   - 循环/条件转移
+   - 计算
+
+   ```assembly
+   .text
+   .global _start
+   _start:
+   addi sp, x0, 256
+   addi x4, x0, 5
+   jal x0, test 
+   loop:
+   add x5, x0, x4
+   jal x1, foo
+   addi x4, x4, -1
+   test:
+   bne x4, x0, loop
+   foo:
+   sb x5, 0(sp)
+   addi sp, sp, -1
+   ret
+   ```
+
+   结果:
+
+   ```assembly
+   pc = 28
+   instr = sb x5, 0(sp)
+   regfile status:
+   x1	 = 20	[x2	 = 252]	x3	 = 0	x4	 = 1	[x5	 = 1]	
+   x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
+   
+   memory status:
+   
+   
+   id_rs1_idx = 2 id_rs1_rdata = 252
+   id_rs2_idx = 5 id_rs2_rdata = 1
+   id_imm = 0
+   id_rd_wen = 0 id_rd_idx = 0
+   ex_alu_res = 0
+   ex_mem_addr = 252
+   ex_branch_jump = 0
+   mem_rdata = 0
+   
+   After:
+   regfile status:
+   x1	 = 20	[x2	 = 252]	x3	 = 0	x4	 = 1	x5	 = 1	
+   x6	 = 0	x7	 = 0	x8	 = 0	x9	 = 0	x10	 = 0	
+   
+   memory status:
+   ram[252]	: 0	 -> 1	| 
+   ```
+
+   
+
+4. 多周期CPU设计
 
 # 二.CPU模块设计
 
@@ -546,14 +636,15 @@ module ex(
 ### 1.ALU
 
 ```verilog
-// ALU的结果直接写回到RD中[除了BRANCH]
+// ALU的结果直接写回到RD中[除了BRANCH, LD_ST]
 // 使用ALU单元的指令有
 // 1. ALU
 // 2. ALU_IMM
 // 3. BRANCH
-// 4. JAL JALR
-// 5. LUI
-// 6. AUIPC
+// 4. LD_ST
+// 5. JAL JALR
+// 6. LUI
+// 7. AUIPC
 
 module alu(
     // opcode info
@@ -570,6 +661,8 @@ module alu(
     input [`XLEN-1:0]     imm_i,
     // ALU计算结果
     output [`XLEN-1:0]    alu_res_o,
+    // MEM 地址结果
+    output [`XLEN-1:0]    mem_addr_o,
     // 分支跳转结果
     output                alu_branch_jump_o
 );
@@ -598,7 +691,7 @@ module alu(
                    :  op_lui ? 0
                    :  rs1_rdata_i;
 
-    assign alu_op2 = (op_lui | op_auipc | op_alu_imm | op_alu_imm_w) ? imm_i
+    assign alu_op2 = (op_lui | op_auipc | op_alu_imm | op_alu_imm_w | op_load | op_store) ? imm_i
                    : (op_jal | op_jalr) ? 4
                    : rs2_rdata_i;
 ```
@@ -622,23 +715,33 @@ module alu(
     wire [`XLEN-1:0] alu_and_res;
 
     // 加减
-    assign alu_add_sub_res = alu_op1 + ({`XLEN{res_sel_sub}} ^ alu_op2) + (res_sel_sub ? 1 : 0);
-    // sll
-    assign alu_sll_res     = alu_op1 << alu_op2[5:0];
+    wire [`XLEN-1:0] adder_op1 = alu_op1;
+    wire [`XLEN-1:0] adder_op2 = {`XLEN{res_sel_sub}} ^ alu_op2;
+    wire adder_cin = res_sel_sub;
+    wire adder_cout;
+    assign {adder_cout, alu_add_sub_res} = adder_op1 + adder_op2 + {63'b0, adder_cin};
+
     // slt
-    assign alu_slt_res     = lt ? 1  : 0;
+    assign alu_slt_res  = {63'b0, lt};
     // sltu
-    assign alu_sltu_res    = ltu ? 1 : 0;
-    // xor
-    assign alu_xor_res     = alu_op1 ^ alu_op2;
+    assign alu_sltu_res = {63'b0, ltu};
+
+    // 移位操作
+    wire [5:0] shift_op2 = (op_alu_imm_w | op_alu_w) ? {1'b0, alu_op2[4:0]} : alu_op2[5:0];
+    // sll
+    assign alu_sll_res     = alu_op1 << shift_op2;
     // srl
-    assign alu_srl_res     = alu_op1 >> alu_op2[5:0];
+    assign alu_srl_res     = alu_op1 >> shift_op2;
     // sra
-    assign alu_sra_res     = $signed(alu_op1) >>> alu_op2[5:0];
-    // or
-    assign alu_or_res      = alu_op1 | alu_op2;
+    assign alu_sra_res     = $signed(alu_op1) >>> shift_op2;
+    
+    // 逻辑操作
     // and
     assign alu_and_res     = alu_op1 & alu_op2;
+    // or
+    assign alu_or_res      = alu_op1 | alu_op2;
+    // xor
+    assign alu_xor_res     = alu_op1 ^ alu_op2;
 ```
 
 #### 1.3计算结果选择
@@ -658,17 +761,11 @@ module alu(
                              | ({`XLEN{res_sel_or}}      & alu_or_res)
                              | ({`XLEN{res_sel_and}}     & alu_and_res);
 
-
     // 对于ALU_W ALU_IMM_W
     // 1. 将结果截断至32位 
     // 2. 将截断结果符号扩展后放入rd
-    wire sel_w_res = op_alu_w | op_alu_imm_w;
-    // 截断
-    wire [31:0] alu_res_truncat = alu_res[31:0];
-    // 符号扩展
-    wire [`XLEN-1:0] alu_res_w = { {32{alu_res_truncat[31]}}, alu_res_truncat };
-
-    assign alu_res_o = sel_w_res ? alu_res_w : alu_res;
+    wire [`XLEN-1:0] alu_res_w = { {32{alu_res[31]}}, alu_res[31:0] };
+    assign alu_res_o = (op_alu_w | op_alu_imm_w) ? alu_res_w : alu_res;
 ```
 
 #### 1.4分支计算
@@ -686,27 +783,188 @@ module alu(
     wire geu ; 
 ```
 
-
-
-### 2.AGU
-
-```verilog
-module agu(
-    input  [`XLEN-1:0] rs1_rdata_i,
-    input  [`XLEN-1:0] imm_i,
-    output [`XLEN-1:0] agu_mem_addr_o
-);
-
-    assign agu_mem_addr_o = rs1_rdata_i + imm_i;
-
-endmodule
-```
-
-### 3.CGU
-
 ## 4. MEMORY
 
+```verilog
+module mem(
+    // from id
+    input  [`LD_ST_INFO_WIDTH-1:0] ld_st_info_i,
+    // from ex
+    input  [`XLEN-1:0] mem_addr_i,
+    // rs2_rdata
+    input  [`XLEN-1:0] mem_wdata_i,
+    // to wb
+    output [`XLEN-1:0] mem_rdata_o,
+
+    // mem x ram
+    output [`XLEN-1:0] ram_addr_o,
+    // write
+    output             ram_wen_o,
+    output [7:0]       ram_byte_en_o,
+    output [`XLEN-1:0] ram_wdata_o,
+    // read
+    output             ram_ren_o,
+    input  [`XLEN-1:0] ram_rdata_i
+);
+```
+
+- ram的读/写数据位宽为8字节，所以访问ram的地址的第三位为0，需要将访存地址的低三位置0作为ram的读写地址
+
+  ```verilog
+   assign ram_addr_o = {mem_addr_i[63:3], 3'b0};
+  ```
+
+### LOAD指令
+
+- 根据load类型以及地址低三位选择`ram_rdata_i`的内容
+
+  例如`lb`指令的数据可能是`ram_rdata_i`中的任意一个字节
+
+  ```verilog
+      reg [7:0] lb_rdata;
+      always @(*) begin
+          case(mem_addr_i[2:0])
+              3'b000: lb_rdata = ram_rdata_i[7 :0 ];
+              3'b001: lb_rdata = ram_rdata_i[15:8 ];
+              3'b010: lb_rdata = ram_rdata_i[23:16];
+              3'b011: lb_rdata = ram_rdata_i[31:24];
+              3'b100: lb_rdata = ram_rdata_i[39:32];
+              3'b101: lb_rdata = ram_rdata_i[47:40];
+              3'b110: lb_rdata = ram_rdata_i[55:48];
+              3'b111: lb_rdata = ram_rdata_i[63:56];
+              default: lb_rdata = 8'b0;
+          endcase
+      end
+      // lh
+      reg [15:0] lh_rdata;
+      always @(*) begin
+          case(mem_addr_i[2:1])
+              2'b00: lh_rdata = ram_rdata_i[15:0];
+              2'b01: lh_rdata = ram_rdata_i[31:16];
+              2'b10: lh_rdata = ram_rdata_i[47:32];
+              2'b11: lh_rdata = ram_rdata_i[63:48];
+              default lh_rdata = 16'b0;
+          endcase
+      end
+      // lw
+      reg [31:0] lw_rdata;
+      always @(*) begin
+          if(mem_addr_i[2] == 1'b0)
+              lw_rdata = ram_rdata_i[31:0];
+          else
+              lw_rdata = ram_rdata_i[63:32];
+      end
+  ```
+
+- 扩展成64位数据
+
+  ```verilog
+      // 符号扩展
+      wire [`XLEN-1:0] mem_rdata_lb  = {{56{lb_rdata[7 ]}}, lb_rdata};
+      wire [`XLEN-1:0] mem_rdata_lh  = {{48{lh_rdata[15]}}, lh_rdata};
+      wire [`XLEN-1:0] mem_rdata_lw  = {{32{lw_rdata[31]}}, lw_rdata};
+      wire [`XLEN-1:0] mem_rdata_ld  = ram_rdata_i;
+      // 无符号扩展
+      wire [`XLEN-1:0] mem_rdata_lbu = {{56'b0}, lb_rdata};
+      wire [`XLEN-1:0] mem_rdata_lhu = {{48'b0}, lh_rdata};
+      wire [`XLEN-1:0] mem_rdata_lwu = {{32'b0}, lw_rdata};
+  ```
+
+- 结果选择
+
+  ```verilog
+      // 结果选择
+      assign mem_rdata_o = {{`XLEN{lb}}  & mem_rdata_lb}
+                         | {{`XLEN{lh}}  & mem_rdata_lh}
+                         | {{`XLEN{lw}}  & mem_rdata_lw}
+                         | {{`XLEN{ld}}  & mem_rdata_ld}
+                         | {{`XLEN{lbu}} & mem_rdata_lbu}
+                         | {{`XLEN{lhu}} & mem_rdata_lhu}
+                         | {{`XLEN{lwu}} & mem_rdata_lwu};
+  ```
+
+### STORE指令
+
+写入内存的数据位宽为8字节，但是有些指令只需要其中部分字节，这时候就需要字节使能，控制写入哪些部分
+
+- 字解使能
+
+  ```verilog
+     reg [7:0] sb_byte_en;
+      always @(*) begin
+          case(mem_addr_i[2:0])
+              3'b000: sb_byte_en = 8'b0000_0001;
+              3'b001: sb_byte_en = 8'b0000_0010;
+              3'b010: sb_byte_en = 8'b0000_0100;
+              3'b011: sb_byte_en = 8'b0000_1000;
+              3'b100: sb_byte_en = 8'b0001_0000;
+              3'b101: sb_byte_en = 8'b0010_0000;
+              3'b110: sb_byte_en = 8'b0100_0000;
+              3'b111: sb_byte_en = 8'b1000_0000;
+              default: sb_byte_en = 8'b0000_0000;
+          endcase
+      end
+      // sh
+      reg [7:0] sh_byte_en;
+      always @(*) begin
+          case(mem_addr_i[2:1])
+              2'b00: sh_byte_en = 8'b0000_0011;
+              2'b01: sh_byte_en = 8'b0000_1100;
+              2'b10: sh_byte_en = 8'b0011_0000;
+              2'b11: sh_byte_en = 8'b1100_0000;
+              default: sh_byte_en = 8'b0000_0000;
+          endcase
+      end
+      // sw
+      reg [7:0] sw_byte_en;
+      always @(*) begin
+          case(mem_addr_i[2])
+              1'b0: sw_byte_en = 8'b0000_1111;
+              1'b1: sw_byte_en = 8'b1111_0000;
+              default: sw_byte_en = 8'b0000_0000;
+          endcase
+      end
+  
+      // 字节使能
+      assign ram_byte_en_o = ({8{sb}} & sb_byte_en)
+                           | ({8{sh}} & sh_byte_en)
+                           | ({8{sw}} & sw_byte_en)
+                           | ({8{sd}} & 8'b1111_1111);
+  ```
+
+- 写入数据
+
+  ```verilog
+    	// 简单写法，配合字节使能就可以写入正确的位置
+  	assign ram_wdata_o = ({64{sb}} & {8{mem_wdata_i[7:0]}})
+                         | ({64{sh}} & {4{mem_wdata_i[15:0]}})
+                         | ({64{sw}} & {2{mem_wdata_i[31:0]}})
+                         | ({64{sd}} & mem_wdata_i);
+  ```
+
+### RAM
+
+字节使能
+
+```verilog
+wire [`XLEN-1:0] mask = {{8{byte_en_i[7]}}, {8{byte_en_i[6]}}, {8{byte_en_i[5]}}, {8{byte_en_i[4]}}, 
+                         {8{byte_en_i[3]}}, {8{byte_en_i[2]}}, {8{byte_en_i[1]}}, {8{byte_en_i[0]}}};  
+assign wdata = ((wdata_i & mask) | (rdata & (~mask)));
+```
+
 ## 5. WRITE BACK
+
+选择写回regfile的内容
+
+- alu_res
+- mem_rdata
+- csr_rdata
+
+```verilog
+assign wb_rd_wdata_o = op_load   ? mem_rdata_i
+                     : op_system ? csr_rdata_i
+					 : alu_res_i;
+```
 
 ## 6.CSR
 
@@ -742,3 +1000,32 @@ endmodule
 2. 根据异常原因设置mcause, 设置mtval为地址异常的地址或者是异常指令的指令内容
 3. 将mstatus.MIE置为0用于屏蔽中断，将mstatus.MPIE = MIE
 4. 将异常发生之前权限模式保存在MPP中，再把权限模式改为M
+
+
+
+## 三.测试代码
+
+- 测试代码1
+
+  ```assembly
+  .text
+  .global _start
+  _start:
+  addi sp, x0, 256
+  addi x4, x0, 5
+  jal x0, test 
+  loop:
+  add x5, x0, x4
+  jal x1, foo
+  addi x4, x4, -1
+  test:
+  bne x4, x0, loop
+  foo:
+  sb x5, 0(sp)
+  addi sp, sp, -1
+  ret
+  ```
+
+- 测试代码2
+
+  

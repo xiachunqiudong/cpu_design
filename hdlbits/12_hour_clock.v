@@ -10,6 +10,7 @@ module clock(
 
 
     reg pm_r;
+    assign pm = pm_r;
     
     always @(posedge clk) begin
         if(reset) begin
@@ -23,14 +24,14 @@ module clock(
 
     wire s_ena, m_ena, h_ena;
     wire s_rst, m_rst, h_rst;
-    
-    assign s_rst = reset | (s_ena & ss == 8'h59);
-    assign m_rst = reset | (m_ena & mm == 8'h59);
-    assign h_rst = reset | (h_ena & hh == 8'h12);
 
     assign s_ena = ena;
     assign m_ena = ena & (ss == 8'h59);
     assign h_ena = ena & (ss == 8'h59) & (mm == 8'h59);
+    
+    assign s_rst = reset | (s_ena & ss == 8'h59);
+    assign m_rst = reset | (m_ena & mm == 8'h59);
+    assign h_rst = reset | (h_ena & hh == 8'h12);
 
     wire [7:0] h_rst_val;
     assign h_rst_val = reset ? 8'h12 : 8'h01;
@@ -41,6 +42,8 @@ module clock(
 
 endmodule
 
+
+// 0 ~ 99
 module bcd(
     input clk,
     input ena,

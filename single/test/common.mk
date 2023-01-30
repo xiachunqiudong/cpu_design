@@ -1,16 +1,13 @@
-RV = riscv64-unknown-linux-gnu-
-CFLAGS = -nostdlib -O0
+RV = riscv64-unknown-elf-
+CFLAGS = -nostdlib -march=rv64i -mabi=lp64 -g -Wall
+VFLAGS = --trace --cc --exe --build
 
 CC = ${RV}gcc
+AS = ${RV}as
 OBJDUMP = ${RV}objdump
 OBJCOPY = ${RV}objcopy
 
 
 # verilator
 VFLAGS = --trace --cc --exe --build
-
-.PHONY: veri
-veri:
-	verilator ${VFLAGS} ${OBJ}_main.cpp ${OBJ}.v
-	./obj_dir/V${OBJ}
 

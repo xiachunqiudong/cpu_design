@@ -19,14 +19,12 @@ VL_MODULE(Vid___024root) {
   public:
 
     // PORTS
-    VL_OUT8(id_rs1_en_o,0,0);
     VL_OUT8(id_rs1_idx_o,4,0);
-    VL_OUT8(id_rs2_en_o,0,0);
     VL_OUT8(id_rs2_idx_o,4,0);
-    VL_OUT8(id_csr_en_o,0,0);
+    VL_OUT8(id_csr_wen_o,0,0);
     VL_OUT8(id_branch_info_o,5,0);
     VL_OUT8(id_csr_info_o,5,0);
-    VL_OUT8(id_rd_en_o,0,0);
+    VL_OUT8(id_rd_wen_o,0,0);
     VL_OUT8(id_rd_idx_o,4,0);
     VL_OUT8(id_ilegl_instr_o,0,0);
     VL_OUT8(id_ecall_o,0,0);

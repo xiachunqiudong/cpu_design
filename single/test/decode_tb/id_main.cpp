@@ -82,14 +82,12 @@ int main(int argc, char* argv[]) {
 
         // verilog
         // regfile
-        int id_rs1_en_o  = id->id_rs1_en_o;
         int id_rs1_idx_o = id->id_rs1_idx_o;
-        int id_rs2_en_o  = id->id_rs2_en_o;
         int id_rs2_idx_o = id->id_rs2_idx_o;
-        int id_rd_en_o   = id->id_rd_en_o;
+        int id_rd_wen_o   = id->id_rd_wen_o;
         int id_rd_idx_o  = id->id_rd_idx_o;
         // csr
-        int id_csr_en_o  = id->id_csr_en_o;
+        int id_csr_wen_o  = id->id_csr_wen_o;
         int id_csr_idx_o = id->id_csr_idx_o;
         // info
         int id_opcode_info_o = id->id_opcode_info_o;
@@ -106,10 +104,10 @@ int main(int argc, char* argv[]) {
 
         puts("");
         puts("REG CSR IMM:");
-        printf("id_rs1_en_o = %d, id_rs1_idx_o = %d\n", id_rs1_en_o, id_rs1_idx_o);
-        printf("id_rs2_en_o = %d, id_rs2_idx_o = %d\n", id_rs2_en_o, id_rs2_idx_o);
-        printf("id_rd_en_o  = %d, id_rd_idx_o  = %d\n", id_rd_en_o,  id_rd_idx_o);
-        printf("id_csr_en_o = %d, id_csr_idx_o = %d\n", id_csr_en_o,  id_csr_idx_o);
+        printf("id_rs1_idx_o = %d\n", id_rs1_idx_o);
+        printf("id_rs2_idx_o = %d\n", id_rs2_idx_o);
+        printf("id_rd_wen_o  = %d, id_rd_idx_o  = %d\n", id_rd_wen_o,  id_rd_idx_o);
+        printf("id_csr_en_o = %d, id_csr_idx_o = %d\n", id_csr_wen_o,  id_csr_idx_o);
         printf("id_imm_o    = %d\n", id_imm_o);
         
         puts("");

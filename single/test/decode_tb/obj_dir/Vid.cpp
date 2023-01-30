@@ -11,13 +11,11 @@
 Vid::Vid(VerilatedContext* _vcontextp__, const char* _vcname__)
     : vlSymsp{new Vid__Syms(_vcontextp__, _vcname__, this)}
     , instr_i{vlSymsp->TOP.instr_i}
-    , id_rs1_en_o{vlSymsp->TOP.id_rs1_en_o}
     , id_rs1_idx_o{vlSymsp->TOP.id_rs1_idx_o}
-    , id_rs2_en_o{vlSymsp->TOP.id_rs2_en_o}
     , id_rs2_idx_o{vlSymsp->TOP.id_rs2_idx_o}
     , rf_rs1_rdata_i{vlSymsp->TOP.rf_rs1_rdata_i}
     , rf_rs2_rdata_i{vlSymsp->TOP.rf_rs2_rdata_i}
-    , id_csr_en_o{vlSymsp->TOP.id_csr_en_o}
+    , id_csr_wen_o{vlSymsp->TOP.id_csr_wen_o}
     , id_csr_idx_o{vlSymsp->TOP.id_csr_idx_o}
     , csr_rdata_i{vlSymsp->TOP.csr_rdata_i}
     , id_opcode_info_o{vlSymsp->TOP.id_opcode_info_o}
@@ -28,7 +26,7 @@ Vid::Vid(VerilatedContext* _vcontextp__, const char* _vcname__)
     , id_rs1_rdata_o{vlSymsp->TOP.id_rs1_rdata_o}
     , id_rs2_rdata_o{vlSymsp->TOP.id_rs2_rdata_o}
     , id_imm_o{vlSymsp->TOP.id_imm_o}
-    , id_rd_en_o{vlSymsp->TOP.id_rd_en_o}
+    , id_rd_wen_o{vlSymsp->TOP.id_rd_wen_o}
     , id_rd_idx_o{vlSymsp->TOP.id_rd_idx_o}
     , id_csr_rdata_o{vlSymsp->TOP.id_csr_rdata_o}
     , id_ilegl_instr_o{vlSymsp->TOP.id_ilegl_instr_o}

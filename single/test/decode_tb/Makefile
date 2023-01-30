@@ -11,7 +11,7 @@ all:
 
 .PHONY: decode
 decode: 
-	${CC} ${CFLAGS} decode.s -o decode.elf
+	${CC} ${CFLAGS} -c decode.s -o decode.elf
 	${OBJCOPY} -O binary decode.elf decode.bin
 	hexdump -e '1/4 "%08x\n"'  decode.bin > decode.hex
 	verilator ${VFLAGS} ${OBJ}_main.cpp util.cpp ${OBJ}.v

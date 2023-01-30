@@ -28,13 +28,11 @@ class Vid VL_NOT_FINAL {
     // The application code writes and reads these signals to
     // propagate new values into/out from the Verilated model.
     VL_IN(&instr_i,31,0);
-    VL_OUT8(&id_rs1_en_o,0,0);
     VL_OUT8(&id_rs1_idx_o,4,0);
-    VL_OUT8(&id_rs2_en_o,0,0);
     VL_OUT8(&id_rs2_idx_o,4,0);
     VL_IN64(&rf_rs1_rdata_i,63,0);
     VL_IN64(&rf_rs2_rdata_i,63,0);
-    VL_OUT8(&id_csr_en_o,0,0);
+    VL_OUT8(&id_csr_wen_o,0,0);
     VL_OUT16(&id_csr_idx_o,11,0);
     VL_IN64(&csr_rdata_i,63,0);
     VL_OUT16(&id_opcode_info_o,11,0);
@@ -45,7 +43,7 @@ class Vid VL_NOT_FINAL {
     VL_OUT64(&id_rs1_rdata_o,63,0);
     VL_OUT64(&id_rs2_rdata_o,63,0);
     VL_OUT64(&id_imm_o,63,0);
-    VL_OUT8(&id_rd_en_o,0,0);
+    VL_OUT8(&id_rd_wen_o,0,0);
     VL_OUT8(&id_rd_idx_o,4,0);
     VL_OUT64(&id_csr_rdata_o,63,0);
     VL_OUT8(&id_ilegl_instr_o,0,0);

@@ -55,13 +55,11 @@ void Vid___024root___ctor_var_reset(Vid___024root* vlSelf) {
     VL_DEBUG_IF(VL_DBG_MSGF("+    Vid___024root___ctor_var_reset\n"); );
     // Body
     vlSelf->instr_i = VL_RAND_RESET_I(32);
-    vlSelf->id_rs1_en_o = VL_RAND_RESET_I(1);
     vlSelf->id_rs1_idx_o = VL_RAND_RESET_I(5);
-    vlSelf->id_rs2_en_o = VL_RAND_RESET_I(1);
     vlSelf->id_rs2_idx_o = VL_RAND_RESET_I(5);
     vlSelf->rf_rs1_rdata_i = VL_RAND_RESET_Q(64);
     vlSelf->rf_rs2_rdata_i = VL_RAND_RESET_Q(64);
-    vlSelf->id_csr_en_o = VL_RAND_RESET_I(1);
+    vlSelf->id_csr_wen_o = VL_RAND_RESET_I(1);
     vlSelf->id_csr_idx_o = VL_RAND_RESET_I(12);
     vlSelf->csr_rdata_i = VL_RAND_RESET_Q(64);
     vlSelf->id_opcode_info_o = VL_RAND_RESET_I(12);
@@ -72,7 +70,7 @@ void Vid___024root___ctor_var_reset(Vid___024root* vlSelf) {
     vlSelf->id_rs1_rdata_o = VL_RAND_RESET_Q(64);
     vlSelf->id_rs2_rdata_o = VL_RAND_RESET_Q(64);
     vlSelf->id_imm_o = VL_RAND_RESET_Q(64);
-    vlSelf->id_rd_en_o = VL_RAND_RESET_I(1);
+    vlSelf->id_rd_wen_o = VL_RAND_RESET_I(1);
     vlSelf->id_rd_idx_o = VL_RAND_RESET_I(5);
     vlSelf->id_csr_rdata_o = VL_RAND_RESET_Q(64);
     vlSelf->id_ilegl_instr_o = VL_RAND_RESET_I(1);

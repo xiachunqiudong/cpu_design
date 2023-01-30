@@ -4,9 +4,8 @@ module id(
     input [`INSTR_WIDTH-1:0] instr_i,
         
     // id x regfile
-    output             id_rs1_en_o,
+    // to regfile
     output [4:0]       id_rs1_idx_o,
-    output             id_rs2_en_o,
     output [4:0]       id_rs2_idx_o,
     // form regfile
     input  [`XLEN-1:0] rf_rs1_rdata_i,
@@ -14,7 +13,7 @@ module id(
     
     // id x csr
     // to csr
-    output                          id_csr_en_o,// csr指令既要读也要写,x0在csr内部处理
+    output                          id_csr_wen_o,// csr指令既要读也要写,x0在csr内部处理
     output [11:0]                   id_csr_idx_o,
     // from csr
     input  [`XLEN-1:0]              csr_rdata_i,
@@ -31,17 +30,24 @@ module id(
     output [`XLEN-1:0]              id_rs2_rdata_o,
     output [`XLEN-1:0]              id_imm_o,
 
-
     // to write back
-    output                          id_rd_en_o,
+    output                          id_rd_wen_o,
     output [4:0]                    id_rd_idx_o,
     output [`XLEN-1:0]              id_csr_rdata_o,
+    
     // excp
     output id_ilegl_instr_o,
     output id_ecall_o,
     output id_ebreak_o,
     output id_mret_o
 );
+
+//xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
+// 前递操作
+//xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
+
+    assign id_rs1_rdata_o = rf_rs1_rdata_i;
+    assign id_rs2_rdata_o = rf_rs2_rdata_i;
 
 //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
 // 指令分解
@@ -246,14 +252,8 @@ module id(
                        | rv64_csrrwi | rv64_csrrsi | rv64_csrrci;
 
 
-    // id_rs1_en id_rs2_en id_rd_en
-    assign id_rs1_en_o = rv64_need_rs1;
-    assign id_rs2_en_o = rv64_need_rs2;
-    assign id_rd_en_o  = rv64_need_rd;
-    assign id_csr_en_o = rv64_need_csr;
-
-    assign id_rs1_rdata_o = rf_rs1_rdata_i;
-    assign id_rs2_rdata_o = rf_rs2_rdata_i;
+    assign id_rd_wen_o  = rv64_need_rd;
+    assign id_csr_wen_o = rv64_need_csr;
 
 //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
 //  立即数解析

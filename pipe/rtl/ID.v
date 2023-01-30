@@ -16,8 +16,8 @@ module ID(
     // handshack
     input                     IF_valid_i,
     input                     EX_ready_i,
-    output                    ID_ready_o,
-    output                    ID_valid_o
+    output                    ID_valid_o,
+    output                    ID_ready_o
 );
 
     wire run;
