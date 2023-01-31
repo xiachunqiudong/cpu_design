@@ -59,9 +59,9 @@ VL_MODULE(Vtop_sim___024root) {
     CData/*0:0*/ top_sim__DOT__id_u__DOT__rv64_csrrci;
     CData/*0:0*/ top_sim__DOT__id_u__DOT__rv64_need_rd;
     CData/*0:0*/ top_sim__DOT__ex_u__DOT__alu_u__DOT__res_sel_sub;
+    CData/*0:0*/ top_sim__DOT__ex_u__DOT__alu_u__DOT__adder_cout;
     CData/*5:0*/ top_sim__DOT__ex_u__DOT__alu_u__DOT__shift_op2;
     CData/*0:0*/ top_sim__DOT__ex_u__DOT__alu_u__DOT__lt;
-    CData/*0:0*/ top_sim__DOT__ex_u__DOT__alu_u__DOT__ltu;
     CData/*7:0*/ top_sim__DOT__mem_u__DOT__lb_rdata;
     CData/*0:0*/ top_sim__DOT__pc_next_gen_u__DOT__jump;
     SData/*11:0*/ top_sim__DOT__id_opcode_info;
