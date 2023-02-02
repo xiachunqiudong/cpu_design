@@ -9,6 +9,9 @@ module id(
     // form regfile
     input  [`XLEN-1:0]              rf_rs1_rdata_i,
     input  [`XLEN-1:0]              rf_rs2_rdata_i,
+    // from EX
+    input                           EX_op_load_i,   
+    input  [4:0]                    EX_rd_idx_i,
     // to ex
     // op info
     output [`OP_INFO_WIDTH-1:0]     id_optype_info_o,
@@ -26,12 +29,19 @@ module id(
     // rd
     output                          id_rd_wen_o,
     output [4:0]                    id_rd_idx_o,
+    // load use
+    output                          id_load_use_o,
     // excp
     output                          id_ilegl_instr_o,
     output                          id_ecall_o,
     output                          id_ebreak_o,
     output                          id_mret_o
 );
+
+//xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
+// 冲突检测
+//xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
+    assign id_load_use_o = EX_op_load_i && ((need_rs1 && EX_rd_idx_i == id_rs1_idx_o) || (need_rs2 && EX_rd_idx_i == id_rs2_idx_o));
 
 //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
 // id_rs1_rdata id_rs2_rdata
@@ -245,6 +255,9 @@ module id(
 
     assign id_rd_wen_o  = rv64_need_rd;
     assign id_csr_wen_o = rv64_need_csr;
+    
+    wire need_rs1 = rv64_need_rs1;
+    wire need_rs2 = rv64_need_rs2;
 
 //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
 //  立即数生成

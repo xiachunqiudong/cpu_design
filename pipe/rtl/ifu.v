@@ -2,6 +2,8 @@
 
 module ifu(
     input  [`PC_WIDTH-1:0]    IF_pc_i,
+    input                     if_flush_i,
+    input  [`PC_WIDTH-1:0]    flush_pc_i,
     output [`PC_WIDTH-1:0]    ifu_pc_next_o,
     // to ID
     output [`INSTR_WIDTH-1:0] ifu_instr_o,

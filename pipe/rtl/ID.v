@@ -7,6 +7,8 @@ module ID(
     input                     ifu_prdt_taken_i,
     input                     ifu_pc_misalign_i,
     input                     ifu_bus_err_i,
+    // from id
+    input                     id_load_use_i,
     // to id
     output [`PC_WIDTH-1:0]    ID_pc_o,
     output [`INSTR_WIDTH-1:0] ID_instr_o,
@@ -21,7 +23,7 @@ module ID(
 );
 
     wire run;
-    assign run = 1;
+    assign run = (!id_load_use_i);
     assign ID_valid_o = (ID_data_valid && run);
     assign ID_ready_o = (EX_ready_i && run);
 
@@ -32,11 +34,12 @@ module ID(
     reg                    ID_pc_misalign_r;
     reg                    ID_if_bus_err_r;
     
-    assign ID_pc_o          = ID_pc_r;
-    assign ID_instr_o       = ID_instr_r;
-    assign ID_prdt_taken_o  = ID_prdt_taken_r;
-    assign ID_pc_misalign_o = ID_pc_misalign_r;
-    assign ID_if_bus_err_o  = ID_if_bus_err_r;
+    assign ID_pc_o          = ID_pc_r          & {`PC_WIDTH{ID_data_valid}};
+    assign ID_instr_o       = ID_instr_r       & {`INSTR_WIDTH{ID_data_valid}};
+    assign ID_prdt_taken_o  = ID_prdt_taken_r  & ID_data_valid;
+    assign ID_pc_misalign_o = ID_pc_misalign_r & ID_data_valid;
+    assign ID_if_bus_err_o  = ID_if_bus_err_r  & ID_data_valid;
+
 
     always @(posedge clk) begin
         if(rst) begin

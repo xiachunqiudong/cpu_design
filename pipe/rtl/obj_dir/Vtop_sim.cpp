@@ -12,6 +12,7 @@ Vtop_sim::Vtop_sim(VerilatedContext* _vcontextp__, const char* _vcname__)
     : vlSymsp{new Vtop_sim__Syms(_vcontextp__, _vcname__, this)}
     , clk{vlSymsp->TOP.clk}
     , rst{vlSymsp->TOP.rst}
+    , reg_data_o{vlSymsp->TOP.reg_data_o}
     , rootp{&(vlSymsp->TOP)}
 {
 }

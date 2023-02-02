@@ -72,5 +72,5 @@
 `define CSR_CSRRCI 0
 
 // REGFILE
-`define REG_X0 0
-`define REG_X1 1
+`define REG_X0 5'b0
+`define REG_X1 5'b1

@@ -1,8 +1,10 @@
 .text
 .global _start
 _start:
-add x1, x2, x3
-jal x1, foo
-addi x1, x1, -1
+addi x10, x10, 10 #0
+addi x9, x9, 9    #4
+bne x9, x10, foo  #8
+add x11, x9, x10  #12
+sltu x11, x9, x10 #16
 foo:
-bne x1, x2, _start
+addi x0, x0, 0    #20
