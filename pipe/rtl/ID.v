@@ -1,6 +1,7 @@
 module ID(
     input                     clk,
     input                     rst,
+    input                     id_flush_i,
     // from if
     input  [`PC_WIDTH-1:0]    IF_pc_i,
     input  [`INSTR_WIDTH-1:0] ifu_instr_i,
@@ -24,7 +25,7 @@ module ID(
 
     wire run;
     assign run = (!id_load_use_i);
-    assign ID_valid_o = (ID_data_valid && run);
+    assign ID_valid_o = (ID_data_valid && run && !id_flush_i);
     assign ID_ready_o = (EX_ready_i && run);
 
     reg                    ID_data_valid;

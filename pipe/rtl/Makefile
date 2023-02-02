@@ -15,3 +15,10 @@ code:
 .PHONY: show
 show:
 	@gtkwave wave.vcd
+
+
+.PHONY: git
+git:
+	git add .
+	git commit -m "支持 前递 load-use冒险处理 分支跳转指令"
+	git push

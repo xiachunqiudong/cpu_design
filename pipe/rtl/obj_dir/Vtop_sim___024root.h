@@ -34,6 +34,7 @@ VL_MODULE(Vtop_sim___024root) {
         CData/*4:0*/ top_sim__DOT__EX_rs1_idx;
         CData/*4:0*/ top_sim__DOT__EX_rs2_idx;
         CData/*4:0*/ top_sim__DOT__EX_rd_idx;
+        CData/*0:0*/ top_sim__DOT__ex_jump;
         CData/*0:0*/ top_sim__DOT__MEM_rd_wen;
         CData/*4:0*/ top_sim__DOT__MEM_rd_idx;
         CData/*0:0*/ top_sim__DOT__WB_csr_wen;
@@ -89,14 +90,16 @@ VL_MODULE(Vtop_sim___024root) {
         CData/*4:0*/ top_sim__DOT__u_EX__DOT__EX_rd_idx_r;
         CData/*0:0*/ top_sim__DOT__u_EX__DOT__EX_pc_misalign_r;
         CData/*0:0*/ top_sim__DOT__u_EX__DOT__EX_if_bus_err_r;
-        CData/*0:0*/ top_sim__DOT__u_EX__DOT__EX_ilegl_instr_r;
     };
     struct {
+        CData/*0:0*/ top_sim__DOT__u_EX__DOT__EX_ilegl_instr_r;
         CData/*0:0*/ top_sim__DOT__u_EX__DOT__EX_ecall_r;
         CData/*0:0*/ top_sim__DOT__u_EX__DOT__EX_ebreak_r;
         CData/*0:0*/ top_sim__DOT__u_EX__DOT__EX_mret_r;
         CData/*0:0*/ top_sim__DOT__u_ex__DOT__alu_u__DOT__res_sel_sub;
+        CData/*0:0*/ top_sim__DOT__u_ex__DOT__alu_u__DOT__adder_cout;
         CData/*5:0*/ top_sim__DOT__u_ex__DOT__alu_u__DOT__shift_op2;
+        CData/*0:0*/ top_sim__DOT__u_ex__DOT__alu_u__DOT__lt;
         CData/*0:0*/ top_sim__DOT__u_MEM__DOT__MEM_data_valid;
         CData/*0:0*/ top_sim__DOT__u_MEM__DOT__MEM_csr_wen_r;
         CData/*0:0*/ top_sim__DOT__u_MEM__DOT__MEM_rd_wen_r;
@@ -132,9 +135,11 @@ VL_MODULE(Vtop_sim___024root) {
         IData/*31:0*/ top_sim__DOT__ID_instr;
         IData/*31:0*/ top_sim__DOT__u_ID__DOT__ID_instr_r;
         IData/*31:0*/ top_sim__DOT__u_mem__DOT__lw_rdata;
+        QData/*63:0*/ top_sim__DOT__ifu_pc_next;
         QData/*63:0*/ top_sim__DOT__EX_pc;
         QData/*63:0*/ top_sim__DOT__EX_rs1_rdata;
         QData/*63:0*/ top_sim__DOT__EX_rs2_rdata;
+        QData/*63:0*/ top_sim__DOT__EX_imm;
         QData/*63:0*/ top_sim__DOT__ex_csr_rdata;
         QData/*63:0*/ top_sim__DOT__ex_csr_wdata;
         QData/*63:0*/ top_sim__DOT__MEM_rs2_rdata;
@@ -147,22 +152,22 @@ VL_MODULE(Vtop_sim___024root) {
         QData/*63:0*/ top_sim__DOT__wb_rd_wdata;
         QData/*63:0*/ top_sim__DOT__ram_rdata;
         QData/*63:0*/ top_sim__DOT__u_IF__DOT__pc_r;
-        QData/*63:0*/ top_sim__DOT__u_ifu__DOT__pc_add_op1;
         QData/*63:0*/ top_sim__DOT__u_ifu__DOT__u_if_mini_dec_u__DOT__idu__DOT__rf_rs1_rdata_i;
         QData/*63:0*/ top_sim__DOT__u_ifu__DOT__u_if_mini_dec_u__DOT__idu__DOT__rf_rs2_rdata_i;
         QData/*63:0*/ top_sim__DOT__u_ifu__DOT__u_if_mini_dec_u__DOT__idu__DOT__rv64_imm;
         QData/*63:0*/ top_sim__DOT__u_ID__DOT__ID_pc_r;
+    };
+    struct {
         QData/*63:0*/ top_sim__DOT__u_id__DOT__rv64_imm;
         QData/*63:0*/ top_sim__DOT__u_EX__DOT__EX_pc_r;
         QData/*63:0*/ top_sim__DOT__u_EX__DOT__EX_rs1_rdata_r;
         QData/*63:0*/ top_sim__DOT__u_EX__DOT__EX_rs2_rdata_r;
-    };
-    struct {
         QData/*63:0*/ top_sim__DOT__u_EX__DOT__EX_imm_r;
         QData/*63:0*/ top_sim__DOT__u_ex__DOT__csr_rdata_i;
         QData/*63:0*/ top_sim__DOT__u_ex__DOT__alu_u__DOT__alu_op1;
         QData/*63:0*/ top_sim__DOT__u_ex__DOT__alu_u__DOT__alu_op2;
         QData/*63:0*/ top_sim__DOT__u_ex__DOT__alu_u__DOT__alu_add_sub_res;
+        QData/*63:0*/ top_sim__DOT__u_ex__DOT__alu_u__DOT__alu_xor_res;
         QData/*63:0*/ top_sim__DOT__u_ex__DOT__alu_u__DOT__adder_op2;
         QData/*63:0*/ top_sim__DOT__u_ex__DOT__alu_u__DOT__alu_res;
         QData/*63:0*/ top_sim__DOT__u_MEM__DOT__MEM_pc_r;

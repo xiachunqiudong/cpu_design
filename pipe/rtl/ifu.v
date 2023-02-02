@@ -74,6 +74,10 @@ module ifu(
     wire [`PC_WIDTH-1:0] pc_add_op1 = jump ? jump_pc_op1 : IF_pc_i;
     wire [`PC_WIDTH-1:0] pc_add_op2 = jump ? jump_pc_op2 : 4;
 
-    assign ifu_pc_next_o = pc_add_op1 + pc_add_op2;
+    // assign ifu_pc_next_o = pc_add_op1 + pc_add_op2;
+    
+    wire [`PC_WIDTH-1:0] pc_add4 = IF_pc_i + 4;
+    assign ifu_pc_next_o = if_flush_i ? flush_pc_i : pc_add4;
+    
 
 endmodule

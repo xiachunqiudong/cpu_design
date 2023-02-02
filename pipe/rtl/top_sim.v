@@ -165,6 +165,7 @@ module top_sim(
     IF u_IF(
         .clk           ( clk         ),
         .rst           ( rst         ),
+        .if_flush_i    ( if_flush        ),
         .ifu_pc_next_i ( ifu_pc_next ),
         .IF_pc_o       ( IF_pc       ),
         .ID_ready_i    ( ID_ready    ),
@@ -186,6 +187,7 @@ module top_sim(
     ID u_ID(
         .clk               ( clk             ),
         .rst               ( rst             ),
+        .id_flush_i        ( id_flush        ),
         .IF_pc_i           ( IF_pc           ),
         .ifu_instr_i       ( ifu_instr       ),
         .ifu_prdt_taken_i  ( ifu_prdt_taken  ),

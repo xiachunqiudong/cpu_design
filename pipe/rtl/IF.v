@@ -3,6 +3,7 @@
 module IF(
     input                  clk,
     input                  rst,
+    input                  if_flush_i,
     output [`PC_WIDTH-1:0] ifu_pc_next_i,
     output [`PC_WIDTH-1:0] IF_pc_o,
     // handshack
@@ -10,11 +11,11 @@ module IF(
     output                 IF_valid_o
 );
 
-    wire data_valid;
+    wire IF_data_valid;
     wire run;
-    assign data_valid = 1;
+    assign IF_data_valid = !if_flush_i;
     assign run = 1;
-    assign IF_valid_o = data_valid && run;
+    assign IF_valid_o = IF_data_valid && run;
 
     // data
     reg [`PC_WIDTH-1:0] pc_r;

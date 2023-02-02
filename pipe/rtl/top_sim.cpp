@@ -31,7 +31,7 @@ int main(int argc, char** argv, char** env) {
     int clk = 1;
     int rst = 1;
 
-    while (main_time < 20) {
+    while (main_time < 50) {
 
         if(main_time == 2) {
             rst = 0;
