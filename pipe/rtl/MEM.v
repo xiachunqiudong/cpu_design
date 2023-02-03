@@ -3,6 +3,7 @@
 module MEM(
     input                              clk,
     input                              rst,
+    input                              mem_flush_i,
     input  [`XLEN-1:0]                 EX_pc_i,
     input  [`OP_INFO_WIDTH-1:0]        EX_optype_info_i,
     input  [`LD_ST_INFO_WIDTH-1:0]     EX_ld_st_info_i,
@@ -22,23 +23,23 @@ module MEM(
     input                              EX_ebreak_i,
     input                              EX_mret_i,
     
-    output reg [`XLEN-1:0]             MEM_pc_o,
-    output reg [`OP_INFO_WIDTH-1:0]    MEM_optype_info_o,
-    output reg [`LD_ST_INFO_WIDTH-1:0] MEM_ld_st_info_o,
-    output reg                         MEM_csr_wen_o,
-    output reg [11:0]                  MEM_csr_idx_o,
-    output reg                         MEM_rd_wen_o,
-    output reg [4:0]                   MEM_rd_idx_o,
-    output reg [`XLEN-1:0]             MEM_rs2_rdata_o,
-    output reg [`XLEN-1:0]             MEM_alu_res_o,
-    output reg [`XLEN-1:0]             MEM_csr_rdata_o,
-    output reg [`XLEN-1:0]             MEM_csr_wdata_o,
-    output reg                         MEM_pc_misalign_o,
-    output reg                         MEM_if_bus_err_o,
-    output reg                         MEM_ilegl_instr_o,
-    output reg                         MEM_ecall_o,
-    output reg                         MEM_ebreak_o,
-    output reg                         MEM_mret_o,
+    output [`XLEN-1:0]                 MEM_pc_o,
+    output [`OP_INFO_WIDTH-1:0]        MEM_optype_info_o,
+    output [`LD_ST_INFO_WIDTH-1:0]     MEM_ld_st_info_o,
+    output                             MEM_csr_wen_o,
+    output [11:0]                      MEM_csr_idx_o,
+    output                             MEM_rd_wen_o,
+    output [4:0]                       MEM_rd_idx_o,
+    output [`XLEN-1:0]                 MEM_rs2_rdata_o,
+    output [`XLEN-1:0]                 MEM_alu_res_o,
+    output [`XLEN-1:0]                 MEM_csr_rdata_o,
+    output [`XLEN-1:0]                 MEM_csr_wdata_o,
+    output                             MEM_pc_misalign_o,
+    output                             MEM_if_bus_err_o,
+    output                             MEM_ilegl_instr_o,
+    output                             MEM_ecall_o,
+    output                             MEM_ebreak_o,
+    output                             MEM_mret_o,
     // hand shack
     input                              EX_valid_i,
     input                              WB_ready_i,
@@ -49,7 +50,7 @@ module MEM(
     reg MEM_data_valid;
     wire run;
     assign run = 1;
-    assign MEM_valid_o = MEM_data_valid && run;
+    assign MEM_valid_o = MEM_data_valid && run && !mem_flush_i;
     assign MEM_ready_o = WB_ready_i && run;
 
     // data

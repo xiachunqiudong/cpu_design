@@ -20,5 +20,5 @@ show:
 .PHONY: git
 git:
 	git add .
-	git commit -m "支持 前递 load-use冒险处理 分支跳转指令"
+	git commit -m "异常处理"
 	git push

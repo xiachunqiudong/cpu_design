@@ -13,13 +13,8 @@ module ex(
     input  [`XLEN-1:0]              rs1_rdata_i,
     input  [`XLEN-1:0]              rs2_rdata_i,
     input  [`XLEN-1:0]              imm_i,
-    input  [11:0]                   csr_idx_i, 
-    // csr
-    output [11:0]                   ex_csr_idx_o,
-    input  [`XLEN-1:0]              csr_rdata_i,
     // to MEM
     output [`XLEN-1:0]              ex_alu_res_o,
-    output [`XLEN-1:0]              ex_csr_rdata_o,
     output [`XLEN-1:0]              ex_csr_wdata_o,
     // JUMP
     output                          ex_jump_o,

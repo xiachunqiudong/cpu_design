@@ -11,18 +11,16 @@ module IF(
     output                 IF_valid_o
 );
 
-    wire IF_data_valid;
     wire run;
-    assign IF_data_valid = !if_flush_i;
     assign run = 1;
-    assign IF_valid_o = IF_data_valid && run;
+    
+    assign IF_valid_o = !if_flush_i && run;
 
     // data
     reg [`PC_WIDTH-1:0] pc_r;
     
     assign IF_pc_o = pc_r;
     
-
     always @(posedge clk) begin
         if(rst) begin
             pc_r <= 64'b0;

@@ -82,6 +82,7 @@ module top_sim(
     wire                          EX_valid;
     wire                          EX_ready;
 
+    wire [`XLEN-1:0]              csr_rdata;
     wire [`XLEN-1:0]              ex_alu_res;
     wire [`XLEN-1:0]              ex_csr_rdata;
     wire [`XLEN-1:0]              ex_csr_wdata;
@@ -143,6 +144,8 @@ module top_sim(
     wire [4:0]                wb_rd_idx;
     wire [`XLEN-1:0]          wb_rd_wdata;
 
+    wire                      wb_trap;
+    wire [`PC_WIDTH-1:0]      wb_trap_handle_pc;
 // controller
     wire                 if_flush;
     wire                 id_flush;
@@ -151,13 +154,15 @@ module top_sim(
     wire [`PC_WIDTH-1:0] flush_pc;
 
     controller u_controller(
-        .ex_jump_i    ( ex_jump      ),
-        .ex_jump_pc_i ( ex_jump_pc   ),
-        .if_flush_o   ( if_flush     ),
-        .id_flush_o   ( id_flush     ),
-        .ex_flush_o   ( ex_flush     ),
-        .mem_flush_o  ( mem_flush    ),
-        .flush_pc_o   ( flush_pc     )
+        .ex_jump_i           ( ex_jump      ),
+        .ex_jump_pc_i        ( ex_jump_pc   ),
+        .wb_trap_i           ( wb_trap      ),
+        .wb_trap_handle_pc_i ( wb_trap_handle_pc),
+        .if_flush_o          ( if_flush     ),
+        .id_flush_o          ( id_flush     ),
+        .ex_flush_o          ( ex_flush     ),
+        .mem_flush_o         ( mem_flush    ),
+        .flush_pc_o          ( flush_pc     )
     );
 
 
@@ -165,7 +170,7 @@ module top_sim(
     IF u_IF(
         .clk           ( clk         ),
         .rst           ( rst         ),
-        .if_flush_i    ( if_flush        ),
+        .if_flush_i    ( if_flush    ),
         .ifu_pc_next_i ( ifu_pc_next ),
         .IF_pc_o       ( IF_pc       ),
         .ID_ready_i    ( ID_ready    ),
@@ -248,6 +253,7 @@ module top_sim(
     EX u_EX(
         .clk              ( clk            ),
         .rst              ( rst            ),
+        .ex_flush_i       ( ex_flush       ),
         .ID_pc_i          ( ID_pc          ),
         .ID_prdt_taken_i  ( ID_prdt_taken  ),
         .id_optype_info_i ( id_optype_info ),
@@ -317,11 +323,7 @@ module top_sim(
         .rs1_rdata_i        ( EX_rs1_rdata   ),
         .rs2_rdata_i        ( EX_rs2_rdata   ),
         .imm_i              ( EX_imm         ),
-        .csr_idx_i          ( EX_csr_idx     ),
-        .ex_csr_idx_o       (),
-        .csr_rdata_i        (),
         .ex_alu_res_o       ( ex_alu_res     ),
-        .ex_csr_rdata_o     ( ex_csr_rdata   ),
         .ex_csr_wdata_o     ( ex_csr_wdata   ),
         .ex_jump_o          ( ex_jump        ),
         .ex_jump_pc_o       ( ex_jump_pc     )
@@ -331,6 +333,7 @@ module top_sim(
     MEM u_MEM(
         .clk               ( clk             ),
         .rst               ( rst             ),
+        .mem_flush_i       ( mem_flush       ),
         .EX_pc_i           ( EX_pc           ),
         .EX_optype_info_i  ( EX_optype_info  ),
         .EX_ld_st_info_i   ( EX_ld_st_info   ),
@@ -340,7 +343,7 @@ module top_sim(
         .EX_rd_idx_i       ( EX_rd_idx       ),
         .EX_rs2_rdata_i    ( EX_rs2_rdata    ),
         .ex_alu_res_i      ( ex_alu_res      ),
-        .ex_csr_rdata_i    ( ex_csr_rdata    ),
+        .ex_csr_rdata_i    ( csr_rdata       ),
         .ex_csr_wdata_i    ( ex_csr_wdata    ),
         .EX_pc_misalign_i  ( EX_pc_misalign  ),
         .EX_if_bus_err_i   ( EX_if_bus_err   ),
@@ -380,10 +383,17 @@ module top_sim(
     wire [`XLEN-1:0] ram_rdata;
 
     mem u_mem(
+        .mem_flush_i       ( mem_flush       ),
         .ld_st_info_i      ( MEM_ld_st_info  ),
         .mem_addr_i        ( MEM_alu_res     ),
         .mem_wdata_i       ( MEM_rs2_rdata   ),
         .mem_rdata_o       ( mem_rdata       ),
+        .MEM_pc_misalign_i ( MEM_pc_misalign ),
+        .MEM_if_bus_err_i  ( MEM_if_bus_err  ),
+        .MEM_ilegl_instr_i ( MEM_ilegl_instr ),
+        .MEM_ecall_i       ( MEM_ecall       ),
+        .MEM_ebreak_i      ( MEM_ebreak      ),
+        .MEM_mret_i        ( MEM_mret        ),
         .mem_ld_misalign_o ( mem_ld_misalign ),
         .mem_ld_bus_err_o  ( mem_ld_bus_err  ),
         .mem_st_misalign_o ( mem_st_misalign ),
@@ -455,19 +465,74 @@ module top_sim(
         .WB_ready_o        ( WB_ready        )
     );
 
+    // wb x csr
+    wire             wb_csr_wen;
+    wire [11:0]      wb_csr_idx;
+    wire [`XLEN-1:0] wb_csr_wdata;
+    
+    
+    wire [`XLEN-1:0] mtvec_rdata;
+    wire [`XLEN-1:0] mepc_rdata;
+    wire             mcause_wen;
+    wire [`XLEN-1:0] mcause_wdata;
+    wire             mtval_wen;
+    wire [`XLEN-1:0] mtval_wdata;
+    wire             mepc_wen;
+    wire [`XLEN-1:0] mepc_wdata;
+
     wb u_wb(
-        .WB_optype_info_i ( WB_optype_info ),
-        .WB_csr_wen_i     (),
-        .WB_csr_idx_i     (),
-        .WB_csr_wdata_i   (),
-        .WB_rd_wen_i      ( WB_rd_wen      ),
-        .WB_rd_idx_i      ( WB_rd_idx      ),
-        .WB_alu_res_i     ( WB_alu_res     ),
-        .WB_csr_rdata_i   ( WB_csr_rdata   ),
-        .WB_mem_rdata_i   ( WB_mem_rdata   ),
-        .wb_rd_wen_o      ( wb_rd_wen      ),
-        .wb_rd_idx_o      ( wb_rd_idx      ),
-        .wb_rd_wdata_o    ( wb_rd_wdata    )
+        .WB_pc_i             ( WB_pc             ),
+        .WB_instr_i          (),
+        .WB_optype_info_i    ( WB_optype_info    ),
+        .WB_csr_wen_i        ( WB_csr_wen        ),
+        .WB_csr_idx_i        ( WB_csr_idx        ),
+        .WB_csr_wdata_i      ( WB_csr_wdata      ),
+        .WB_rd_wen_i         ( WB_rd_wen         ),
+        .WB_rd_idx_i         ( WB_rd_idx         ),
+        .WB_alu_res_i        ( WB_alu_res        ),
+        .WB_csr_rdata_i      ( WB_csr_rdata      ),
+        .WB_mem_rdata_i      ( WB_mem_rdata      ),
+        .wb_rd_wen_o         ( wb_rd_wen         ),
+        .wb_rd_idx_o         ( wb_rd_idx         ),
+        .wb_rd_wdata_o       ( wb_rd_wdata       ),
+        .WB_pc_misalign_i    ( WB_pc_misalign    ),
+        .WB_if_bus_err_i     ( WB_if_bus_err     ),
+        .WB_ilegl_instr_i    ( WB_ilegl_instr    ),
+        .WB_ecall_i          ( WB_ecall          ),
+        .WB_ebreak_i         ( WB_ebreak         ),
+        .WB_mret_i           ( WB_mret           ),
+        .WB_ld_misalign_i    ( WB_ld_misalign    ),
+        .WB_ld_bus_err_i     ( WB_ld_bus_err     ),
+        .WB_st_misalign_i    ( WB_st_misalign    ),
+        .WB_st_bus_err_i     ( WB_st_bus_err     ),
+        .mtvec_rdata_i       ( mtvec_rdata       ),
+        .mepc_rdata_i        ( mepc_rdata        ),
+        .mcause_wen_o        ( mcause_wen        ),
+        .mcause_wdata_o      ( mcause_wdata      ),
+        .mtval_wen_o         ( mtval_wen         ),
+        .mtval_wdata_o       ( mtval_wdata       ),
+        .mepc_wen_o          ( mepc_wen          ),
+        .mepc_wdata_o        ( mepc_wdata        ),
+        .wb_trap_o           ( wb_trap           ),
+        .wb_trap_handle_pc_o ( wb_trap_handle_pc )
+    );
+
+
+    csr u_csr(
+        .clk            ( clk            ),
+        .EX_csr_idx_i   ( EX_csr_idx     ),
+        .csr_rdata_o    ( csr_rdata      ),
+        .wb_csr_wen_i   ( wb_csr_wen     ),
+        .wb_csr_idx_i   ( wb_csr_idx     ),
+        .wb_csr_wdata_i ( wb_csr_wdata   ),
+        .mcause_wen_i   ( mcause_wen     ),
+        .mcause_wdata_i ( mcause_wdata   ),
+        .mtval_wen_i    ( mtval_wen      ),
+        .mtval_wdata_i  ( mtval_wdata    ),
+        .mepc_wen_i     ( mepc_wen       ),
+        .mepc_wdata_i   ( mepc_wdata     ),
+        .mtvec_rdata_o  ( mtvec_rdata    ),
+        .mepc_rdata_o   ( mepc_rdata     )
     );
 
 

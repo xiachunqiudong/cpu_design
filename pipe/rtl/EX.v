@@ -3,6 +3,7 @@
 module EX(
     input                           clk,
     input                           rst,
+    input                           ex_flush_i,
     input  [`XLEN-1:0]              ID_pc_i,
     input                           ID_prdt_taken_i,
     // op info
@@ -79,13 +80,12 @@ module EX(
     reg EX_data_valid;
     wire run;
     assign run = 1;
-    assign EX_valid_o = EX_data_valid && run;
+    assign EX_valid_o = EX_data_valid && run && !ex_flush_i;
     assign EX_ready_o = MEM_ready_i && run;
 
-    //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
+//xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
 // 前递
 //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
-
 
     wire rs1_MEM_fwd = MEM_rd_wen_i && (EX_rs1_idx_o != `REG_X0) && (EX_rs1_idx_o == MEM_rd_idx_i);
     wire rs2_MEM_fwd = MEM_rd_wen_i && (EX_rs2_idx_o != `REG_X0) && (EX_rs2_idx_o == MEM_rd_idx_i);

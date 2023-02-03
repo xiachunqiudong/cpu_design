@@ -213,10 +213,6 @@ module id(
                             rv64_csrrci  // 0
                         };
 
-    // excp
-    assign id_ecall_o  = rv64_ecall;
-    assign id_ebreak_o = rv64_ebreak;
-    assign id_mret_o   = rv64_mret;
 
 //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
 // 源寄存器, 目的寄存器解析 id_rs1_en id_rs2_en id_rd_en 
@@ -284,5 +280,13 @@ module id(
 
     assign id_imm_o = rv64_imm;
 
+
+//xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
+//  异常
+//xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
+    assign id_ilegl_instr_o = 0;
+    assign id_ecall_o  = rv64_ecall;
+    assign id_ebreak_o = rv64_ebreak;
+    assign id_mret_o   = rv64_mret;
 
 endmodule

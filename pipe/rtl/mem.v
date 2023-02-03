@@ -1,9 +1,16 @@
 module mem(
+    input                          mem_flush_i,
     input  [`LD_ST_INFO_WIDTH-1:0] ld_st_info_i,
     input  [`XLEN-1:0]             mem_addr_i,
     input  [`XLEN-1:0]             mem_wdata_i,
     output [`XLEN-1:0]             mem_rdata_o,
     // excp
+    input                          MEM_pc_misalign_i,
+    input                          MEM_if_bus_err_i,
+    input                          MEM_ilegl_instr_i,
+    input                          MEM_ecall_i,
+    input                          MEM_ebreak_i,
+    input                          MEM_mret_i,
     output                         mem_ld_misalign_o,
     output                         mem_ld_bus_err_o,
     output                         mem_st_misalign_o,
@@ -42,13 +49,16 @@ module mem(
                              | sd & (|mem_addr_i[2:0]);
     assign mem_st_bus_err_o = 0;
 
+    wire mem_excp = MEM_pc_misalign_i | MEM_if_bus_err_i | MEM_ecall_i       | MEM_ebreak_i     | MEM_mret_i
+                  | mem_ld_misalign_o | mem_ld_bus_err_o | mem_st_misalign_o | mem_st_bus_err_o;
+
 
     // ram_addr RAM位宽为8字节
     assign ram_addr_o = {mem_addr_i[63:3], 3'b0};
     
     // LOAD
     // 读使能
-    assign ram_ren_o   = (lb | lh | lw | ld | lbu | lhu | lwu);
+    assign ram_ren_o   = !mem_flush_i && !mem_excp && (lb || lh || lw || ld || lbu || lhu || lwu);
     // lb
     // 根据低三位从ram_rdata中选择所需数据  
     reg [7:0] lb_rdata;
@@ -106,7 +116,7 @@ module mem(
 
     // STORE
     // 写使能
-    assign ram_wen_o   = (sb | sh | sw | sd);
+    assign ram_wen_o   = !mem_flush_i && !mem_excp && (sb | sh | sw | sd);
     // 写字节使能
     // sb
     reg [7:0] sb_byte_en;
