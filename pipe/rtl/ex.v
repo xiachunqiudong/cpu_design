@@ -61,5 +61,6 @@ module ex(
 // CGU单元
 //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
 
+    assign ex_csr_wdata_o = rs1_rdata_i;
 
 endmodule

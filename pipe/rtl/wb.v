@@ -28,6 +28,9 @@ module wb(
     input [`XLEN-1:0]          mtvec_rdata_i,  
     input [`XLEN-1:0]          mepc_rdata_i,  
     // to csr
+    output                     wb_csr_wen_o,
+    output [11:0]              wb_csr_idx_o,
+    output [`XLEN-1:0]         wb_csr_wdata_o,
     output                     mcause_wen_o,
     output [`XLEN-1:0]         mcause_wdata_o,
     output                     mtval_wen_o,
@@ -39,15 +42,20 @@ module wb(
     output [`XLEN-1:0]         wb_trap_handle_pc_o
 );
     
-    // 写回结果选择
+    // 通用寄存器写回结果选择
     wire op_load   = WB_optype_info_i[`OP_LOAD];
     wire op_system = WB_optype_info_i[`OP_SYSTEM];    
     assign wb_rd_wdata_o = op_load   ? WB_mem_rdata_i
                          : op_system ? WB_csr_rdata_i
                          : WB_alu_res_i;
     // 指令有异常 不能写回
-    assign wb_rd_wen_o   = WB_rd_wen_i & !wb_excp;
+    assign wb_rd_wen_o   = WB_rd_wen_i && !wb_excp;
     assign wb_rd_idx_o   = WB_rd_idx_i;
+
+    // CSR写回
+    assign wb_csr_wen_o   = WB_csr_wen_i && !wb_excp;
+    assign wb_csr_idx_o   = WB_csr_idx_i;
+    assign wb_csr_wdata_o = WB_csr_wdata_i;
 
 
     // 异常处理

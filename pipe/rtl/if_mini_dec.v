@@ -16,6 +16,7 @@ module if_mini_dec(
     assign mini_dec_branch_o = optype_info[`OP_BRANCH];
 
     id idu(
+        .id_flush_i       (),
         .instr_i          ( instr_i ),
         .id_rs1_idx_o     ( mini_dec_rs1_idx_o ),
         .id_rs2_idx_o     (),

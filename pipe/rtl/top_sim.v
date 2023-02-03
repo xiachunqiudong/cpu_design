@@ -97,6 +97,7 @@ module top_sim(
     wire [11:0]                  MEM_csr_idx;
     wire                         MEM_rd_wen;
     wire [4:0]                   MEM_rd_idx;
+    wire [`XLEN-1:0]             MEM_fwd_data;
     wire [`XLEN-1:0]             MEM_rs2_rdata;
     wire [`XLEN-1:0]             MEM_alu_res;
     wire [`XLEN-1:0]             MEM_csr_rdata;
@@ -154,15 +155,15 @@ module top_sim(
     wire [`PC_WIDTH-1:0] flush_pc;
 
     controller u_controller(
-        .ex_jump_i           ( ex_jump      ),
-        .ex_jump_pc_i        ( ex_jump_pc   ),
-        .wb_trap_i           ( wb_trap      ),
-        .wb_trap_handle_pc_i ( wb_trap_handle_pc),
-        .if_flush_o          ( if_flush     ),
-        .id_flush_o          ( id_flush     ),
-        .ex_flush_o          ( ex_flush     ),
-        .mem_flush_o         ( mem_flush    ),
-        .flush_pc_o          ( flush_pc     )
+        .ex_jump_i           ( ex_jump           ),
+        .ex_jump_pc_i        ( ex_jump_pc        ),
+        .wb_trap_i           ( wb_trap           ),
+        .wb_trap_handle_pc_i ( wb_trap_handle_pc ),
+        .if_flush_o          ( if_flush          ),
+        .id_flush_o          ( id_flush          ),
+        .ex_flush_o          ( ex_flush          ),
+        .mem_flush_o         ( mem_flush         ),
+        .flush_pc_o          ( flush_pc          )
     );
 
 
@@ -211,6 +212,7 @@ module top_sim(
     );
 
     id u_id(
+        .id_flush_i       ( id_flush       ),
         .instr_i          ( ID_instr       ),
         .id_rs1_idx_o     ( id_rs1_idx     ),
         .id_rs2_idx_o     ( id_rs2_idx     ),
@@ -268,7 +270,7 @@ module top_sim(
         .id_imm_i         ( id_imm         ),
         .MEM_rd_wen_i     ( MEM_rd_wen     ),
         .MEM_rd_idx_i     ( MEM_rd_idx     ),
-        .MEM_alu_res_i    ( MEM_alu_res    ),
+        .MEM_fwd_data_i   ( MEM_fwd_data   ),
         .WB_rd_wen_i      ( WB_rd_wen      ),
         .WB_rd_idx_i      ( WB_rd_idx      ),
         .wb_rd_wdata_i    ( wb_rd_wdata    ),
@@ -358,6 +360,7 @@ module top_sim(
         .MEM_csr_idx_o     ( MEM_csr_idx     ),
         .MEM_rd_wen_o      ( MEM_rd_wen      ),
         .MEM_rd_idx_o      ( MEM_rd_idx      ),
+        .MEM_fwd_data_o    ( MEM_fwd_data    ),
         .MEM_rs2_rdata_o   ( MEM_rs2_rdata   ),
         .MEM_alu_res_o     ( MEM_alu_res     ),
         .MEM_csr_rdata_o   ( MEM_csr_rdata   ),
@@ -507,6 +510,9 @@ module top_sim(
         .WB_st_bus_err_i     ( WB_st_bus_err     ),
         .mtvec_rdata_i       ( mtvec_rdata       ),
         .mepc_rdata_i        ( mepc_rdata        ),
+        .wb_csr_wen_o        ( wb_csr_wen        ),
+        .wb_csr_idx_o        ( wb_csr_idx        ),
+        .wb_csr_wdata_o      ( wb_csr_wdata      ),
         .mcause_wen_o        ( mcause_wen        ),
         .mcause_wdata_o      ( mcause_wdata      ),
         .mtval_wen_o         ( mtval_wen         ),

@@ -1,6 +1,7 @@
 `include "defines.v"
 
 module id(
+    input                           id_flush_i,
     input [`INSTR_WIDTH-1:0]        instr_i,
     // id x regfile
     // to regfile
@@ -41,7 +42,8 @@ module id(
 //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
 // 冲突检测
 //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
-    assign id_load_use_o = EX_op_load_i && ((need_rs1 && EX_rd_idx_i == id_rs1_idx_o) || (need_rs2 && EX_rd_idx_i == id_rs2_idx_o));
+    assign id_load_use_o =  !id_flush_i && EX_op_load_i 
+                         && ((need_rs1 && EX_rd_idx_i == id_rs1_idx_o) || (need_rs2 && EX_rd_idx_i == id_rs2_idx_o));
 
 //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
 // id_rs1_rdata id_rs2_rdata

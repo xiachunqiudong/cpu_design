@@ -22,7 +22,7 @@ module EX(
     // from MEM
     input                           MEM_rd_wen_i,
     input  [4:0]                    MEM_rd_idx_i,
-    input  [`XLEN-1:0]              MEM_alu_res_i,
+    input  [`XLEN-1:0]              MEM_fwd_data_i,
     // from WB
     input                           WB_rd_wen_i,
     input  [4:0]                    WB_rd_idx_i,
@@ -93,10 +93,10 @@ module EX(
     wire rs1_WB_fwd = WB_rd_wen_i && (EX_rs1_idx_o != `REG_X0) && (EX_rs1_idx_o == WB_rd_idx_i);
     wire rs2_WB_fwd = WB_rd_wen_i && (EX_rs2_idx_o != `REG_X0) && (EX_rs2_idx_o == WB_rd_idx_i);
 
-    assign EX_rs1_rdata_o = rs1_MEM_fwd ? MEM_alu_res_i
+    assign EX_rs1_rdata_o = rs1_MEM_fwd ? MEM_fwd_data_i
                           : rs1_WB_fwd  ? wb_rd_wdata_i
                           : EX_rs1_rdata_r & {`XLEN{EX_data_valid}};
-    assign EX_rs2_rdata_o = rs2_MEM_fwd ? MEM_alu_res_i
+    assign EX_rs2_rdata_o = rs2_MEM_fwd ? MEM_fwd_data_i
                           : rs2_WB_fwd  ? wb_rd_wdata_i
                           : EX_rs2_rdata_r & {`XLEN{EX_data_valid}};
 

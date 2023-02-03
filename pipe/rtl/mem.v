@@ -116,7 +116,7 @@ module mem(
 
     // STORE
     // 写使能
-    assign ram_wen_o   = !mem_flush_i && !mem_excp && (sb | sh | sw | sd);
+    assign ram_wen_o   = !mem_flush_i && !mem_excp && (sb || sh || sw || sd);
     // 写字节使能
     // sb
     reg [7:0] sb_byte_en;

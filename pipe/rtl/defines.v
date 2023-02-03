@@ -74,3 +74,14 @@
 // REGFILE
 `define REG_X0 5'b0
 `define REG_X1 5'b1
+
+
+// CSR
+`define CSR_MTVEC    12'h305
+`define CSR_MCAUSE   12'h342
+`define CSR_MEPC     12'h341
+`define CSR_MIE      12'h304
+`define CSR_MSTATUS  12'h300
+`define CSR_MTVAL    12'h300
+`define CSR_MSCRATCH 12'h340
+

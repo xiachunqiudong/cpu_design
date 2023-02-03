@@ -30,6 +30,7 @@ module MEM(
     output [11:0]                      MEM_csr_idx_o,
     output                             MEM_rd_wen_o,
     output [4:0]                       MEM_rd_idx_o,
+    output [`XLEN-1:0]                 MEM_fwd_data_o,
     output [`XLEN-1:0]                 MEM_rs2_rdata_o,
     output [`XLEN-1:0]                 MEM_alu_res_o,
     output [`XLEN-1:0]                 MEM_csr_rdata_o,
@@ -71,6 +72,10 @@ module MEM(
     reg                         MEM_ecall_r;
     reg                         MEM_ebreak_r;
     reg                         MEM_mret_r;
+
+    // 前递数据选择
+    wire op_system        = MEM_optype_info_o[`OP_SYSTEM];
+    assign MEM_fwd_data_o = op_system ? MEM_csr_rdata_o : MEM_alu_res_o;
 
 
     assign MEM_pc_o          = MEM_pc_r          & {`PC_WIDTH{MEM_data_valid}};
