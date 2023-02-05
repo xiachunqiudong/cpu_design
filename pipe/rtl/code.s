@@ -1,16 +1,25 @@
 .text
 .global _start
 _start:
-addi x9, x9, 28     # 0
-csrrw x0, mtvec, x9 # 4
-ecall               # 8
-lw   x20, 1(x0)     # 12
-ld   x20, 4(x0)     # 16
-sw   x20, 2(x0)     # 20
-sd   x20, 4(x0)     # 24
-csrrw x10, mepc, x0 # 28 excp handle
-addi x10, x10, 4    # 32
-csrrw x0, mepc, x10 # 36 
-addi x6, x6, 6      # 40 
-mret                # 44
-
+addi x10, x0, 10       # 0
+addi x10, x0, 100      # 4
+addi x11, x0, -1       # 8
+add  x12, x10, x11     # 12
+bne x10, x11, foo      # 16
+addi x0, x0, 0         # 20
+addi x0, x0, 0         # 24
+addi x0, x0, 0         # 28
+addi x0, x0, 0         # 32
+foo:
+sd x10, 16(x0)         # 36
+ld x20, 16(x0)         # 40
+addi x20, x20, 19      # 44
+addi x21, x0, 64       # 48 
+csrrw x0, mtvec, x21   # 52
+ecall                  # 56
+jal _start             # 60
+excp_handle:            
+csrrw x30, mepc, x0    # 64
+addi x30, x30, 4       # 68
+csrrw x0, mepc, x30    # 72
+mret                   # 76

@@ -37,6 +37,8 @@ module wb(
     output [`XLEN-1:0]         mtval_wdata_o,
     output                     mepc_wen_o,
     output [`XLEN-1:0]         mepc_wdata_o,
+    output                     mstatus_ie_set_o,
+    output                     mstatus_ie_clear_o,
     // to controller
     output                     wb_trap_o,
     output [`XLEN-1:0]         wb_trap_handle_pc_o
@@ -69,7 +71,6 @@ module wb(
                    | WB_ilegl_instr_i | WB_ecall_i      | WB_ebreak_i      | WB_mret_i
                    | WB_ld_misalign_i | WB_ld_bus_err_i | WB_st_misalign_i | WB_st_bus_err_i;
 
-    
     assign wb_trap_o = wb_excp;
     assign wb_trap_handle_pc_o = WB_mret_i ? mepc_rdata_i : mtvec_rdata_i;
     // update csr
@@ -99,6 +100,14 @@ module wb(
     // 2. int:  发生中断下一条指令的地址
     assign mepc_wen_o  =  wb_trap_o;
     assign mepc_wdata_o = wb_excp ? WB_pc_i : WB_pc_i + 4;
-        
+
+    // excp
+    // mstatus_mie  = 0
+    // mstatus_mpie = mie
+    // mret
+    // mstatus_mie  = mpie
+    // mstatus_mpie = 1
+    assign mstatus_ie_set_o   = wb_trap_o && !WB_mret_i;
+    assign mstatus_ie_clear_o = WB_mret_i;
 
 endmodule

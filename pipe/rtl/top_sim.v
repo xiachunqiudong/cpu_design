@@ -473,15 +473,18 @@ module top_sim(
     wire [11:0]      wb_csr_idx;
     wire [`XLEN-1:0] wb_csr_wdata;
     
-    
-    wire [`XLEN-1:0] mtvec_rdata;
-    wire [`XLEN-1:0] mepc_rdata;
+
     wire             mcause_wen;
     wire [`XLEN-1:0] mcause_wdata;
     wire             mtval_wen;
     wire [`XLEN-1:0] mtval_wdata;
     wire             mepc_wen;
     wire [`XLEN-1:0] mepc_wdata;
+    wire             mstatus_ie_set;
+    wire             mstatus_ie_clear;
+
+    wire [`XLEN-1:0] mtvec_rdata;
+    wire [`XLEN-1:0] mepc_rdata;
 
     wb u_wb(
         .WB_pc_i             ( WB_pc             ),
@@ -519,26 +522,40 @@ module top_sim(
         .mtval_wdata_o       ( mtval_wdata       ),
         .mepc_wen_o          ( mepc_wen          ),
         .mepc_wdata_o        ( mepc_wdata        ),
+        .mstatus_ie_set_o    ( mstatus_ie_set    ),
+        .mstatus_ie_clear_o  ( mstatus_ie_clear  ),
         .wb_trap_o           ( wb_trap           ),
         .wb_trap_handle_pc_o ( wb_trap_handle_pc )
     );
 
 
     csr u_csr(
-        .clk            ( clk            ),
-        .EX_csr_idx_i   ( EX_csr_idx     ),
-        .csr_rdata_o    ( csr_rdata      ),
-        .wb_csr_wen_i   ( wb_csr_wen     ),
-        .wb_csr_idx_i   ( wb_csr_idx     ),
-        .wb_csr_wdata_i ( wb_csr_wdata   ),
-        .mcause_wen_i   ( mcause_wen     ),
-        .mcause_wdata_i ( mcause_wdata   ),
-        .mtval_wen_i    ( mtval_wen      ),
-        .mtval_wdata_i  ( mtval_wdata    ),
-        .mepc_wen_i     ( mepc_wen       ),
-        .mepc_wdata_i   ( mepc_wdata     ),
-        .mtvec_rdata_o  ( mtvec_rdata    ),
-        .mepc_rdata_o   ( mepc_rdata     )
+        .clk                ( clk            ),
+        .EX_csr_idx_i       ( EX_csr_idx     ),
+        .csr_rdata_o        ( csr_rdata      ),
+        .wb_csr_wen_i       ( wb_csr_wen     ),
+        .wb_csr_idx_i       ( wb_csr_idx     ),
+        .wb_csr_wdata_i     ( wb_csr_wdata   ),
+        .int_soft_i         (),
+        .int_timer_i        (),
+        .int_exter_i        (),
+        .mcause_wen_i       ( mcause_wen       ),
+        .mcause_wdata_i     ( mcause_wdata     ),
+        .mtval_wen_i        ( mtval_wen        ),
+        .mtval_wdata_i      ( mtval_wdata      ),
+        .mepc_wen_i         ( mepc_wen         ),
+        .mepc_wdata_i       ( mepc_wdata       ),
+        .mstatus_ie_set_i   ( mstatus_ie_set   ),
+        .mstatus_ie_clear_i ( mstatus_ie_clear ),
+        .mstatus_ie_o       (),
+        .mie_soft_o         (),
+        .mie_timer_o        (),
+        .mie_exter_o        (),
+        .mip_soft_o         (),
+        .mip_timer_o        (),
+        .mip_exter_o        (),
+        .mtvec_rdata_o      ( mtvec_rdata    ),
+        .mepc_rdata_o       ( mepc_rdata     )
     );
 
 

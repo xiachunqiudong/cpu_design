@@ -23,6 +23,7 @@ VL_INLINE_OPT void Vtop_sim___024root___sequent__TOP__2(Vtop_sim___024root* vlSe
     CData/*7:0*/ __Vdlyvval__top_sim__DOT__u_ram__DOT__ram_data__v5;
     CData/*7:0*/ __Vdlyvval__top_sim__DOT__u_ram__DOT__ram_data__v6;
     CData/*7:0*/ __Vdlyvval__top_sim__DOT__u_ram__DOT__ram_data__v7;
+    CData/*0:0*/ __Vdly__top_sim__DOT__u_csr__DOT__mstatus_mie;
     SData/*9:0*/ __Vdlyvdim0__top_sim__DOT__u_ram__DOT__ram_data__v0;
     SData/*9:0*/ __Vdlyvdim0__top_sim__DOT__u_ram__DOT__ram_data__v1;
     SData/*9:0*/ __Vdlyvdim0__top_sim__DOT__u_ram__DOT__ram_data__v2;
@@ -39,6 +40,7 @@ VL_INLINE_OPT void Vtop_sim___024root___sequent__TOP__2(Vtop_sim___024root* vlSe
     VlWide<3>/*95:0*/ __Vtemp9;
     QData/*63:0*/ __Vdlyvval__top_sim__DOT__u_regfile__DOT__reg_data__v0;
     // Body
+    __Vdly__top_sim__DOT__u_csr__DOT__mstatus_mie = vlSelf->top_sim__DOT__u_csr__DOT__mstatus_mie;
     __Vdlyvset__top_sim__DOT__u_ram__DOT__ram_data__v0 = 0U;
     __Vdlyvset__top_sim__DOT__u_regfile__DOT__reg_data__v0 = 0U;
     if ((1U & ((~ (IData)(vlSelf->top_sim__DOT__id_load_use)) 
@@ -575,14 +577,18 @@ VL_INLINE_OPT void Vtop_sim___024root___sequent__TOP__2(Vtop_sim___024root* vlSe
     }
     if (vlSelf->top_sim__DOT__EX_valid) {
         vlSelf->top_sim__DOT__u_MEM__DOT__MEM_csr_rdata_r 
-            = (((((- (QData)((IData)((0x305U == (IData)(vlSelf->top_sim__DOT__EX_csr_idx))))) 
-                  & vlSelf->top_sim__DOT__u_csr__DOT__mtvec) 
-                 | ((- (QData)((IData)((0x342U == (IData)(vlSelf->top_sim__DOT__EX_csr_idx))))) 
-                    & vlSelf->top_sim__DOT__u_csr__DOT__mcause)) 
-                | ((- (QData)((IData)((0x300U == (IData)(vlSelf->top_sim__DOT__EX_csr_idx))))) 
-                   & vlSelf->top_sim__DOT__u_csr__DOT__mtval)) 
-               | ((- (QData)((IData)((0x341U == (IData)(vlSelf->top_sim__DOT__EX_csr_idx))))) 
-                  & vlSelf->top_sim__DOT__u_csr__DOT__mepc));
+            = ((((((- (QData)((IData)((0x300U == (IData)(vlSelf->top_sim__DOT__EX_csr_idx))))) 
+                   & (((QData)((IData)(vlSelf->top_sim__DOT__u_csr__DOT__mstatus_mpie)) 
+                       << 7U) | (QData)((IData)(((IData)(vlSelf->top_sim__DOT__u_csr__DOT__mstatus_mie) 
+                                                 << 3U))))) 
+                  | ((- (QData)((IData)((0x305U == (IData)(vlSelf->top_sim__DOT__EX_csr_idx))))) 
+                     & vlSelf->top_sim__DOT__u_csr__DOT__mtvec)) 
+                 | ((- (QData)((IData)((0x341U == (IData)(vlSelf->top_sim__DOT__EX_csr_idx))))) 
+                    & vlSelf->top_sim__DOT__u_csr__DOT__mepc)) 
+                | ((- (QData)((IData)((0x342U == (IData)(vlSelf->top_sim__DOT__EX_csr_idx))))) 
+                   & vlSelf->top_sim__DOT__u_csr__DOT__mcause)) 
+               | ((- (QData)((IData)((0x343U == (IData)(vlSelf->top_sim__DOT__EX_csr_idx))))) 
+                  & vlSelf->top_sim__DOT__u_csr__DOT__mtval));
     }
     if (vlSelf->top_sim__DOT__EX_valid) {
         vlSelf->top_sim__DOT__u_MEM__DOT__MEM_mret_r 
@@ -700,6 +706,24 @@ VL_INLINE_OPT void Vtop_sim___024root___sequent__TOP__2(Vtop_sim___024root* vlSe
                 & (0x341U == (IData)(vlSelf->top_sim__DOT__WB_csr_idx)))) {
         vlSelf->top_sim__DOT__u_csr__DOT__mepc = vlSelf->top_sim__DOT__WB_csr_wdata;
     }
+    if (((IData)(vlSelf->top_sim__DOT__wb_csr_wen) 
+         & (0x300U == (IData)(vlSelf->top_sim__DOT__WB_csr_idx)))) {
+        __Vdly__top_sim__DOT__u_csr__DOT__mstatus_mie 
+            = (1U & (IData)((vlSelf->top_sim__DOT__WB_csr_wdata 
+                             >> 3U)));
+        vlSelf->top_sim__DOT__u_csr__DOT__mstatus_mpie 
+            = (1U & (IData)((vlSelf->top_sim__DOT__WB_csr_wdata 
+                             >> 7U)));
+    } else if (((IData)(vlSelf->top_sim__DOT__u_wb__DOT__wb_excp) 
+                & (~ (IData)(vlSelf->top_sim__DOT__WB_mret)))) {
+        vlSelf->top_sim__DOT__u_csr__DOT__mstatus_mpie 
+            = vlSelf->top_sim__DOT__u_csr__DOT__mstatus_mie;
+        __Vdly__top_sim__DOT__u_csr__DOT__mstatus_mie = 0U;
+    } else if (vlSelf->top_sim__DOT__WB_mret) {
+        __Vdly__top_sim__DOT__u_csr__DOT__mstatus_mie 
+            = vlSelf->top_sim__DOT__u_csr__DOT__mstatus_mie;
+        vlSelf->top_sim__DOT__u_csr__DOT__mstatus_mpie = 1U;
+    }
     if (vlSelf->top_sim__DOT__u_wb__DOT__wb_excp) {
         vlSelf->top_sim__DOT__u_csr__DOT__mcause = 
             ((IData)(vlSelf->top_sim__DOT__u_wb__DOT__wb_int)
@@ -718,7 +742,7 @@ VL_INLINE_OPT void Vtop_sim___024root___sequent__TOP__2(Vtop_sim___024root* vlSe
                                                     ? (QData)((IData)(vlSelf->top_sim__DOT__u_wb__DOT__WB_instr_i))
                                                     : vlSelf->top_sim__DOT__WB_alu_res);
     } else if (((IData)(vlSelf->top_sim__DOT__wb_csr_wen) 
-                & (0x300U == (IData)(vlSelf->top_sim__DOT__WB_csr_idx)))) {
+                & (0x343U == (IData)(vlSelf->top_sim__DOT__WB_csr_idx)))) {
         vlSelf->top_sim__DOT__u_csr__DOT__mtval = vlSelf->top_sim__DOT__WB_csr_wdata;
     }
     if (vlSelf->top_sim__DOT__ID_valid) {
@@ -901,8 +925,6 @@ VL_INLINE_OPT void Vtop_sim___024root___sequent__TOP__2(Vtop_sim___024root* vlSe
     vlSelf->top_sim__DOT____Vcellout__u_regfile__reg_data_o[0x1eU] 
         = vlSelf->top_sim__DOT__u_regfile__DOT__reg_data
         [0x1eU];
-    vlSelf->top_sim__DOT__WB_mret = ((IData)(vlSelf->top_sim__DOT__u_WB__DOT__WB_mret_r) 
-                                     & (IData)(vlSelf->top_sim__DOT__u_WB__DOT__WB_data_valid));
     vlSelf->top_sim__DOT__WB_rd_idx = ((IData)(vlSelf->top_sim__DOT__u_WB__DOT__WB_rd_idx_r) 
                                        & (- (IData)((IData)(vlSelf->top_sim__DOT__u_WB__DOT__WB_data_valid))));
     vlSelf->top_sim__DOT__WB_rd_wen = ((IData)(vlSelf->top_sim__DOT__u_WB__DOT__WB_rd_wen_r) 
@@ -935,6 +957,9 @@ VL_INLINE_OPT void Vtop_sim___024root___sequent__TOP__2(Vtop_sim___024root* vlSe
         = ((~ (IData)(vlSelf->rst)) & (IData)(vlSelf->top_sim__DOT__EX_valid));
     vlSelf->top_sim__DOT__WB_pc = (vlSelf->top_sim__DOT__u_WB__DOT__WB_pc_r 
                                    & (- (QData)((IData)(vlSelf->top_sim__DOT__u_WB__DOT__WB_data_valid))));
+    vlSelf->top_sim__DOT__u_csr__DOT__mstatus_mie = __Vdly__top_sim__DOT__u_csr__DOT__mstatus_mie;
+    vlSelf->top_sim__DOT__WB_mret = ((IData)(vlSelf->top_sim__DOT__u_WB__DOT__WB_mret_r) 
+                                     & (IData)(vlSelf->top_sim__DOT__u_WB__DOT__WB_data_valid));
     vlSelf->top_sim__DOT__WB_if_bus_err = ((IData)(vlSelf->top_sim__DOT__u_WB__DOT__WB_if_bus_err_r) 
                                            & (IData)(vlSelf->top_sim__DOT__u_WB__DOT__WB_data_valid));
     vlSelf->top_sim__DOT__WB_ebreak = ((IData)(vlSelf->top_sim__DOT__u_WB__DOT__WB_ebreak_r) 

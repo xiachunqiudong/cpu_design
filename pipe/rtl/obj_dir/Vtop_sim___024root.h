@@ -137,6 +137,17 @@ VL_MODULE(Vtop_sim___024root) {
         CData/*0:0*/ top_sim__DOT__u_wb__DOT__wb_excp;
         CData/*0:0*/ top_sim__DOT__u_wb__DOT__wb_int;
         CData/*3:0*/ top_sim__DOT__u_wb__DOT__int_code;
+        CData/*0:0*/ top_sim__DOT__u_csr__DOT__int_soft_i;
+        CData/*0:0*/ top_sim__DOT__u_csr__DOT__int_timer_i;
+        CData/*0:0*/ top_sim__DOT__u_csr__DOT__int_exter_i;
+        CData/*0:0*/ top_sim__DOT__u_csr__DOT__mie_soft_o;
+        CData/*0:0*/ top_sim__DOT__u_csr__DOT__mie_timer_o;
+        CData/*0:0*/ top_sim__DOT__u_csr__DOT__mie_exter_o;
+        CData/*0:0*/ top_sim__DOT__u_csr__DOT__mip_soft_o;
+        CData/*0:0*/ top_sim__DOT__u_csr__DOT__mip_timer_o;
+        CData/*0:0*/ top_sim__DOT__u_csr__DOT__mip_exter_o;
+        CData/*0:0*/ top_sim__DOT__u_csr__DOT__mstatus_mie;
+        CData/*0:0*/ top_sim__DOT__u_csr__DOT__mstatus_mpie;
         SData/*11:0*/ top_sim__DOT__EX_optype_info;
         SData/*9:0*/ top_sim__DOT__EX_alu_info;
         SData/*11:0*/ top_sim__DOT__EX_csr_idx;
@@ -145,6 +156,8 @@ VL_MODULE(Vtop_sim___024root) {
         SData/*11:0*/ top_sim__DOT__WB_optype_info;
         SData/*11:0*/ top_sim__DOT__WB_csr_idx;
         SData/*11:0*/ top_sim__DOT__u_ifu__DOT__u_if_mini_dec_u__DOT__optype_info;
+    };
+    struct {
         SData/*9:0*/ top_sim__DOT__u_ifu__DOT__u_if_mini_dec_u__DOT__idu__DOT__id_alu_info_o;
         SData/*10:0*/ top_sim__DOT__u_ifu__DOT__u_if_mini_dec_u__DOT__idu__DOT__id_ld_st_info_o;
         SData/*11:0*/ top_sim__DOT__u_EX__DOT__EX_optype_info_r;
@@ -156,8 +169,6 @@ VL_MODULE(Vtop_sim___024root) {
         SData/*11:0*/ top_sim__DOT__u_MEM__DOT__MEM_csr_idx_r;
         SData/*15:0*/ top_sim__DOT__u_mem__DOT__lh_rdata;
         SData/*11:0*/ top_sim__DOT__u_WB__DOT__WB_optype_info_r;
-    };
-    struct {
         SData/*11:0*/ top_sim__DOT__u_WB__DOT__WB_csr_idx_r;
         IData/*31:0*/ top_sim__DOT__ifu_instr;
         IData/*31:0*/ top_sim__DOT__ID_instr;
@@ -211,6 +222,8 @@ VL_MODULE(Vtop_sim___024root) {
         QData/*63:0*/ top_sim__DOT__u_csr__DOT__mtvec;
         QData/*63:0*/ top_sim__DOT__u_csr__DOT__mcause;
         QData/*63:0*/ top_sim__DOT__u_csr__DOT__mtval;
+    };
+    struct {
         QData/*63:0*/ top_sim__DOT__u_csr__DOT__mepc;
         VlUnpacked<CData/*7:0*/, 1024> top_sim__DOT__u_ifu__DOT__u_if_bus__DOT__instr_mem;
         VlUnpacked<QData/*63:0*/, 31> top_sim__DOT__u_regfile__DOT__reg_data;
