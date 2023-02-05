@@ -128,9 +128,191 @@ HDLBITS刷题状态：
    ram[252]	: 0	 -> 1	| 
    ```
 
-   
-
 4. 多周期CPU设计
+
+## 2023年2月
+
+### 2月5日
+
+```assembly
+.text
+.global _start
+_start:
+addi x10, x0, 10       # 0
+addi x10, x0, 100      # 4
+addi x11, x0, -1       # 8
+add  x12, x10, x11     # 12
+bne x10, x11, foo      # 16
+addi x0, x0, 0         # 20
+addi x0, x0, 0         # 24
+addi x0, x0, 0         # 28
+addi x0, x0, 0         # 32
+foo:
+sd x10, 16(x0)         # 36
+ld x20, 16(x0)         # 40
+addi x20, x20, 19      # 44
+addi x21, x0, 64       # 48 
+csrrw x0, mtvec, x21   # 52
+ecall                  # 56
+jal _start             # 60
+excp_handle:            
+csrrw x30, mepc, x0    # 64
+addi x30, x30, 4       # 68
+csrrw x0, mepc, x30    # 72
+mret                   # 76
+```
+
+#### 前递
+
+```verilog
+    wire rs1_MEM_fwd = MEM_rd_wen_i && (EX_rs1_idx_o != `REG_X0) && (EX_rs1_idx_o == MEM_rd_idx_i);
+    wire rs2_MEM_fwd = MEM_rd_wen_i && (EX_rs2_idx_o != `REG_X0) && (EX_rs2_idx_o == MEM_rd_idx_i);
+
+    wire rs1_WB_fwd = WB_rd_wen_i && (EX_rs1_idx_o != `REG_X0) && (EX_rs1_idx_o == WB_rd_idx_i);
+    wire rs2_WB_fwd = WB_rd_wen_i && (EX_rs2_idx_o != `REG_X0) && (EX_rs2_idx_o == WB_rd_idx_i);
+
+    assign EX_rs1_rdata_o = rs1_MEM_fwd ? MEM_fwd_data_i
+                          : rs1_WB_fwd  ? wb_rd_wdata_i
+                          : EX_rs1_rdata_r & {`XLEN{EX_data_valid}};
+    assign EX_rs2_rdata_o = rs2_MEM_fwd ? MEM_fwd_data_i
+                          : rs2_WB_fwd  ? wb_rd_wdata_i
+                          : EX_rs2_rdata_r & {`XLEN{EX_data_valid}};
+```
+
+![image-20230205141355223](/home/xia/.config/Typora/typora-user-images/image-20230205141355223.png)
+
+#### load-use
+
+```verilog
+    assign id_load_use_o =  !id_flush_i && EX_op_load_i 
+                         && ((need_rs1 && EX_rd_idx_i == id_rs1_idx_o) || (need_rs2 && EX_rd_idx_i == id_rs2_idx_o));
+
+	wire run;
+    assign run = (!id_load_use_i);
+    assign ID_valid_o = (ID_data_valid && run && !id_flush_i);
+    assign ID_ready_o = (EX_ready_i && run);
+```
+
+![image-20230205142113821](/home/xia/.config/Typora/typora-user-images/image-20230205142113821.png)
+
+#### 分支
+
+```verilog
+`include "defines.v"
+
+module controller(
+    // flush by ex
+    input                  ex_jump_i,
+    input [`PC_WIDTH-1:0]  ex_jump_pc_i,
+    // flush by trap
+    input                  wb_trap_i,
+    input [`PC_WIDTH-1:0]  wb_trap_handle_pc_i,
+    output                 if_flush_o,
+    output                 id_flush_o,
+    output                 ex_flush_o,
+    output                 mem_flush_o,
+    output [`PC_WIDTH-1:0] flush_pc_o
+);
+
+
+    assign if_flush_o  = ex_jump_i | wb_trap_i;
+    assign id_flush_o  = ex_jump_i | wb_trap_i;
+    assign ex_flush_o  = wb_trap_i;
+    assign mem_flush_o = wb_trap_i;
+
+    assign flush_pc_o = wb_trap_i ? wb_trap_handle_pc_i : ex_jump_pc_i;
+
+endmodule
+```
+
+```verilog
+//xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
+// branch jal jalr 指令跳转地址计算
+//xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
+    wire op_jal    = optype_info_i[`OP_JAL];
+    wire op_jalr   = optype_info_i[`OP_JALR];
+    
+    wire [`XLEN-1:0] jump_pc_src1;
+    wire [`XLEN-1:0] jump_pc_src2;
+
+    assign jump_pc_src1 = op_jalr ? rs1_rdata_i : pc_i;
+    assign jump_pc_src2 = imm_i;
+    assign ex_jump_pc_o = jump_pc_src1 + jump_pc_src2;
+
+    assign ex_jump_o = branch_jump | op_jal | op_jalr;
+```
+
+
+
+![image-20230205142426759](/home/xia/.config/Typora/typora-user-images/image-20230205142426759.png)
+
+
+
+
+
+#### 异常处理
+
+```verilog
+    wire wb_excp;
+    wire wb_int;
+    assign wb_excp = WB_pc_misalign_i | WB_if_bus_err_i 
+                   | WB_ilegl_instr_i | WB_ecall_i      | WB_ebreak_i      | WB_mret_i
+                   | WB_ld_misalign_i | WB_ld_bus_err_i | WB_st_misalign_i | WB_st_bus_err_i;
+
+    assign wb_trap_o = wb_excp;
+    assign wb_trap_handle_pc_o = WB_mret_i ? mepc_rdata_i : mtvec_rdata_i;
+    // update csr
+    // 1.mcause: 发生异常的原因
+    assign mcause_wen_o   = wb_trap_o;
+    wire [3:0] excp_code;
+    assign excp_code = {4{WB_pc_misalign_i}} & 4'd0   // 指令地址不对齐
+                     | {4{WB_if_bus_err_i}}  & 4'd1   // 指令访存错误
+                     | {4{WB_ilegl_instr_i}} & 4'd2   // 非法指令
+                     | {4{WB_ebreak_i}}      & 4'd3   // 断点
+                     | {4{WB_ld_misalign_i}} & 4'd4   // 读存储器地址不对齐
+                     | {4{WB_ld_bus_err_i}}  & 4'd5   // 读存储器访存错误
+                     | {4{WB_st_misalign_i}} & 4'd6   // 写存储器地址不对齐
+                     | {4{WB_st_bus_err_i}}  & 4'd7   // 写存储器访存错误
+                     | {4{WB_ecall_i}}       & 4'd11; // 机器模式环境调用  
+    wire [3:0] int_code;
+    assign mcause_wdata_o = wb_int ? {1'b1, 59'b0, int_code} : {60'b0, excp_code};
+    
+    // 2.mtval: 异常的详细信息
+    assign mtval_wen_o = wb_trap_o;
+    // 非法指令: 指令 
+    // 访问存储器错误: 访问存储器地址
+    assign mtval_wdata_o = WB_ilegl_instr_i ? {32'b0, WB_instr_i} : WB_alu_res_i;
+
+    // 3.mepc: trap处理程序返回地址
+    // 1. excp: 发生异常指令的地址
+    // 2. int:  发生中断下一条指令的地址
+    assign mepc_wen_o  =  wb_trap_o;
+    assign mepc_wdata_o = wb_excp ? WB_pc_i : WB_pc_i + 4;
+
+    // excp
+    // mstatus_mie  = 0
+    // mstatus_mpie = mie
+    // mret
+    // mstatus_mie  = mpie
+    // mstatus_mpie = 1
+    assign mstatus_ie_set_o   = wb_trap_o && !WB_mret_i;
+    assign mstatus_ie_clear_o = WB_mret_i;
+```
+
+发生异常不能修改CPU 内存的状态
+
+```verilog
+assign wb_rd_wen_o   = WB_rd_wen_i && !wb_excp;
+
+assign ram_ren_o   = !mem_flush_i && !mem_excp && (lb || lh || lw || ld || lbu || lhu || lwu);
+assign ram_wen_o   = !mem_flush_i && !mem_excp && (sb || sh || sw || sd);
+```
+
+
+
+![image-20230205143035280](/home/xia/.config/Typora/typora-user-images/image-20230205143035280.png)s
+
+![image-20230205143143968](/home/xia/.config/Typora/typora-user-images/image-20230205143143968.png)
 
 # 二.CPU模块设计
 
@@ -994,7 +1176,11 @@ assign wb_rd_wdata_o = op_load   ? mem_rdata_i
 
   ![image-20230108114729444](/home/xia/.config/Typora/typora-user-images/image-20230108114729444.png)
 
-### 异常处理流程
+## 7.异常处理
+
+将异常看做是一种特殊的函数跳转那么就需要知道往哪里跳`mtvec`, 返回地址`mepc`, 异常的信息`mcause`和`mtval`
+
+
 
 1. 异常指令的PC保存在mepc, 将PC设置为mtvec
 2. 根据异常原因设置mcause, 设置mtval为地址异常的地址或者是异常指令的指令内容
@@ -1011,21 +1197,36 @@ assign wb_rd_wdata_o = op_load   ? mem_rdata_i
   .text
   .global _start
   _start:
-  addi sp, x0, 256
-  addi x4, x0, 5
-  jal x0, test 
-  loop:
-  add x5, x0, x4
-  jal x1, foo
-  addi x4, x4, -1
+  addi sp, x0, 256  # 0
+  addi x4, x0, 5    # 4
+  jal x0, test      # 8
+  loop:           
+  add x5, x0, x4    # 12
+  jal x1, foo       # 16
+  addi x4, x4, -1   # 20
   test:
-  bne x4, x0, loop
-  foo:
-  sb x5, 0(sp)
-  addi sp, sp, -1
-  ret
+  bne x4, x0, loop  # 24
+  foo:    
+  sb x5, 0(sp)      # 28
+  addi sp, sp, -1   # 32
+  ret               # 36
   ```
 
 - 测试代码2
 
+  ```assembly
+  .text
+  .global _start
+  _start:
+  addi x10, x10, 10 #0
+  addi x9, x9, 9    #4
+  jal x1, foo       #8
+  add x11, x9, x10  #12
+  sltu x11, x9, x10 #16
+  add x1, x2, x3    #20
+  foo:
+  addi x0, x0, 0    #24
+  ret               #28
+  ```
+  
   

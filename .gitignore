@@ -1,4 +1,8 @@
 
 *.vcd
 
-single/difftest
+/pipe/rtl/obj_dir
+/single/rtl/obj_dir
+
+.vscode
+.idea
