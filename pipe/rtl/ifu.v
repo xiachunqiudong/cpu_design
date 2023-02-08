@@ -51,33 +51,19 @@ module ifu(
     // pc_next = pc + 4
     // 2. jal
     // pc_next = pc + imm
-    // 3. jalr
-    // pc_next = rs1 + imm
-    // 4. bxx
+    // 3. bxx
     // pc_next = cnd ? pc + imm : pc + 4
 
     // 静态分支预测, 向前跳预测为跳, 向后跳预测不跳
     assign ifu_prdt_taken_o = (branch & imm[63]);
     // 是否跳转
     wire jump;
-    assign jump = ifu_prdt_taken_o | jal | jalr;
-    
-    // jal & branch pc_next = pc + imm   -> PC相对跳转
-    // jalr         pc_next = rs1 + imm  -> 绝对跳转
-    wire [`PC_WIDTH-1:0] jump_pc_op1;
-    wire [`PC_WIDTH-1:0] jump_pc_op2;
-    assign jump_pc_op1 = jalr ? 0 : IF_pc_i;
-    assign jump_pc_op2 = imm;
+    assign jump = ifu_prdt_taken_o | jal;
 
-    // 跳转:   pc_next = bj_pc_op1 + bj_pc_op2
-    // 不跳转: pc_next = pc + 4
-    wire [`PC_WIDTH-1:0] pc_add_op1 = jump ? jump_pc_op1 : IF_pc_i;
-    wire [`PC_WIDTH-1:0] pc_add_op2 = jump ? jump_pc_op2 : 4;
+    wire [`XLEN-1:0] pc_add_src2;
+    assign pc_add_src2 = jump ? imm : `XLEN'd4;
 
-    // assign ifu_pc_next_o = pc_add_op1 + pc_add_op2;
-    
-    wire [`PC_WIDTH-1:0] pc_add4 = IF_pc_i + 4;
-    assign ifu_pc_next_o = if_flush_i ? flush_pc_i : pc_add4;
-    
+    assign ifu_pc_next_o = if_flush_i ? flush_pc_i 
+                         : (IF_pc_i + pc_add_src2);
 
 endmodule

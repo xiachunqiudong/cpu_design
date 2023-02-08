@@ -25,6 +25,7 @@ module id(
     output [`XLEN-1:0]              id_rs2_rdata_o,
     output [`XLEN-1:0]              id_imm_o,
     // csr
+    output                          id_csr_ren_o,
     output                          id_csr_wen_o,
     output [11:0]                   id_csr_idx_o,
     // rd
@@ -250,9 +251,9 @@ module id(
     wire rv64_need_csr = rv64_csrrw  | rv64_csrrs  | rv64_csrrc
                        | rv64_csrrwi | rv64_csrrsi | rv64_csrrci;
 
-
     assign id_rd_wen_o  = rv64_need_rd;
-    assign id_csr_wen_o = rv64_need_csr;
+    assign id_csr_ren_o = rv64_need_csr && rd != `REG_X0;
+    assign id_csr_wen_o = rv64_need_csr && (rs1 != 5'b0);
     
     wire need_rs1 = rv64_need_rs1;
     wire need_rs2 = rv64_need_rs2;

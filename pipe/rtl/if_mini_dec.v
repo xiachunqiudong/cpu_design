@@ -24,6 +24,7 @@ module if_mini_dec(
         .rf_rs2_rdata_i   (),
         .EX_op_load_i     (),
         .EX_rd_idx_i      (),
+        .id_csr_ren_o     (),
         .id_csr_wen_o     (),
         .id_csr_idx_o     (),
         .id_optype_info_o ( optype_info ),

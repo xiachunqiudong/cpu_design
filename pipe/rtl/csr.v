@@ -18,18 +18,16 @@ module csr(
     input  [`XLEN-1:0] mtval_wdata_i,
     input              mepc_wen_i,
     input  [`XLEN-1:0] mepc_wdata_i,
-    input              mstatus_ie_set_i,
-    input              mstatus_ie_clear_i,
+    input              mstatus_mie_set_i,
+    input              mstatus_mie_clear_i,
     // excp handle 读端口
-    output             mstatus_ie_o,
-    output             mie_soft_o,
-    output             mie_timer_o,
-    output             mie_exter_o,
-    
-    output             mip_soft_o,
-    output             mip_timer_o,
-    output             mip_exter_o,
-
+    output             mstatus_mie_rdata_o,
+    output             mie_meie_rdata_o,
+    output             mie_mtie_rdata_o,
+    output             mie_msie_rdata_o,
+    output             mip_meip_rdata_o,
+    output             mip_mtip_rdata_o,
+    output             mip_msip_rdata_o,
     output [`XLEN-1:0] mtvec_rdata_o,
     output [`XLEN-1:0] mepc_rdata_o
 );
@@ -42,16 +40,16 @@ module csr(
     reg mstatus_mie;
     reg mstatus_mpie;
 
-    assign mstatus_ie_o = mstatus_mie;
+    assign mstatus_mie_rdata_o = mstatus_mie;
 
     always @(posedge clk) begin
         if(wb_csr_wen_i && wb_csr_idx_i == `CSR_MSTATUS) begin
             mstatus_mie  <= wb_csr_wdata_i[3];
             mstatus_mpie <= wb_csr_wdata_i[7];
-        end else if(mstatus_ie_set_i) begin
+        end else if(mstatus_mie_set_i) begin
             mstatus_mie  <= 1'b0;
             mstatus_mpie <= mstatus_mie;
-        end else if(mstatus_ie_clear_i) begin
+        end else if(mstatus_mie_clear_i) begin
             mstatus_mie  <= mstatus_mie;
             mstatus_mpie <= 1'b1;
         end
@@ -99,6 +97,44 @@ module csr(
         end
     end
 
+    // 可读可写
+    // 外部中断使能
+    reg mie_meie;
+    // 时钟中断使能
+    reg mie_mtie;
+    // 软件中断使能
+    reg mie_msie;
+    wire [`XLEN-1:0] mie = {52'b0, mie_meie, 3'b0, mie_mtie, 3'b0, mie_msie, 3'b0};
+    
+    assign mie_meie_rdata_o = mie_meie;
+    assign mie_mtie_rdata_o = mie_mtie;
+    assign mie_msie_rdata_o = mie_msie;
+
+    always @(posedge clk) begin
+        if(wb_csr_wen_i && wb_csr_idx_i == `CSR_MIE) begin
+            mie_meie <= wb_csr_wdata_i[11];
+            mie_mtie <= wb_csr_wdata_i[7];
+            mie_msie <= wb_csr_wdata_i[3];
+        end
+    end
+
+    // 只读
+    reg mip_meip;
+    reg mip_mtip;
+    reg mip_msip;
+
+    wire [`XLEN-1:0] mip = {52'b0, mip_meip, 3'b0, mip_mtip, 3'b0, mip_msip, 3'b0};
+    
+    assign mip_meip_rdata_o = mip_meip;
+    assign mip_mtip_rdata_o = mip_mtip;
+    assign mip_msip_rdata_o = mip_msip;
+
+    always @(posedge clk) begin
+        mip_meip <= int_exter_i;
+        mip_mtip <= int_timer_i;
+        mip_msip <= int_soft_i;
+    end
+
 
     wire read_mstatus   = EX_csr_idx_i == `CSR_MSTATUS;
     wire read_mie       = EX_csr_idx_i == `CSR_MIE;
@@ -113,6 +149,8 @@ module csr(
                        | ({`XLEN{read_mtvec}}    & mtvec)
                        | ({`XLEN{read_mepc}}     & mepc)
                        | ({`XLEN{read_mcause}}   & mcause)
-                       | ({`XLEN{read_mtval}}    & mtval);
+                       | ({`XLEN{read_mtval}}    & mtval)
+                       | ({`XLEN{read_mie}}      & mie)
+                       | ({`XLEN{read_mip}}      & mip);
 
 endmodule

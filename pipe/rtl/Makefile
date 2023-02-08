@@ -20,5 +20,5 @@ show:
 .PHONY: git
 git:
 	git add .
-	git commit -m "异常处理"
+	git commit -m "CSR 读写 CSR数据冒险 分支预测"
 	git push

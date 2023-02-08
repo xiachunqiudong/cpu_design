@@ -27,7 +27,15 @@ module EX(
     input                           WB_rd_wen_i,
     input  [4:0]                    WB_rd_idx_i,
     input  [`XLEN-1:0]              wb_rd_wdata_i,
+    // CSR DATA HAZARD DETECT
+    // from MEM
+    input                           MEM_csr_wen_i,
+    input [11:0]                    MEM_csr_idx_i,
+    // from WB
+    input                           WB_csr_wen_i,
+    input [11:0]                    WB_csr_idx_i,
     // csr
+    input                           id_csr_ren_i,
     input                           id_csr_wen_i,
     input  [11:0]                   id_csr_idx_i,
     // rd
@@ -79,7 +87,7 @@ module EX(
 
     reg EX_data_valid;
     wire run;
-    assign run = 1;
+    assign run = (!csr_hazard);
     assign EX_valid_o = EX_data_valid && run && !ex_flush_i;
     assign EX_ready_o = MEM_ready_i && run;
 
@@ -100,6 +108,16 @@ module EX(
                           : rs2_WB_fwd  ? wb_rd_wdata_i
                           : EX_rs2_rdata_r & {`XLEN{EX_data_valid}};
 
+
+//xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
+// CSR 数据冒险检测
+//xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
+
+    wire EX_csr_ren;
+    wire csr_hazard = EX_csr_ren && !ex_flush_i
+                    && ((MEM_csr_wen_i && MEM_csr_idx_i == EX_csr_idx_o) || (WB_csr_wen_i  && WB_csr_idx_i  == EX_csr_idx_o));
+
+
     reg [`XLEN-1:0]              EX_pc_r;
     reg                          EX_prdt_taken_r;
     reg [`OP_INFO_WIDTH-1:0]     EX_optype_info_r;
@@ -112,6 +130,7 @@ module EX(
     reg [`XLEN-1:0]              EX_rs1_rdata_r;
     reg [`XLEN-1:0]              EX_rs2_rdata_r;
     reg [`XLEN-1:0]              EX_imm_r;
+    reg                          EX_csr_ren_r;
     reg                          EX_csr_wen_r;
     reg [11:0]                   EX_csr_idx_r;
     reg                          EX_rd_wen_r;
@@ -134,6 +153,7 @@ module EX(
     assign EX_rs1_idx_o     = EX_rs1_idx_r               & {5{EX_data_valid}};
     assign EX_rs2_idx_o     = EX_rs2_idx_r               & {5{EX_data_valid}};
     assign EX_imm_o         = EX_imm_r                   & {`XLEN{EX_data_valid}};
+    assign EX_csr_ren       = EX_csr_ren_r               & EX_data_valid;
     assign EX_csr_wen_o     = EX_csr_wen_r               & EX_data_valid;
     assign EX_csr_idx_o     = EX_csr_idx_r               & {12{EX_data_valid}};
     assign EX_rd_wen_o      = EX_rd_wen_r                & EX_data_valid;
@@ -154,7 +174,7 @@ module EX(
             EX_data_valid <= ID_valid_i;
         end 
     end
-    // pc_r
+    // data
     always @(posedge clk) begin
         if(EX_ready_o && ID_valid_i) begin
             EX_pc_r          <= ID_pc_i;
@@ -168,6 +188,7 @@ module EX(
             EX_rs1_rdata_r   <= id_rs1_rdata_i;
             EX_rs2_rdata_r   <= id_rs2_rdata_i;
             EX_imm_r         <= id_imm_i;
+            EX_csr_ren_r     <= id_csr_ren_i;
             EX_csr_wen_r     <= id_csr_wen_i;
             EX_csr_idx_r     <= id_csr_idx_i;
             EX_rd_wen_r      <= id_rd_wen_i;
