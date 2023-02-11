@@ -50,7 +50,7 @@ module csr(
             mstatus_mie  <= 1'b0;
             mstatus_mpie <= mstatus_mie;
         end else if(mstatus_mie_clear_i) begin
-            mstatus_mie  <= mstatus_mie;
+            mstatus_mie  <= mstatus_mpie;
             mstatus_mpie <= 1'b1;
         end
     end
@@ -134,7 +134,6 @@ module csr(
         mip_mtip <= int_timer_i;
         mip_msip <= int_soft_i;
     end
-
 
     wire read_mstatus   = EX_csr_idx_i == `CSR_MSTATUS;
     wire read_mie       = EX_csr_idx_i == `CSR_MIE;

@@ -1,7 +1,7 @@
 `include "defines.v"
 
 module ram
-#(parameter SIZE = 1024) 
+#(parameter SIZE = 8192) 
 (
     input              clk,
     input  [`XLEN-1:0] addr_i,
@@ -18,7 +18,7 @@ module ram
 
     reg [7:0] ram_data [0:SIZE-1];
 
-    wire [9:0] addr = addr_i[9:0];
+    wire [12:0] addr = addr_i[12:0];
 
     // read
     wire [`XLEN-1:0] rdata = {ram_data[addr+7], ram_data[addr+6], ram_data[addr+5], ram_data[addr+4],
@@ -39,4 +39,8 @@ module ram
         end    
     end
 
+    initial begin
+        $readmemh("./code.txt", ram_data);
+    end
+    
 endmodule

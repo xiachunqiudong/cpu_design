@@ -3,7 +3,9 @@
 module top_sim(
     input clk,
     input rst,
-    output [`XLEN-1:0] reg_data_o [1:31]
+    input int_exter,
+    output [`XLEN-1:0] reg_data_o [1:31],
+    output [7:0] ram_data_o [0:8191]
 );
 
     // wires for IF
@@ -428,7 +430,7 @@ module top_sim(
         .wdata_i    ( ram_wdata   ),
         .ren_i      ( ram_ren     ),
         .rdata_o    ( ram_rdata   ),
-        .ram_data_o (             )
+        .ram_data_o ( ram_data_o  )
     );
 
     // WB stage
@@ -564,7 +566,7 @@ module top_sim(
         .wb_csr_wdata_i     ( wb_csr_wdata     ),
         .int_soft_i         (),
         .int_timer_i        (),
-        .int_exter_i        (),
+        .int_exter_i        ( int_exter        ),
         .mcause_wen_i       ( mcause_wen       ),
         .mcause_wdata_i     ( mcause_wdata     ),
         .mtval_wen_i        ( mtval_wen        ),

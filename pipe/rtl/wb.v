@@ -52,7 +52,7 @@ module wb(
     output                     wb_trap_o,
     output [`XLEN-1:0]         wb_trap_handle_pc_o
 );
-    
+
 //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
 // 通用寄存器写回
 //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
@@ -85,6 +85,10 @@ module wb(
     wire int_exter;
     wire int_time;
     wire int_soft;
+
+    assign int_exter = mstatus_mie_rdata_i && mie_meie_rdata_i && mip_meip_rdata_i;
+    assign int_time  = mstatus_mie_rdata_i && mie_mtie_rdata_i && mip_mtip_rdata_i;
+    assign int_soft  = mstatus_mie_rdata_i && mie_msie_rdata_i && mip_msip_rdata_i;
 
     assign wb_excp = WB_pc_misalign_i | WB_if_bus_err_i 
                    | WB_ilegl_instr_i | WB_ecall_i      | WB_ebreak_i      | WB_mret_i

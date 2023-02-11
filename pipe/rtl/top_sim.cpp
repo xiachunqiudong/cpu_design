@@ -12,6 +12,29 @@ using namespace std;
 
 vluint64_t main_time = 0;
 
+
+int prev_ram[8192];
+
+void show_ram(CData *ram) {
+    int n = 10;
+    int begin = 4096;
+    int end   = begin + ((n-1) << 2);
+    for(int i = begin; i <= end; i++) {
+        if(ram[i] != prev_ram[i]) {
+            for(int i = 0; i < n; i++) {
+                int index = begin + (i << 2);
+                printf("ram[%d] = %d ", index, ram[index]);
+            }
+            puts("");
+        }
+    }
+    for(int i = begin; i <= end; i++) {
+        prev_ram[i] = ram[i];
+    }
+
+
+}
+
 double sc_time_stamp()
 {
 	return main_time;
@@ -31,17 +54,17 @@ int main(int argc, char** argv, char** env) {
     int clk = 1;
     int rst = 1;
 
-    while (main_time < 100) {
+    while (main_time < 10000) {
 
         if(main_time == 2) {
             rst = 0;
         }
         
-       
         top->clk = clk;
         top->rst = rst;
         top->eval();
-
+        CData *ram = top->ram_data_o;
+        show_ram(ram);
         clk = 1 - clk;
        
         tfp->dump(main_time);

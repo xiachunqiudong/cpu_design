@@ -178,6 +178,7 @@ module EX(
     always @(posedge clk) begin
         if(EX_ready_o && ID_valid_i) begin
             EX_pc_r          <= ID_pc_i;
+            EX_prdt_taken_r  <= ID_prdt_taken_i;
             EX_optype_info_r <= id_optype_info_i;
             EX_alu_info_r    <= id_alu_info_i;
             EX_branch_info_r <= id_branch_info_i;
