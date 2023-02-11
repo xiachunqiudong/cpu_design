@@ -314,6 +314,260 @@ assign ram_wen_o   = !mem_flush_i && !mem_excp && (sb || sh || sw || sd);
 
 ![image-20230205143143968](/home/xia/.config/Typora/typora-user-images/image-20230205143143968.png)
 
+
+
+### 2月12日
+
+#### 1.CSR写回结果生成
+
+csr的读以及csr写会数据生成都发生在执行阶段 
+
+介绍下CSR指令
+
+```verilog
+    wire csr_csrrw = csr_info_i[`CSR_CSRRW];
+    wire csr_csrrs = csr_info_i[`CSR_CSRRS];
+    wire csr_csrrc = csr_info_i[`CSR_CSRRC];
+
+    wire csr_csrrwi = csr_info_i[`CSR_CSRRWI];
+    wire csr_csrrsi = csr_info_i[`CSR_CSRRSI];
+    wire csr_csrrci = csr_info_i[`CSR_CSRRCI];
+
+    wire [`XLEN-1:0] csr_src2;
+    assign csr_src2 = (csr_csrrw | csr_csrrs | csr_csrrc) ? rs1_rdata_i : {59'b0, EX_rs1_idx_i};
+
+    wire [`XLEN-1:0] csrrw_res = csr_src2;
+    wire [`XLEN-1:0] csrrs_res = csr_rdata_i |   csr_src2;
+    wire [`XLEN-1:0] csrrc_res = csr_rdata_i & (~csr_src2);
+
+    assign ex_csr_wdata_o = {`XLEN{(csr_csrrw | csr_csrrwi)}} & csrrw_res
+                          | {`XLEN{(csr_csrrs | csr_csrrsi)}} & csrrs_res
+                          | {`XLEN{(csr_csrrc | csr_csrrci)}} & csrrc_res;
+```
+
+#### 2.读CSR数据冒险
+
+由于CSR读发生在执行阶段，如果在访存和写回阶段有要写CSR的指令就会发生CSR数据冒险
+
+考虑到CSR指令很少使用，根据体系结构设计的加速经常性事件，这边就不设计前递操作，直接阻塞执行阶段。
+
+`rd = x0` 就不需要读CSR
+
+`rs1/imm  = 0`就不需要写CSR
+
+```verilog
+assign id_csr_ren_o = rv64_need_csr && rd != `REG_X0;
+assign id_csr_wen_o = rv64_need_csr && (rs1 != 5'b0);
+```
+
+```verilog
+reg EX_data_valid;
+wire run;
+assign run = (!csr_hazard);
+assign EX_valid_o = EX_data_valid && run && !ex_flush_i;
+assign EX_ready_o = MEM_ready_i && run;
+
+wire EX_csr_ren;
+wire csr_hazard = EX_csr_ren && !ex_flush_i
+                && ((MEM_csr_wen_i && MEM_csr_idx_i == EX_csr_idx_o) || (WB_csr_wen_i  && WB_csr_idx_i  == EX_csr_idx_o));
+
+```
+
+这边要注意`ex_flush_1 == 1`，代表需要冲刷执行阶段，如果这种情况就不需要考虑冒险
+
+![image-20230208215719811](/home/xia/.config/Typora/typora-user-images/image-20230208215719811.png)
+
+#### 3.添加静态分支预测
+
+**取指阶段预测向前跳转为跳，向后跳转为不跳。**
+
+```assembly
+loop:
+addi x10, x10, -1
+bne x10, x0, loop
+```
+
+`jal`为直接跳转
+
+`jalr`到执行阶段冲刷流水线
+
+```verilog
+    // 静态分支预测, 向前跳预测为跳, 向后跳预测不跳
+    assign ifu_prdt_taken_o = (branch & imm[63]);
+    // 是否跳转
+    wire jump;
+    assign jump = ifu_prdt_taken_o | jal;
+
+    wire [`XLEN-1:0] pc_add_src2;
+    assign pc_add_src2 = jump ? imm : `XLEN'd4;
+
+    assign ifu_pc_next_o = if_flush_i ? flush_pc_i 
+                         : (IF_pc_i + pc_add_src2);
+```
+
+**执行阶段冲刷流水线**
+
+预测失败，或者`jalr`
+
+```verilog
+    wire op_jalr   = optype_info_i[`OP_JALR];
+
+    wire mis_prdt = branch_jump ^ EX_prdt_taken_i;
+    
+    wire [`XLEN-1:0] jump_pc_src1;
+    wire [`XLEN-1:0] jump_pc_src2;
+
+    assign jump_pc_src1 = op_jalr ? rs1_rdata_i : pc_i;
+    assign jump_pc_src2 = (op_jalr || branch_jump) ? imm_i : 64'd4;
+    assign ex_jump_pc_o = jump_pc_src1 + jump_pc_src2;
+
+    assign ex_jump_o = mis_prdt || op_jalr;
+```
+
+**预测成功**
+
+```assembly
+addi x10, x10, 10     # 0
+loop:
+addi x9, x9, -1       # 4
+addi x0, x0, 0        # 8
+addi x0, x0, 0        # 12
+blt x9, x10, loop     # 16
+addi x8, x0, 8        # 20
+addi x7, x0, 7        # 24
+```
+
+![image-20230209235320047](/home/xia/.config/Typora/typora-user-images/image-20230209235320047.png)
+
+**预测失败/jalr**
+
+```verilog
+addi x10, x10, 10     # 0
+loop:
+addi x9, x9, -1       # 4
+addi x0, x0, 0        # 8
+addi x0, x0, 0        # 12
+bltu x9, x10, loop    # 16
+addi x8, x0, 8        # 20
+addi x7, x0, 7        # 24
+```
+
+![image-20230209235506534](/home/xia/.config/Typora/typora-user-images/image-20230209235506534.png)
+
+#### 4.异常处理的优先级
+
+```verilog
+    wire [3:0] excp_code;
+    assign excp_code = WB_pc_misalign_i ? 4'd0   // 指令地址不对齐
+                    : WB_if_bus_err_i   ? 4'd1   // 指令访存错误
+                    : WB_ilegl_instr_i  ? 4'd2   // 非法指令
+                    : WB_ebreak_i       ? 4'd3   // 断点
+                    : WB_ld_misalign_i  ? 4'd4   // 读存储器地址不对齐
+                    : WB_ld_bus_err_i   ? 4'd5   // 读存储器访存错误
+                    : WB_st_misalign_i  ? 4'd6   // 写存储器地址不对齐
+                    : WB_st_bus_err_i   ? 4'd7   // 写存储器访存错误
+                    : WB_ecall_i        ? 4'd11  // 机器模式环境调用  
+                    : 4'd0;
+
+    wire [3:0] int_code;
+    assign int_code = int_soft  ? 4'd3
+                    : int_time  ? 4'd7
+                    : int_exter ? 4'd11
+                    : 4'd0;
+```
+
+#### 5.加入中断处理
+
+
+
+#### 6.测试案例
+
+程序的内存模型
+
+<img src="/home/xia/.config/Typora/typora-user-images/image-20230211151156827.png" alt="image-20230211151156827" style="zoom: 50%;" />
+
+```assembly
+# 将栈指针设置为8192
+.text
+.global _start
+_start:
+addi sp, x0, 1024
+slli sp, sp, 3
+j my
+```
+
+```c
+// 冒泡排序
+int arr[] = {112, 20, 5, 7, 2, 11, 50, 38, 22, 79};
+
+void sort(int arr[], int n) {
+    for(int i = n-1; i > 0; i--) {
+        for(int j = 0; j < i; j++) {
+            if(arr[j] > arr[j+1]) {
+                int temp = arr[j];
+                arr[j] = arr[j+1];
+                arr[j+1] = temp;
+            }
+        }
+    }
+}
+
+void my() {
+    sort(arr, 10);
+}
+```
+
+结果:
+
+```verilog
+ram[4096] = 112 ram[4100] = 20 ram[4104] = 5 ram[4108] = 7 ram[4112] = 2 ram[4116] = 11 ram[4120] = 50 ram[4124] = 38 ram[4128] = 22 ram[4132] = 79 
+ram[4096] = 112 ram[4100] = 20 ram[4104] = 5 ram[4108] = 7 ram[4112] = 2 ram[4116] = 11 ram[4120] = 50 ram[4124] = 38 ram[4128] = 22 ram[4132] = 79 
+ram[4096] = 112 ram[4100] = 20 ram[4104] = 5 ram[4108] = 7 ram[4112] = 2 ram[4116] = 11 ram[4120] = 50 ram[4124] = 38 ram[4128] = 22 ram[4132] = 79 
+ram[4096] = 112 ram[4100] = 20 ram[4104] = 5 ram[4108] = 7 ram[4112] = 2 ram[4116] = 11 ram[4120] = 50 ram[4124] = 38 ram[4128] = 22 ram[4132] = 79 
+ram[4096] = 112 ram[4100] = 20 ram[4104] = 5 ram[4108] = 7 ram[4112] = 2 ram[4116] = 11 ram[4120] = 50 ram[4124] = 38 ram[4128] = 22 ram[4132] = 79 
+ram[4096] = 112 ram[4100] = 20 ram[4104] = 5 ram[4108] = 7 ram[4112] = 2 ram[4116] = 11 ram[4120] = 50 ram[4124] = 38 ram[4128] = 22 ram[4132] = 79 
+ram[4096] = 112 ram[4100] = 20 ram[4104] = 5 ram[4108] = 7 ram[4112] = 2 ram[4116] = 11 ram[4120] = 50 ram[4124] = 38 ram[4128] = 22 ram[4132] = 79 
+ram[4096] = 112 ram[4100] = 20 ram[4104] = 5 ram[4108] = 7 ram[4112] = 2 ram[4116] = 11 ram[4120] = 50 ram[4124] = 38 ram[4128] = 22 ram[4132] = 79 
+ram[4096] = 112 ram[4100] = 20 ram[4104] = 5 ram[4108] = 7 ram[4112] = 2 ram[4116] = 11 ram[4120] = 50 ram[4124] = 38 ram[4128] = 22 ram[4132] = 79 
+ram[4096] = 112 ram[4100] = 20 ram[4104] = 5 ram[4108] = 7 ram[4112] = 2 ram[4116] = 11 ram[4120] = 50 ram[4124] = 38 ram[4128] = 22 ram[4132] = 79 
+ram[4096] = 20 ram[4100] = 20 ram[4104] = 5 ram[4108] = 7 ram[4112] = 2 ram[4116] = 11 ram[4120] = 50 ram[4124] = 38 ram[4128] = 22 ram[4132] = 79 
+ram[4096] = 20 ram[4100] = 112 ram[4104] = 5 ram[4108] = 7 ram[4112] = 2 ram[4116] = 11 ram[4120] = 50 ram[4124] = 38 ram[4128] = 22 ram[4132] = 79 
+ram[4096] = 20 ram[4100] = 5 ram[4104] = 5 ram[4108] = 7 ram[4112] = 2 ram[4116] = 11 ram[4120] = 50 ram[4124] = 38 ram[4128] = 22 ram[4132] = 79 
+ram[4096] = 20 ram[4100] = 5 ram[4104] = 112 ram[4108] = 7 ram[4112] = 2 ram[4116] = 11 ram[4120] = 50 ram[4124] = 38 ram[4128] = 22 ram[4132] = 79 
+ram[4096] = 20 ram[4100] = 5 ram[4104] = 7 ram[4108] = 7 ram[4112] = 2 ram[4116] = 11 ram[4120] = 50 ram[4124] = 38 ram[4128] = 22 ram[4132] = 79 
+ram[4096] = 20 ram[4100] = 5 ram[4104] = 7 ram[4108] = 112 ram[4112] = 2 ram[4116] = 11 ram[4120] = 50 ram[4124] = 38 ram[4128] = 22 ram[4132] = 79 
+ram[4096] = 20 ram[4100] = 5 ram[4104] = 7 ram[4108] = 2 ram[4112] = 2 ram[4116] = 11 ram[4120] = 50 ram[4124] = 38 ram[4128] = 22 ram[4132] = 79 
+ram[4096] = 20 ram[4100] = 5 ram[4104] = 7 ram[4108] = 2 ram[4112] = 112 ram[4116] = 11 ram[4120] = 50 ram[4124] = 38 ram[4128] = 22 ram[4132] = 79 
+ram[4096] = 20 ram[4100] = 5 ram[4104] = 7 ram[4108] = 2 ram[4112] = 11 ram[4116] = 11 ram[4120] = 50 ram[4124] = 38 ram[4128] = 22 ram[4132] = 79 
+ram[4096] = 20 ram[4100] = 5 ram[4104] = 7 ram[4108] = 2 ram[4112] = 11 ram[4116] = 112 ram[4120] = 50 ram[4124] = 38 ram[4128] = 22 ram[4132] = 79 
+ram[4096] = 20 ram[4100] = 5 ram[4104] = 7 ram[4108] = 2 ram[4112] = 11 ram[4116] = 50 ram[4120] = 50 ram[4124] = 38 ram[4128] = 22 ram[4132] = 79 
+ram[4096] = 20 ram[4100] = 5 ram[4104] = 7 ram[4108] = 2 ram[4112] = 11 ram[4116] = 50 ram[4120] = 112 ram[4124] = 38 ram[4128] = 22 ram[4132] = 79 
+ram[4096] = 20 ram[4100] = 5 ram[4104] = 7 ram[4108] = 2 ram[4112] = 11 ram[4116] = 50 ram[4120] = 38 ram[4124] = 38 ram[4128] = 22 ram[4132] = 79 
+ram[4096] = 20 ram[4100] = 5 ram[4104] = 7 ram[4108] = 2 ram[4112] = 11 ram[4116] = 50 ram[4120] = 38 ram[4124] = 112 ram[4128] = 22 ram[4132] = 79 
+ram[4096] = 20 ram[4100] = 5 ram[4104] = 7 ram[4108] = 2 ram[4112] = 11 ram[4116] = 50 ram[4120] = 38 ram[4124] = 22 ram[4128] = 22 ram[4132] = 79 
+ram[4096] = 20 ram[4100] = 5 ram[4104] = 7 ram[4108] = 2 ram[4112] = 11 ram[4116] = 50 ram[4120] = 38 ram[4124] = 22 ram[4128] = 112 ram[4132] = 79 
+ram[4096] = 20 ram[4100] = 5 ram[4104] = 7 ram[4108] = 2 ram[4112] = 11 ram[4116] = 50 ram[4120] = 38 ram[4124] = 22 ram[4128] = 79 ram[4132] = 79 
+ram[4096] = 20 ram[4100] = 5 ram[4104] = 7 ram[4108] = 2 ram[4112] = 11 ram[4116] = 50 ram[4120] = 38 ram[4124] = 22 ram[4128] = 79 ram[4132] = 112 
+ram[4096] = 5 ram[4100] = 5 ram[4104] = 7 ram[4108] = 2 ram[4112] = 11 ram[4116] = 50 ram[4120] = 38 ram[4124] = 22 ram[4128] = 79 ram[4132] = 112 
+ram[4096] = 5 ram[4100] = 20 ram[4104] = 7 ram[4108] = 2 ram[4112] = 11 ram[4116] = 50 ram[4120] = 38 ram[4124] = 22 ram[4128] = 79 ram[4132] = 112 
+ram[4096] = 5 ram[4100] = 7 ram[4104] = 7 ram[4108] = 2 ram[4112] = 11 ram[4116] = 50 ram[4120] = 38 ram[4124] = 22 ram[4128] = 79 ram[4132] = 112 
+ram[4096] = 5 ram[4100] = 7 ram[4104] = 20 ram[4108] = 2 ram[4112] = 11 ram[4116] = 50 ram[4120] = 38 ram[4124] = 22 ram[4128] = 79 ram[4132] = 112 
+ram[4096] = 5 ram[4100] = 7 ram[4104] = 2 ram[4108] = 2 ram[4112] = 11 ram[4116] = 50 ram[4120] = 38 ram[4124] = 22 ram[4128] = 79 ram[4132] = 112 
+ram[4096] = 5 ram[4100] = 7 ram[4104] = 2 ram[4108] = 20 ram[4112] = 11 ram[4116] = 50 ram[4120] = 38 ram[4124] = 22 ram[4128] = 79 ram[4132] = 112 
+ram[4096] = 5 ram[4100] = 7 ram[4104] = 2 ram[4108] = 11 ram[4112] = 11 ram[4116] = 50 ram[4120] = 38 ram[4124] = 22 ram[4128] = 79 ram[4132] = 112 
+ram[4096] = 5 ram[4100] = 7 ram[4104] = 2 ram[4108] = 11 ram[4112] = 20 ram[4116] = 50 ram[4120] = 38 ram[4124] = 22 ram[4128] = 79 ram[4132] = 112 
+ram[4096] = 5 ram[4100] = 7 ram[4104] = 2 ram[4108] = 11 ram[4112] = 20 ram[4116] = 38 ram[4120] = 38 ram[4124] = 22 ram[4128] = 79 ram[4132] = 112 
+ram[4096] = 5 ram[4100] = 7 ram[4104] = 2 ram[4108] = 11 ram[4112] = 20 ram[4116] = 38 ram[4120] = 50 ram[4124] = 22 ram[4128] = 79 ram[4132] = 112 
+ram[4096] = 5 ram[4100] = 7 ram[4104] = 2 ram[4108] = 11 ram[4112] = 20 ram[4116] = 38 ram[4120] = 22 ram[4124] = 22 ram[4128] = 79 ram[4132] = 112 
+ram[4096] = 5 ram[4100] = 7 ram[4104] = 2 ram[4108] = 11 ram[4112] = 20 ram[4116] = 38 ram[4120] = 22 ram[4124] = 50 ram[4128] = 79 ram[4132] = 112 
+ram[4096] = 5 ram[4100] = 2 ram[4104] = 2 ram[4108] = 11 ram[4112] = 20 ram[4116] = 38 ram[4120] = 22 ram[4124] = 50 ram[4128] = 79 ram[4132] = 112 
+ram[4096] = 5 ram[4100] = 2 ram[4104] = 7 ram[4108] = 11 ram[4112] = 20 ram[4116] = 38 ram[4120] = 22 ram[4124] = 50 ram[4128] = 79 ram[4132] = 112 
+ram[4096] = 5 ram[4100] = 2 ram[4104] = 7 ram[4108] = 11 ram[4112] = 20 ram[4116] = 22 ram[4120] = 22 ram[4124] = 50 ram[4128] = 79 ram[4132] = 112 
+ram[4096] = 5 ram[4100] = 2 ram[4104] = 7 ram[4108] = 11 ram[4112] = 20 ram[4116] = 22 ram[4120] = 38 ram[4124] = 50 ram[4128] = 79 ram[4132] = 112 
+ram[4096] = 2 ram[4100] = 2 ram[4104] = 7 ram[4108] = 11 ram[4112] = 20 ram[4116] = 22 ram[4120] = 38 ram[4124] = 50 ram[4128] = 79 ram[4132] = 112 
+ram[4096] = 2 ram[4100] = 5 ram[4104] = 7 ram[4108] = 11 ram[4112] = 20 ram[4116] = 22 ram[4120] = 38 ram[4124] = 50 ram[4128] = 79 ram[4132] = 112 
+```
+
 # 二.CPU模块设计
 
 ## 1. INSTR FETCH
@@ -1180,14 +1434,31 @@ assign wb_rd_wdata_o = op_load   ? mem_rdata_i
 
 将异常看做是一种特殊的函数跳转那么就需要知道往哪里跳`mtvec`, 返回地址`mepc`, 异常的信息`mcause`和`mtval`
 
-
-
 1. 异常指令的PC保存在mepc, 将PC设置为mtvec
 2. 根据异常原因设置mcause, 设置mtval为地址异常的地址或者是异常指令的指令内容
 3. 将mstatus.MIE置为0用于屏蔽中断，将mstatus.MPIE = MIE
 4. 将异常发生之前权限模式保存在MPP中，再把权限模式改为M
 
 
+
+中断屏蔽
+
+异常不可以屏蔽，而中断可以屏蔽。
+
+中断优先级
+
+1. 外部中断
+2. 软件中断
+3. 时钟中断
+
+中断嵌套
+
+发生异常之后 mstatus.mie <= 0, 中断被全局关闭，无法响应新的中断，因此默认不支持中断嵌套。
+
+可以使用软件解决
+
+- 进入异常处理程序之后，将mstatus.mie = 1
+- 如果想屏蔽优先级比其优先级低的中断，可以使用mie
 
 ## 三.测试代码
 
@@ -1229,4 +1500,32 @@ assign wb_rd_wdata_o = op_load   ? mem_rdata_i
   ret               #28
   ```
   
-  
+- 测试代码3
+
+  ```assembly
+  .text
+  .global _start
+  _start:
+  addi x10, x0, 10       # 0
+  addi x10, x0, 100      # 4
+  addi x11, x0, -1       # 8
+  add  x12, x10, x11     # 12
+  bne x10, x11, foo      # 16
+  addi x0, x0, 0         # 20
+  addi x0, x0, 0         # 24
+  addi x0, x0, 0         # 28
+  addi x0, x0, 0         # 32
+  foo:
+  sd x10, 16(x0)         # 36
+  ld x20, 16(x0)         # 40
+  addi x20, x20, 19      # 44
+  addi x21, x0, 64       # 48 
+  csrrw x0, mtvec, x21   # 52
+  ecall                  # 56
+  jal _start             # 60
+  excp_handle:            
+  csrrw x30, mepc, x0    # 64
+  addi x30, x30, 4       # 68
+  csrrw x0, mepc, x30    # 72
+  mret                   # 76
+  ```
