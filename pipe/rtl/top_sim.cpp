@@ -15,24 +15,29 @@ vluint64_t main_time = 0;
 
 int prev_ram[8192];
 
-void show_ram(CData *ram) {
-    int n = 10;
-    int begin = 4096;
+void show_data(CData *ram, int begin, int n, string msg) {
     int end   = begin + ((n-1) << 2);
     for(int i = begin; i <= end; i++) {
         if(ram[i] != prev_ram[i]) {
+            cout << msg << endl;
+            puts("---begin---");
             for(int i = 0; i < n; i++) {
                 int index = begin + (i << 2);
                 printf("ram[%d] = %d ", index, ram[index]);
             }
             puts("");
+            puts("---end---");
+
         }
     }
     for(int i = begin; i <= end; i++) {
         prev_ram[i] = ram[i];
     }
+}
 
-
+void show_ram(CData *ram) {
+    show_data(ram, 4096, 10, "bubble:");
+    show_data(ram, 4136, 10, "quick:");
 }
 
 double sc_time_stamp()

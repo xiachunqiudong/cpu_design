@@ -2,19 +2,22 @@ OUTPUT_ARCH("riscv")
 
 ENTRY(_start)
 
+MEMORY
+{
+    ram(rxa!w) : ORIGIN = 0, LENGTH = 8K
+}
+
 
 SECTIONS
 {   
-    . = 0x0;
     .text : 
     {
         *(.text)
-    }
+    } >ram
     
-    . = 0x2000;
     .data : 
     {   
         *(.data)
-    }
+    } >ram
     
 }

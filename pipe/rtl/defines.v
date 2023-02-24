@@ -1,6 +1,5 @@
-
-`define REG_INIT
-
+`define RAM_SIZE 32768
+`define RAM_LEN  15
 
 `define INSTR_WIDTH 32
 `define PC_WIDTH 64

@@ -4,3 +4,4 @@ _start:
 addi sp, x0, 1024
 slli sp, sp, 3
 j my
+

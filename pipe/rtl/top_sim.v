@@ -5,7 +5,7 @@ module top_sim(
     input rst,
     input int_exter,
     output [`XLEN-1:0] reg_data_o [1:31],
-    output [7:0] ram_data_o [0:8191]
+    output [7:0] ram_data_o [0:`RAM_SIZE-1]
 );
 
     // wires for IF

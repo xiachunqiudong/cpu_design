@@ -320,7 +320,7 @@ assign ram_wen_o   = !mem_flush_i && !mem_excp && (sb || sh || sw || sd);
 
 #### 1.CSR写回结果生成
 
-csr的读以及csr写会数据生成都发生在执行阶段 
+csr的读以及csr写会回数据生成都发生在执行阶段 
 
 介绍下CSR指令
 
@@ -478,7 +478,39 @@ addi x7, x0, 7        # 24
 
 #### 5.加入中断处理
 
+- mstatus_mie
 
+  全局中断使能
+
+- mie
+
+  不同类型的中断使能
+
+- mip
+
+  不同类型中断标志位
+
+```verilog
+    // csr
+	always @(posedge clk) begin
+        mip_meip <= int_exter_i;
+        mip_mtip <= int_timer_i;
+        mip_msip <= int_soft_i;
+    end   
+	
+	// wb
+	wire int_exter;
+    wire int_time;
+    wire int_soft;
+
+    assign int_exter = mstatus_mie_rdata_i && mie_meie_rdata_i && mip_meip_rdata_i;
+    assign int_time  = mstatus_mie_rdata_i && mie_mtie_rdata_i && mip_mtip_rdata_i;
+    assign int_soft  = mstatus_mie_rdata_i && mie_msie_rdata_i && mip_msip_rdata_i;
+```
+
+- 中断可以被屏蔽，但是异常不可以
+
+- 发生中断或者异常之后会将mstatus_mie = 0， 关闭全局中断使能，这样的话就不能中断嵌套，但是可以通过软件将mstatus_mie = 1，这样就支持中断嵌套，如果想屏蔽优先级比自己低的中断，这时候就可以设置mie。
 
 #### 6.测试案例
 

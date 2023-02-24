@@ -1,8 +1,6 @@
 `include "defines.v"
 
-module ram
-#(parameter SIZE = 8192) 
-(
+module ram(
     input              clk,
     input  [`XLEN-1:0] addr_i,
     input              wen_i,
@@ -11,14 +9,14 @@ module ram
     input              ren_i,
     output [`XLEN-1:0] rdata_o,
     
-    output [7:0] ram_data_o [0:SIZE-1]
+    output [7:0] ram_data_o [0:`RAM_SIZE-1]
 );
 
     assign ram_data_o = ram_data;
 
-    reg [7:0] ram_data [0:SIZE-1];
+    reg [7:0] ram_data [0:`RAM_SIZE-1];
 
-    wire [12:0] addr = addr_i[12:0];
+    wire [`RAM_LEN-1:0] addr = addr_i[`RAM_LEN-1:0];
 
     // read
     wire [`XLEN-1:0] rdata = {ram_data[addr+7], ram_data[addr+6], ram_data[addr+5], ram_data[addr+4],

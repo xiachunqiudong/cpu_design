@@ -13,10 +13,10 @@ module if_bus(
     assign if_bus_pc_misalign_o = |(pc_i[1:0]);
     assign if_bus_bus_err_o = 0;
 
-    reg [7:0] instr_mem[0:8191];
+    reg [7:0] instr_mem[0:`RAM_SIZE-1];
 
     // 小端法 低位在低地址
-    wire [12:0] pc = pc_i[12:0];
+    wire [`RAM_LEN-1:0] pc = pc_i[`RAM_LEN-1:0];
     assign if_bus_instr_o = {instr_mem[pc+3], instr_mem[pc+2], instr_mem[pc+1], instr_mem[pc]};
 
     // 从code.txt中读入指令
