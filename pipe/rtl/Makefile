@@ -27,7 +27,7 @@ show:
 
 git:
 	git add .
-	git commit -m "测试冒泡排序"
+	git commit -m "更新文档"
 	git push
 
 clean:
