@@ -1,4 +1,10 @@
-## 总体介绍
+## 一.参考书籍
+
+- 手把手教你设计CPU-riscv处理器篇
+- CPU设计实战
+- 计算机组成与设计: 硬件软件接口
+
+## 二.总体介绍
 
 ### 指令类型
 
@@ -54,7 +60,7 @@
 
 `lui`, `auipc`
 
-## 流水线的握手信号
+## 三.流水线的握手信号
 
 在处理`load-use`冒险的时候，我们需要暂停译码阶段一个时钟周期。但是也需要注意暂停取指阶段和往执行阶段插入气泡。
 
@@ -109,7 +115,7 @@ ID流水线寄存器的输出信号只有在`ID_data_valid`有效时才是有效
 
 这样如果某个阶段没有准备完毕`run == 0`，那面前面的阶段都会因为`ready_o == 0`而阻塞，并向他下一个阶段插入气泡`valid_o ==0`。
 
-## 取指
+## 四.取指
 
 ```verilog
 module ifu(
@@ -176,12 +182,12 @@ module ifu(
 
 那有没有更好的办法？那我们可以猜测一下，是跳转还是不跳。至少有一半的几率是对的，如果猜测正确就不需要冲刷流水线了。
 
-我们可以猜测向前跳转为跳，反之为不跳，可以规定编译器，循环向前跳转，这样预测的正确率可以进一步提高。
+我们可以猜测往回跳转为跳，反之为不跳，可以规定编译器，循环向前跳转，这样预测的正确率可以进一步提高。
 
 这里我们就采用这种方式预测，注意为了在执行阶段知道预测的结果是否正确，需要把预测结果带到执行阶段。
 
 ```verilog
-// 静态分支预测, 向前跳预测为跳, 向后跳预测不跳
+// 静态分支预测, 往回跳预测为跳, 反之为不跳
 assign ifu_prdt_taken_o = (branch & imm[63]);
 ```
 
@@ -242,7 +248,7 @@ assign ifu_prdt_taken_o = (branch & imm[63]);
 assign IF_valid_o = !if_flush_i && run;
 ```
 
-## 译码
+## 五.译码
 
 ```verilog
 module id(
@@ -351,7 +357,7 @@ assign ID_valid_o = (ID_data_valid && run && !id_flush_i);
 assign ID_ready_o = (EX_ready_i && run);
 ```
 
-## 执行
+## 六.执行
 
 ```verilog
 module ex(
@@ -382,7 +388,181 @@ module ex(
 );
 ```
 
-## 访存
+### 1.前递
+
+```verilog
+    wire rs1_MEM_fwd = MEM_rd_wen_i && (EX_rs1_idx_o != `REG_X0) && (EX_rs1_idx_o == MEM_rd_idx_i);
+    wire rs2_MEM_fwd = MEM_rd_wen_i && (EX_rs2_idx_o != `REG_X0) && (EX_rs2_idx_o == MEM_rd_idx_i);
+
+    wire rs1_WB_fwd = WB_rd_wen_i && (EX_rs1_idx_o != `REG_X0) && (EX_rs1_idx_o == WB_rd_idx_i);
+    wire rs2_WB_fwd = WB_rd_wen_i && (EX_rs2_idx_o != `REG_X0) && (EX_rs2_idx_o == WB_rd_idx_i);
+	
+	// 使用最新指令的写回的值作为前递的值
+    assign EX_rs1_rdata_o = rs1_MEM_fwd ? MEM_fwd_data_i
+                          : rs1_WB_fwd  ? wb_rd_wdata_i
+                          : EX_rs1_rdata_r & {`XLEN{EX_data_valid}};
+    assign EX_rs2_rdata_o = rs2_MEM_fwd ? MEM_fwd_data_i
+                          : rs2_WB_fwd  ? wb_rd_wdata_i
+                          : EX_rs2_rdata_r & {`XLEN{EX_data_valid}};
+```
+
+### 2.csr数据冒险检测
+
+```verilog
+    wire csr_hazard = EX_csr_ren && !ex_flush_i
+                    && ((MEM_csr_wen_i && MEM_csr_idx_i == EX_csr_idx_o) || (WB_csr_wen_i  && WB_csr_idx_i  == EX_csr_idx_o));
+	// 检测到冒险就阻塞
+    assign run = (!csr_hazard);
+```
+
+### 3.ALU单元
+
+```verilog
+module alu(
+    input [`OP_INFO_WIDTH-1:0]     optype_info_i,
+    input [`ALU_INFO_WIDTH-1:0]    alu_info_i,
+    input [`BRANCH_INFO_WIDTH-1:0] branch_info_i,
+    // op number
+    input [`PC_WIDTH-1:0] pc_i,
+    input [`XLEN-1:0]     rs1_rdata_i,
+    input [`XLEN-1:0]     rs2_rdata_i,
+    input [`XLEN-1:0]     imm_i,
+    output [`XLEN-1:0]    alu_res_o,
+    output                alu_branch_jump_o
+);
+```
+
+- 计算计算指令写回目的寄存器的值
+
+  ```verilog
+      // 加减
+      wire [`XLEN-1:0] adder_op1 = alu_op1;
+      wire [`XLEN-1:0] adder_op2 = {`XLEN{res_sel_sub}} ^ alu_op2;
+      wire adder_cin = res_sel_sub;
+      wire adder_cout;
+      assign {adder_cout, alu_add_sub_res} = adder_op1 + adder_op2 + {63'b0, adder_cin};
+  
+      // slt
+      assign alu_slt_res  = {63'b0, lt};
+      // sltu
+      assign alu_sltu_res = {63'b0, ltu};
+  
+      // 移位操作
+      wire [5:0] shift_op2 = (op_alu_imm_w | op_alu_w) ? {1'b0, alu_op2[4:0]} : alu_op2[5:0];
+      // sll
+      assign alu_sll_res   = alu_op1 << shift_op2;
+      // srl
+      assign alu_srl_res   = alu_op1 >> shift_op2;
+      // sra
+      assign alu_sra_res   = $signed(alu_op1) >>> shift_op2;
+      
+      // 逻辑操作
+      // and
+      assign alu_and_res   = alu_op1 & alu_op2;
+      // or
+      assign alu_or_res    = alu_op1 | alu_op2;
+      // xor
+      assign alu_xor_res   = alu_op1 ^ alu_op2;
+  
+  //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
+  // ALU结果选择
+  //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
+  
+      wire [`XLEN-1:0] alu_res = ({`XLEN{res_sel_add_sub}} & alu_add_sub_res) 
+                               | ({`XLEN{res_sel_sll}}     & alu_sll_res)
+                               | ({`XLEN{res_sel_slt}}     & alu_slt_res)
+                               | ({`XLEN{res_sel_sltu}}    & alu_sltu_res)
+                               | ({`XLEN{res_sel_xor}}     & alu_xor_res)
+                               | ({`XLEN{res_sel_srl}}     & alu_srl_res)
+                               | ({`XLEN{res_sel_sra}}     & alu_sra_res)
+                               | ({`XLEN{res_sel_or}}      & alu_or_res)
+                               | ({`XLEN{res_sel_and}}     & alu_and_res);
+  
+      // 对于ALU_W ALU_IMM_W
+      // 1. 将结果截断至32位 
+      // 2. 将截断结果符号扩展后放入rd
+      wire [`XLEN-1:0] alu_res_w = { {32{alu_res[31]}}, alu_res[31:0] };
+      assign alu_res_o = (op_alu_w | op_alu_imm_w) ? alu_res_w : alu_res;
+  ```
+
+- 计算分支指令是否跳转
+
+  ```verilog
+  //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
+  // 分支结果计算
+  //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
+      wire ne  = (|alu_xor_res);
+      wire eq  = ~ne;
+      // 有符号比较
+      // 1. 符号不同 
+      // op1为负数 op2为正数 lt = 1
+      // 2. 符号相同
+      // res为负数 lt = 1
+      wire lt  = ((alu_op1[63] & ~alu_op2[63]) | (~(alu_op1[63] ^ alu_op2[63]) & alu_add_sub_res[63]));
+      wire ltu = ~adder_cout;
+      
+      wire ge  = ~lt;
+      wire geu = ~ltu;
+  
+      assign alu_branch_jump_o = (branch_beq  & eq)
+                               | (branch_bne  & ne)
+                               | (branch_blt  & lt)
+                               | (branch_bge  & ge)
+                               | (branch_bltu & ltu)
+                               | (branch_bgeu & geu);
+  ```
+
+- 计算访存指令的访存地址
+
+  复用`alu_res_o`的结果
+
+### 4.分支预测冲刷流水线
+
+```verilog
+    wire op_jalr   = optype_info_i[`OP_JALR];
+
+    wire mis_prdt = branch_jump ^ EX_prdt_taken_i;
+    
+    wire [`XLEN-1:0] jump_pc_src1;
+    wire [`XLEN-1:0] jump_pc_src2;
+
+    assign jump_pc_src1 = op_jalr ? rs1_rdata_i : pc_i;
+    assign jump_pc_src2 = (op_jalr || branch_jump) ? imm_i : 64'd4;
+    assign ex_jump_pc_o = jump_pc_src1 + jump_pc_src2;
+
+    assign ex_jump_o = mis_prdt || op_jalr;
+
+    assign ex_csr_rdata_o = csr_rdata_i;
+```
+
+### 5.生成写回CSR寄存器的内容
+
+- 读`CSR`寄存器
+- 根据从`CSR`寄存器中读到的内容生成写回`CSR`寄存器的内容
+
+```verilog
+    wire csr_csrrw = csr_info_i[`CSR_CSRRW];
+    wire csr_csrrs = csr_info_i[`CSR_CSRRS];
+    wire csr_csrrc = csr_info_i[`CSR_CSRRC];
+
+    wire csr_csrrwi = csr_info_i[`CSR_CSRRWI];
+    wire csr_csrrsi = csr_info_i[`CSR_CSRRSI];
+    wire csr_csrrci = csr_info_i[`CSR_CSRRCI];
+
+    wire [`XLEN-1:0] csr_src2;
+    assign csr_src2 = (csr_csrrw | csr_csrrs | csr_csrrc) ? rs1_rdata_i : {59'b0, EX_rs1_idx_i};
+
+    wire [`XLEN-1:0] csrrw_res = csr_src2;
+    wire [`XLEN-1:0] csrrs_res = csr_rdata_i |   csr_src2;
+    wire [`XLEN-1:0] csrrc_res = csr_rdata_i & (~csr_src2);
+
+
+    assign ex_csr_wdata_o = {`XLEN{(csr_csrrw | csr_csrrwi)}} & csrrw_res
+                          | {`XLEN{(csr_csrrs | csr_csrrsi)}} & csrrs_res
+                          | {`XLEN{(csr_csrrc | csr_csrrci)}} & csrrc_res;
+```
+
+## 七.访存
 
 ```verilog
 module mem(
@@ -414,7 +594,168 @@ module mem(
 );
 ```
 
-## 写回
+- ram的读/写数据位宽为8字节，所以访问ram的地址的低三位为0，需要将访存地址的低三位置0作为ram的读写地址
+
+  ```verilog
+   assign ram_addr_o = {mem_addr_i[63:3], 3'b0};
+  ```
+
+### 1.异常处理
+
+```verilog
+    // excp
+    assign mem_ld_misalign_o = (lh | lhu) & ( mem_addr_i[0])
+                             | (lw | lwu) & (|mem_addr_i[1:0])
+                             |  ld        & (|mem_addr_i[2:0]);
+    assign mem_ld_bus_err_o = 0;
+
+    assign mem_st_misalign_o = sh & ( mem_addr_i[0])
+                             | sw & (|mem_addr_i[1:0])
+                             | sd & (|mem_addr_i[2:0]);
+    assign mem_st_bus_err_o = 0;
+
+    wire mem_excp = MEM_pc_misalign_i | MEM_if_bus_err_i | MEM_ecall_i       | MEM_ebreak_i     | MEM_mret_i
+                  | mem_ld_misalign_o | mem_ld_bus_err_o | mem_st_misalign_o | mem_st_bus_err_o;
+```
+
+如果访存级指令发生了异常/写回级发生了异常，都不能对存储器进行访问，不能修改计算机的状态！
+
+```verilog
+    // 读使能
+    assign ram_ren_o   = !mem_flush_i && !mem_excp && (lb || lh || lw || ld || lbu || lhu || lwu);
+    // 写使能
+    assign ram_wen_o   = !mem_flush_i && !mem_excp && (sb || sh || sw || sd);
+```
+
+### 2.LOAD指令
+
+- 根据load类型以及地址低三位选择`ram_rdata_i`的内容
+
+  例如`lb`指令的数据可能是`ram_rdata_i`中的任意一个字节
+
+  ```verilog
+      reg [7:0] lb_rdata;
+      always @(*) begin
+          case(mem_addr_i[2:0])
+              3'b000: lb_rdata = ram_rdata_i[7 :0 ];
+              3'b001: lb_rdata = ram_rdata_i[15:8 ];
+              3'b010: lb_rdata = ram_rdata_i[23:16];
+              3'b011: lb_rdata = ram_rdata_i[31:24];
+              3'b100: lb_rdata = ram_rdata_i[39:32];
+              3'b101: lb_rdata = ram_rdata_i[47:40];
+              3'b110: lb_rdata = ram_rdata_i[55:48];
+              3'b111: lb_rdata = ram_rdata_i[63:56];
+              default: lb_rdata = 8'b0;
+          endcase
+      end
+      // lh
+      reg [15:0] lh_rdata;
+      always @(*) begin
+          case(mem_addr_i[2:1])
+              2'b00: lh_rdata = ram_rdata_i[15:0];
+              2'b01: lh_rdata = ram_rdata_i[31:16];
+              2'b10: lh_rdata = ram_rdata_i[47:32];
+              2'b11: lh_rdata = ram_rdata_i[63:48];
+              default lh_rdata = 16'b0;
+          endcase
+      end
+      // lw
+      reg [31:0] lw_rdata;
+      always @(*) begin
+          if(mem_addr_i[2] == 1'b0)
+              lw_rdata = ram_rdata_i[31:0];
+          else
+              lw_rdata = ram_rdata_i[63:32];
+      end
+  ```
+
+- 扩展成64位数据
+
+  ```verilog
+      // 符号扩展
+      wire [`XLEN-1:0] mem_rdata_lb  = {{56{lb_rdata[7 ]}}, lb_rdata};
+      wire [`XLEN-1:0] mem_rdata_lh  = {{48{lh_rdata[15]}}, lh_rdata};
+      wire [`XLEN-1:0] mem_rdata_lw  = {{32{lw_rdata[31]}}, lw_rdata};
+      wire [`XLEN-1:0] mem_rdata_ld  = ram_rdata_i;
+      // 无符号扩展
+      wire [`XLEN-1:0] mem_rdata_lbu = {{56'b0}, lb_rdata};
+      wire [`XLEN-1:0] mem_rdata_lhu = {{48'b0}, lh_rdata};
+      wire [`XLEN-1:0] mem_rdata_lwu = {{32'b0}, lw_rdata};
+  ```
+
+- 结果选择
+
+  ```verilog
+      // 结果选择
+      assign mem_rdata_o = {{`XLEN{lb}}  & mem_rdata_lb}
+                         | {{`XLEN{lh}}  & mem_rdata_lh}
+                         | {{`XLEN{lw}}  & mem_rdata_lw}
+                         | {{`XLEN{ld}}  & mem_rdata_ld}
+                         | {{`XLEN{lbu}} & mem_rdata_lbu}
+                         | {{`XLEN{lhu}} & mem_rdata_lhu}
+                         | {{`XLEN{lwu}} & mem_rdata_lwu};
+  ```
+
+### 3.STORE指令
+
+写入内存的数据位宽为8字节，但是有些指令只需要其中部分字节，这时候就需要字节使能，控制写入哪些部分
+
+- 字解使能
+
+  ```verilog
+     reg [7:0] sb_byte_en;
+      always @(*) begin
+          case(mem_addr_i[2:0])
+              3'b000: sb_byte_en = 8'b0000_0001;
+              3'b001: sb_byte_en = 8'b0000_0010;
+              3'b010: sb_byte_en = 8'b0000_0100;
+              3'b011: sb_byte_en = 8'b0000_1000;
+              3'b100: sb_byte_en = 8'b0001_0000;
+              3'b101: sb_byte_en = 8'b0010_0000;
+              3'b110: sb_byte_en = 8'b0100_0000;
+              3'b111: sb_byte_en = 8'b1000_0000;
+              default: sb_byte_en = 8'b0000_0000;
+          endcase
+      end
+      // sh
+      reg [7:0] sh_byte_en;
+      always @(*) begin
+          case(mem_addr_i[2:1])
+              2'b00: sh_byte_en = 8'b0000_0011;
+              2'b01: sh_byte_en = 8'b0000_1100;
+              2'b10: sh_byte_en = 8'b0011_0000;
+              2'b11: sh_byte_en = 8'b1100_0000;
+              default: sh_byte_en = 8'b0000_0000;
+          endcase
+      end
+      // sw
+      reg [7:0] sw_byte_en;
+      always @(*) begin
+          case(mem_addr_i[2])
+              1'b0: sw_byte_en = 8'b0000_1111;
+              1'b1: sw_byte_en = 8'b1111_0000;
+              default: sw_byte_en = 8'b0000_0000;
+          endcase
+      end
+  
+      // 字节使能
+      assign ram_byte_en_o = ({8{sb}} & sb_byte_en)
+                           | ({8{sh}} & sh_byte_en)
+                           | ({8{sw}} & sw_byte_en)
+                           | ({8{sd}} & 8'b1111_1111);
+  ```
+
+- 写入数据
+
+  ```verilog
+    	// 简单写法，配合字节使能就可以写入正确的位置
+  	assign ram_wdata_o = ({64{sb}} & {8{mem_wdata_i[7:0]}})
+                         | ({64{sh}} & {4{mem_wdata_i[15:0]}})
+                         | ({64{sw}} & {2{mem_wdata_i[31:0]}})
+                         | ({64{sd}} & mem_wdata_i);
+  ```
+
+## 八.写回
 
 ```verilog
 module wb(
@@ -471,5 +812,123 @@ module wb(
     output                     wb_trap_o,
     output [`XLEN-1:0]         wb_trap_handle_pc_o
 );
+```
+
+### 1.写回通用寄存器
+
+```verilog
+    wire op_load   = WB_optype_info_i[`OP_LOAD];
+    wire op_system = WB_optype_info_i[`OP_SYSTEM];    
+    assign wb_rd_wdata_o = op_load   ? WB_mem_rdata_i
+                         : op_system ? WB_csr_rdata_i
+                         : WB_alu_res_i;
+	// 有异常就不能写回
+    assign wb_rd_wen_o   = WB_rd_wen_i && !wb_excp;
+    assign wb_rd_idx_o   = WB_rd_idx_i;
+```
+
+### 2.写回CSR寄存器
+
+```verilog
+    assign wb_csr_wen_o   = WB_csr_wen_i && !wb_excp;
+    assign wb_csr_idx_o   = WB_csr_idx_i;
+    assign wb_csr_wdata_o = WB_csr_wdata_i;
+```
+
+## 九.异常处理
+
+​		异常就是CPU执行过程中出现了异常情况，比如说在译码阶段发现了`非法指令`或者是访存阶段`load地址不对齐`，这个时候我们需要处理这种情况。
+
+下面我将介绍我这个CPU是如何设计异常处理的。
+
+​		我是在写回阶段统一处理异常和中断的，这样处理异常可以做到精准异常，异常之前的指令都执行完成，异常之后的指令都没执行。
+
+为了做到异常之后的指令都没执行，就是不能让异常之后的指令修改计算机状态。这边我只需要注意当写回级有异常时，访存级不能`load`或者`store`。
+
+如果一条指令发生了异常需要把异常类型和PC一直携带到写回阶段，同时在访存阶段也不可以`load`或者`store`，在写回阶段也不能写回。
+
+​		异常处理就是跳转到异常处理程序，执行完异常处理程序之后还需要跳转回发生异常的指令，重新执行。所以就需要异常处理程序的入口地址，就是`mtvec`寄存器，还需要保存发生异常指令的PC就是保存到`mepc`寄存器。同时我们还需要保存发生异常的类型和发生异常的额外信息，这边就需要`mcause`保存发生异常的原因，`mtval`发生异常的额外信息。
+
+- `mtvec`: 异常处理程序的入口地址
+- `mepc`: 异常处理程序的返回地址
+- `mcause`: 发生异常的原因
+- `mtval`: 发生异常的额外信息
+
+下面是我实现的代码:
+
+```verilog
+//xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
+// 异常处理
+//xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
+    // 1. 发生异常的指令的PC -> mepc
+    // 2. 发生异常的原因     -> mcause
+    // 3. 冲刷流水线        pc <- mtvec
+
+    wire wb_excp;
+    wire wb_int;
+
+    wire int_exter;
+    wire int_time;
+    wire int_soft;
+
+    assign int_exter = mstatus_mie_rdata_i && mie_meie_rdata_i && mip_meip_rdata_i;
+    assign int_time  = mstatus_mie_rdata_i && mie_mtie_rdata_i && mip_mtip_rdata_i;
+    assign int_soft  = mstatus_mie_rdata_i && mie_msie_rdata_i && mip_msip_rdata_i;
+
+    assign wb_excp = WB_pc_misalign_i | WB_if_bus_err_i 
+                   | WB_ilegl_instr_i | WB_ecall_i      | WB_ebreak_i      | WB_mret_i
+                   | WB_ld_misalign_i | WB_ld_bus_err_i | WB_st_misalign_i | WB_st_bus_err_i;
+    
+    assign wb_int = int_exter | int_time | int_soft;
+
+    assign wb_trap_o = wb_excp | wb_int;
+    assign wb_trap_handle_pc_o = WB_mret_i ? mepc_rdata_i : mtvec_rdata_i;
+    // update csr
+    // 1.mcause: 发生异常的原因
+    assign mcause_wen_o   = wb_trap_o && !WB_mret_i;
+    
+    wire [3:0] excp_code;
+    assign excp_code = WB_pc_misalign_i ? 4'd0   // 指令地址不对齐
+                    : WB_if_bus_err_i   ? 4'd1   // 指令访存错误
+                    : WB_ilegl_instr_i  ? 4'd2   // 非法指令
+                    : WB_ebreak_i       ? 4'd3   // 断点
+                    : WB_ld_misalign_i  ? 4'd4   // 读存储器地址不对齐
+                    : WB_ld_bus_err_i   ? 4'd5   // 读存储器访存错误
+                    : WB_st_misalign_i  ? 4'd6   // 写存储器地址不对齐
+                    : WB_st_bus_err_i   ? 4'd7   // 写存储器访存错误
+                    : WB_ecall_i        ? 4'd11  // 机器模式环境调用  
+                    : 4'd0;
+    
+    wire [3:0] int_code;
+    assign int_code = int_soft  ? 4'd3
+                    : int_time  ? 4'd7
+                    : int_exter ? 4'd11
+                    : 4'd0;
+    
+    assign mcause_wdata_o = wb_int ? {1'b1, 59'b0, int_code} : {60'b0, excp_code};
+    
+    // 2.mtval: 异常的详细信息
+    assign mtval_wen_o = wb_trap_o && !WB_mret_i;
+    // 非法指令: 指令 
+    // 访问存储器错误: 访问存储器地址
+    assign mtval_wdata_o = (WB_pc_misalign_i | WB_if_bus_err_i) ? WB_pc_i
+                         : WB_ilegl_instr_i ? {32'b0, WB_instr_i} 
+                         : WB_alu_res_i;
+    
+
+    // 3.mepc: trap处理程序返回地址
+    // 1. excp: 发生异常指令的地址
+    // 2. int:  发生中断下一条指令的地址
+    assign mepc_wen_o  =  wb_trap_o && !WB_mret_i;
+    assign mepc_wdata_o = wb_excp ? WB_pc_i : WB_pc_i + 4;
+
+    // excp
+    // mstatus_mie  = 0
+    // mstatus_mpie = mie
+    // mret
+    // mstatus_mie  = mpie
+    // mstatus_mpie = 1
+    assign mstatus_mie_set_o   = wb_trap_o && !WB_mret_i;
+    assign mstatus_mie_clear_o = WB_mret_i;
 ```
 

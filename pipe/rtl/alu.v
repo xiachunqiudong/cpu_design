@@ -159,7 +159,7 @@ module alu(
     assign alu_res_o = (op_alu_w | op_alu_imm_w) ? alu_res_w : alu_res;
 
 //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
-// 分支计算计算
+// 分支结果计算
 //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx//
     wire ne  = (|alu_xor_res);
     wire eq  = ~ne;

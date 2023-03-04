@@ -54,7 +54,7 @@ module ifu(
     // 3. bxx
     // pc_next = cnd ? pc + imm : pc + 4
 
-    // 静态分支预测, 向前跳预测为跳, 向后跳预测不跳
+    // 静态分支预测, 往回预测为跳, 反之跳预测不跳
     assign ifu_prdt_taken_o = (branch & imm[63]);
     // 是否跳转
     wire jump;
